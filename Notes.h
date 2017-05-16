@@ -28,36 +28,17 @@ public:
 }
 
 
-class Image : public Note{
+class Image  {
     QString descpt;
     QString fichier;
    public:
-    Image(const QString& i,const QString& t, Date c, Date da,const QString& d, const QString& f)Note(i,,t,c,da),descpt(d),fichier(f){}
+    Image(const QString& i,const QString& t, Date c, Date da,const QString& d, const QString& f)Note(i,t,c,da),descpt(d),fichier(f){}
     QString getDescpt() const {return descpt;}
     QString getFicher() const {return fichier;}
 
 }
 
-class Video : public Note{
-    QString descpt;
-    QString fichier;
-   public:
-    Image(const QString& i,const QString& t, Date c, Date da,const QString& d, const QString& f)Note(i,,t,c,da),descpt(d),fichier(f){}
-    QString getDescpt() const {return descpt;}
-    QString getFicher() const {return fichier;}
 
-}
-class Audio : public Note{
-    QString descpt;
-    QString fichier;
-   public:
-    Image(const QString& i,const QString& t, Date c, Date da,const QString& d, const QString& f)Note(i,,t,c,da),descpt(d),fichier(f){}
-    QString getDescpt() const {return descpt;}
-    QString getFicher() const {return fichier;}
-
-}
-
-    
 
 
 
@@ -65,7 +46,7 @@ class Article : public Note{
 
     QString text;
 public:
-    Article(const QString& i,const QString& t, Date c, Date da,const QString& te):Note(i,,t,c,da),text(te){}
+    Article(const QString& i, const QString& ti, const QString& te);
     QString getText() const { return text; }
     void setText(const QString& t);
 };
@@ -77,7 +58,7 @@ class Tache : public Note {
     int priorite;
     Date echeance;
 public :
-    Tache(const QString& i,const QString& t, Date c, Date da,const QString & i,const QString& a,const QString s,int p, Date e):Note(i,,t,c,da),action(a),statut("en attente"),priorite(p),echeance(e){}
+    Tache(const QString & i,const QString& a,const QString s="attente",int p, Date e):action(a),statut(s),priorite(p),echeance(e){}
     QString getAction()const {return action;}   
     QString getStatus()const {return status;}
     int getPriorite()const {return priorite;}
@@ -114,6 +95,10 @@ private:
     NotesManager(const NotesManager& m);
     NotesManager& operator=(const NotesManager& m);
 public:
+    void addArticle(const QString& i, const QString& ti, const QString& te);
+    void addTache(const QString & i,const QString & t, Date c, date d,const QString & i,const QString& a,const QString s="attente",int p, Date e);
+    void addImage(const QString& i,const QString& t, Date c, Date da,const QString& d, const QString& f);
+    void 
     Note& getNote(const QString& id); // return the article with identificator id (create a new one if it not exists)
     QString getFilename() const { return filename; }
     void setFilename(const QString& f) { filename=f; }
