@@ -22,9 +22,10 @@ class Note {
     Date der_modf;
 public:
     Note(const QString & i,const QString & t, Date c, date d):id(i),title(t),create(c),der_modf(d){}
-    QString getId() const{return id ;}
-    QString getTitle()const {return };
-    QS
+     QString getId() const{return id ;}
+    QString getTitle()const {return title; }
+    QString getDateCreat() const {return creat;}
+    QString getDateDernier() const {return der_modf;}
 }
 
 
@@ -32,7 +33,9 @@ class Image {
     QString descpt;
     QString fichier;
    public:
-    Image(const QString& i,const QString& t,const QString& d, const QString& f);
+    Image(const QString& i,const QString& t, Date c, Date da,const QString& d, const QString& f)Note(i,,t,c,da),descpt(d),fichier(f){}
+    QString getDescpt() const {return descpt;}
+    QString getFicher() const {return fichier;}
 
 }
 
