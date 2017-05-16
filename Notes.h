@@ -28,7 +28,7 @@ public:
 }
 
 
-class Image {
+class Image : public Note{
     QString descpt;
     QString fichier;
    public:
@@ -38,7 +38,26 @@ class Image {
 
 }
 
+class Video : public Note{
+    QString descpt;
+    QString fichier;
+   public:
+    Image(const QString& i,const QString& t, Date c, Date da,const QString& d, const QString& f)Note(i,,t,c,da),descpt(d),fichier(f){}
+    QString getDescpt() const {return descpt;}
+    QString getFicher() const {return fichier;}
 
+}
+class Audio : public Note{
+    QString descpt;
+    QString fichier;
+   public:
+    Image(const QString& i,const QString& t, Date c, Date da,const QString& d, const QString& f)Note(i,,t,c,da),descpt(d),fichier(f){}
+    QString getDescpt() const {return descpt;}
+    QString getFicher() const {return fichier;}
+
+}
+
+    
 
 
 
