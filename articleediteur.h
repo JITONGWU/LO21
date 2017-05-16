@@ -1,4 +1,3 @@
-#if !defined(_NOTES_H)
 #define _NOTES_H
 #include <QString>
 using namespace std;
@@ -79,10 +78,10 @@ public :
 
 class NotesManager {
 private:
-    Article** articles;
-    unsigned int nbArticles;
-    unsigned int nbMaxArticles;
-    void addArticle(Article* a);
+    Note** notes;
+    unsigned int nbNotes;
+    unsigned int nbMaxNotes;
+    void addNotes(Note* a);  //
     mutable QString filename;
     struct Handler {
         NotesManager* instance; // pointeur sur l'unique instance
@@ -94,9 +93,8 @@ private:
     ~NotesManager();
     NotesManager(const NotesManager& m);
     NotesManager& operator=(const NotesManager& m);
-    void addArticle(const QString& i, const QString& ti, const QString& te);
 public:
-    Article& getArticle(const QString& id); // return the article with identificator id (create a new one if it not exists)
+    Note& getNote(const QString& id); // return the article with identificator id (create a new one if it not exists)
     QString getFilename() const { return filename; }
     void setFilename(const QString& f) { filename=f; }
     void load(); // load notes from file filename
@@ -128,7 +126,7 @@ public:
             return Iterator(articles,nbArticles);
         }
 
-        class ConstIterator {
+        class ConstIterator {   //non modifiable
             friend class NotesManager;
             Article** currentA;
             unsigned int nbRemain;
