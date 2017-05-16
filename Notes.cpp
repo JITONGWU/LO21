@@ -20,22 +20,22 @@ void NotesManager::freeManager(){
 
 void NotesManager::addNote(Note* a){
     for(unsigned int i=0; i<nbNotes; i++){
-        if (Notes[i]->getId()==a->getId()) throw NotesException("error, creation of an already existent note");
+        if (notes[i]->getId()==a->getId()) throw NotesException("error, creation of an already existent note");
     }
     if (nbNotes==nbMaxNotes){
         Note** newNotes= new Note*[nbMaxNotes+5];
-        for(unsigned int i=0; i<nbNotes; i++) newNotes[i]=Notes[i];
-        Note** oldNotes=Notes;
-        Notes=newNotes;
+        for(unsigned int i=0; i<nbNotes; i++) newNotes[i]=notes[i];
+        Note** oldNotes=notes;
+        notes=newNotes;
         nbMaxNotes+=5;
         if (oldNotes) delete[] oldNotes;
     }
-    Notes[nbNotes++]=a;
+    notes[nbNotes++]=a;
 }
 
 void NotesManager::addNote(const QString& id, const QString& ti, const QString& te){
     for(unsigned int i=0; i<nbNotes; i++){
-        if (Notes[i]->getId()==id) throw NotesException("Erreur : identificateur d existant");
+        if (notes[i]->getId()==id) throw NotesException("Erreur : identificateur d existant");
     }
     Note* a=new Note(id,ti,te);
     addNote(a);
@@ -69,9 +69,12 @@ void NotesManager::save() const {
     stream.writeStartDocument();
     stream.writeStartElement("notes");
     for(unsigned int i=0; i<nbNotes; i++){
-        stream.writeStartElement("Note");
-        stream.writeTextElement("id",Notes[i]->getId());
-        stream.writeTextElement("title",Notes[i]->getTitle());
+        switch(typeid(*notes[i]).name()):
+        case "Article": 
+                        stream.writeStartElement("Article");
+                        stream.writeTextElement("id",notes[i]->getId());
+                        stream.writeTextElement("title",notes[i]->getTitle());
+                        stream.writeTextElement("date de creation",notes[i]->getDate
         stream.writeTextElement("text",Notes[i]->getText());
         stream.writeEndElement();
     }
