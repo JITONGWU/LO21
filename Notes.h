@@ -1,4 +1,3 @@
-#if !defined(_NOTES_H)
 #define _NOTES_H
 #include <QString>
 using namespace std;
@@ -15,8 +14,6 @@ private:
 };
 
 
-
-
 class Note {
     QString id;
     QString title;
@@ -24,9 +21,10 @@ class Note {
     Date der_modf;
 public:
     Note(const QString & i,const QString & t, Date c, date d):id(i),title(t),create(c),der_modf(d){}
-    QString getId() const{return id ;}
-    QString getTitle()const {return };
-    QS
+     QString getId() const{return id ;}
+    QString getTitle()const {return title; }
+    QString getDateCreat() const {return creat;}
+    QString getDateDernier() const {return der_modf;}
 }
 
 
@@ -34,7 +32,9 @@ class Image {
     QString descpt;
     QString fichier;
    public:
-    Image(const QString& i,const QString& t,const QString& d, const QString& f);
+    Image(const QString& i,const QString& t, Date c, Date da,const QString& d, const QString& f)Note(i,,t,c,da),descpt(d),fichier(f){}
+    QString getDescpt() const {return descpt;}
+    QString getFicher() const {return fichier;}
 
 }
 
@@ -57,14 +57,17 @@ public:
 
 class Tache : public Note {
     QString action;
-    enum {attente,cours,termine} statut=attente;
+    QString status;
     int priorite;
     Date echeance;
 public :
-    Tache(const QString & i,const QString& a,const enum {attente,cours,termine} s,int p, Date e):action(a),statut(s),priorite(p),echeance(e){}
-    QString getAction()const {return action;}
-    
-    
+    Tache(const QString & i,const QString& a,const QString s,int p, Date e):action(a),statut("en attente"),priorite(p),echeance(e){}
+    QString getAction()const {return action;}   
+    QString getStatus()const {return status;}
+    int getPriorite()const {return priorite;}
+    Date getDate_echeance()const{return echeance;}
+    ~Tache();
+
 }
 
 
@@ -75,10 +78,10 @@ public :
 
 class NotesManager {
 private:
-    Article** articles;
-    unsigned int nbArticles;
-    unsigned int nbMaxArticles;
-    void addArticle(Article* a);
+    Note** notes;
+    unsigned int nbNotes;
+    unsigned int nbMaxNotes;
+    void addNotes(Note* a);  //
     mutable QString filename;
     struct Handler {
         NotesManager* instance; // pointeur sur l'unique instance
@@ -90,9 +93,8 @@ private:
     ~NotesManager();
     NotesManager(const NotesManager& m);
     NotesManager& operator=(const NotesManager& m);
-    void addArticle(const QString& i, const QString& ti, const QString& te);
 public:
-    Article& getArticle(const QString& id); // return the article with identificator id (create a new one if it not exists)
+    Note& getNote(const QString& id); // return the article with identificator id (create a new one if it not exists)
     QString getFilename() const { return filename; }
     void setFilename(const QString& f) { filename=f; }
     void load(); // load notes from file filename
@@ -124,7 +126,7 @@ public:
             return Iterator(articles,nbArticles);
         }
 
-        class ConstIterator {
+        class ConstIterator {   //non modifiable
             friend class NotesManager;
             Article** currentA;
             unsigned int nbRemain;
