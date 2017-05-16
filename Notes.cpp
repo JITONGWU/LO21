@@ -5,17 +5,6 @@
 #include <QMessageBox>
 #include "time.h"
 
-Article::Article(const QString& i, const QString& ti, const QString& te):
-    id(i),title(ti),text(te)
-{}
-
-void Article::setTitle(const QString& t) {
-    title=t;
-}
-
-void Article::setText(const QString& t) {
-    text=t;
-}
 
 NotesManager::Handler NotesManager::handler=Handler();
 
@@ -29,46 +18,46 @@ void NotesManager::freeManager(){
     handler.instance=nullptr;
 }
 
-void NotesManager::addArticle(Article* a){
-    for(unsigned int i=0; i<nbArticles; i++){
-        if (articles[i]->getId()==a->getId()) throw NotesException("error, creation of an already existent note");
+void NotesManager::addNote(Note* a){
+    for(unsigned int i=0; i<nbNotes; i++){
+        if (Notes[i]->getId()==a->getId()) throw NotesException("error, creation of an already existent note");
     }
-    if (nbArticles==nbMaxArticles){
-        Article** newArticles= new Article*[nbMaxArticles+5];
-        for(unsigned int i=0; i<nbArticles; i++) newArticles[i]=articles[i];
-        Article** oldArticles=articles;
-        articles=newArticles;
-        nbMaxArticles+=5;
-        if (oldArticles) delete[] oldArticles;
+    if (nbNotes==nbMaxNotes){
+        Note** newNotes= new Note*[nbMaxNotes+5];
+        for(unsigned int i=0; i<nbNotes; i++) newNotes[i]=Notes[i];
+        Note** oldNotes=Notes;
+        Notes=newNotes;
+        nbMaxNotes+=5;
+        if (oldNotes) delete[] oldNotes;
     }
-    articles[nbArticles++]=a;
+    Notes[nbNotes++]=a;
 }
 
-void NotesManager::addArticle(const QString& id, const QString& ti, const QString& te){
-    for(unsigned int i=0; i<nbArticles; i++){
-        if (articles[i]->getId()==id) throw NotesException("Erreur : identificateur d existant");
+void NotesManager::addNote(const QString& id, const QString& ti, const QString& te){
+    for(unsigned int i=0; i<nbNotes; i++){
+        if (Notes[i]->getId()==id) throw NotesException("Erreur : identificateur d existant");
     }
-    Article* a=new Article(id,ti,te);
-    addArticle(a);
+    Note* a=new Note(id,ti,te);
+    addNote(a);
 }
 
-Article& NotesManager::getArticle(const QString& id){
-    // si l'article existe d, on en renvoie une rrence
-    for(unsigned int i=0; i<nbArticles; i++){
-        if (articles[i]->getId()==id) return *articles[i];
+Note& NotesManager::getNote(const QString& id){
+    // si l'Note existe d, on en renvoie une rrence
+    for(unsigned int i=0; i<nbNotes; i++){
+        if (Notes[i]->getId()==id) return *Notes[i];
     }
     // sinon il est cr
-    Article* a=new Article(id,"","");
-    addArticle(a);
+    Note* a=new Note(id,"","");
+    addNote(a);
     return *a;
 }
 
-NotesManager::NotesManager():articles(nullptr),nbArticles(0),nbMaxArticles(0),filename(""){}
+NotesManager::NotesManager():Notes(nullptr),nbNotes(0),nbMaxNotes(0),filename(""){}
 
 NotesManager::~NotesManager(){
     if (filename!="") save();
-    for(unsigned int i=0; i<nbArticles; i++) delete articles[i];
-    delete[] articles;
+    for(unsigned int i=0; i<nbNotes; i++) delete Notes[i];
+    delete[] Notes;
 }
 
 void NotesManager::save() const {
@@ -79,11 +68,11 @@ void NotesManager::save() const {
     stream.setAutoFormatting(true);
     stream.writeStartDocument();
     stream.writeStartElement("notes");
-    for(unsigned int i=0; i<nbArticles; i++){
-        stream.writeStartElement("article");
-        stream.writeTextElement("id",articles[i]->getId());
-        stream.writeTextElement("title",articles[i]->getTitle());
-        stream.writeTextElement("text",articles[i]->getText());
+    for(unsigned int i=0; i<nbNotes; i++){
+        stream.writeStartElement("Note");
+        stream.writeTextElement("id",Notes[i]->getId());
+        stream.writeTextElement("title",Notes[i]->getTitle());
+        stream.writeTextElement("text",Notes[i]->getText());
         stream.writeEndElement();
     }
     stream.writeEndElement();
@@ -111,16 +100,16 @@ void NotesManager::load() {
             // If it's named taches, we'll go to the next.
             if(xml.name() == "notes") continue;
             // If it's named tache, we'll dig the information from there.
-            if(xml.name() == "article") {
-                qDebug()<<"new article\n";
+            if(xml.name() == "Note") {
+                qDebug()<<"new Note\n";
                 QString identificateur;
                 QString titre;
                 QString text;
                 QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
                 //We're going to loop over the things because the order might change.
-                //We'll continue the loop until we hit an EndElement named article.
-                while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "article")) {
+                //We'll continue the loop until we hit an EndElement named Note.
+                while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Note")) {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
                         if(xml.name() == "id") {
@@ -144,7 +133,7 @@ void NotesManager::load() {
                     xml.readNext();
                 }
                 qDebug()<<"ajout note "<<identificateur<<"\n";
-                addArticle(identificateur,titre,text);
+                addNote(identificateur,titre,text);
             }
         }
     }
@@ -156,3 +145,4 @@ void NotesManager::load() {
     xml.clear();
     qDebug()<<"fin load\n";
 }
+
