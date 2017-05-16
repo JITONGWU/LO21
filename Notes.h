@@ -23,8 +23,8 @@ public:
     Note(const QString & i,const QString & t, Date c, date d):id(i),title(t),create(c),der_modf(d){}
      QString getId() const{return id ;}
     QString getTitle()const {return title; }
-    QString getDateCreat() const {return creat;}
-    QString getDateDernier() const {return der_modf;}
+    Date getDateCreat() const {return creat;}
+    Date getDateDernier() const {return der_modf;}
 }
 
 
