@@ -46,7 +46,7 @@ class Article : public Note{
 
     QString text;
 public:
-    Article(const QString& i, const QString& ti, const QString& te);
+    Article(const QString& i,const QString& t, Date c, Date da,const QString& te):Note(i,,t,c,da),text(te){}
     QString getText() const { return text; }
     void setText(const QString& t);
 };
@@ -58,7 +58,7 @@ class Tache : public Note {
     int priorite;
     Date echeance;
 public :
-    Tache(const QString & i,const QString& a,const QString s,int p, Date e):action(a),statut("en attente"),priorite(p),echeance(e){}
+    Tache(const QString& i,const QString& t, Date c, Date da,const QString & i,const QString& a,const QString s,int p, Date e):Note(i,,t,c,da),action(a),statut("en attente"),priorite(p),echeance(e){}
     QString getAction()const {return action;}   
     QString getStatus()const {return status;}
     int getPriorite()const {return priorite;}
