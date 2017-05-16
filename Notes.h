@@ -47,10 +47,7 @@ class Article : public Note{
     QString text;
 public:
     Article(const QString& i, const QString& ti, const QString& te);
-    QString getId() const { return id; }
-    QString getTitle() const { return title; }
     QString getText() const { return text; }
-    void setTitle(const QString& t);
     void setText(const QString& t);
 };
 
@@ -66,6 +63,10 @@ public :
     QString getStatus()const {return status;}
     int getPriorite()const {return priorite;}
     Date getDate_echeance()const{return echeance;}
+    void setAction(const QString& s){action=s;}
+    void setStatus(const QString& s){action=s;}
+    void setPriorite(const int p){priorite=p;}
+    void setDate(const date e){echeance=d;}
     ~Tache();
 
 }
