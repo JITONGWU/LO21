@@ -15,8 +15,6 @@ private:
 };
 
 
-
-
 class Note {
     QString id;
     QString title;
@@ -57,14 +55,17 @@ public:
 
 class Tache : public Note {
     QString action;
-    enum {attente,cours,termine} statut=attente;
+    QString status;
     int priorite;
     Date echeance;
 public :
-    Tache(const QString & i,const QString& a,const enum {attente,cours,termine} s,int p, Date e):action(a),statut(s),priorite(p),echeance(e){}
-    QString getAction()const {return action;}
-    
-    
+    Tache(const QString & i,const QString& a,const QString s,int p, Date e):action(a),statut("en attente"),priorite(p),echeance(e){}
+    QString getAction()const {return action;}   
+    QString getStatus()const {return status;}
+    int getPriorite()const {return priorite;}
+    Date getDate_echeance()const{return echeance;}
+    ~Tache();
+
 }
 
 
