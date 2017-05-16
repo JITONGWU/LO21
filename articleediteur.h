@@ -1,153 +1,50 @@
-#define _NOTES_H
-#include <QString>
-using namespace std;
+#ifndef ARTICLEEDITEUR
+#define ARTICLEEDITEUR
 
-class Article;
-class NotesManager;
+#include <QApplication>
+#include <QWidget>
+#include <QLabel>
+#include <QLineEdit>
+#include <QTextEdit>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QFileDialog>
+#include <QObject>
+#include "Notes.h"
+class ArticleEditeur: public QWidget
+{
+    Q_OBJECT     //macro pour pouvoir utiliser les signals et les slots
 
-class NotesException{
+    QLineEdit *id;
+    QLineEdit *titre;
+    QTextEdit *text;
+
+    QLabel *id1;
+    QLabel *titre1;
+    QLabel *text1;
+
+    QPushButton *save;
+    QHBoxLayout *cid;
+    QHBoxLayout *ctitre;
+    QHBoxLayout *ctext;
+    QVBoxLayout *couche;
+
+    Article *article; //pointeur vers l'article à afficher par la fenetre
+
 public:
-    NotesException(const QString& message):info(message){}
-    QString getInfo() const { return info; }
-private:
-    QString info;
+    explicit ArticleEditeur (Article& article,QWidget *parent=0);
+    //explicit pour empêcher la conversion implicite de article vers Article
+
+signals:
+private slots:
+    void activerSave(QString ="");
+    //la valeur par défaut c'est pour pouvoir la connecter avec deux signals
+    //l'un avec un parametre qstring et l'autre sans parametre
+public slots:
+    void saveArticle();
+
+
 };
 
-
-class Note {
-    QString id;
-    QString title;
-    Date creat;
-    Date der_modf;
-public:
-    Note(const QString & i,const QString & t, Date c, date d):id(i),title(t),create(c),der_modf(d){}
-     QString getId() const{return id ;}
-    QString getTitle()const {return title; }
-    QString getDateCreat() const {return creat;}
-    QString getDateDernier() const {return der_modf;}
-}
-
-
-class Image {
-    QString descpt;
-    QString fichier;
-   public:
-    Image(const QString& i,const QString& t, Date c, Date da,const QString& d, const QString& f)Note(i,,t,c,da),descpt(d),fichier(f){}
-    QString getDescpt() const {return descpt;}
-    QString getFicher() const {return fichier;}
-
-}
-
-
-
-
-
-class Article : public Note{
-
-    QString text;
-public:
-    Article(const QString& i, const QString& ti, const QString& te);
-    QString getId() const { return id; }
-    QString getTitle() const { return title; }
-    QString getText() const { return text; }
-    void setTitle(const QString& t);
-    void setText(const QString& t);
-};
-
-
-class Tache : public Note {
-    QString action;
-    QString status;
-    int priorite;
-    Date echeance;
-public :
-    Tache(const QString & i,const QString& a,const QString s,int p, Date e):action(a),statut("en attente"),priorite(p),echeance(e){}
-    QString getAction()const {return action;}   
-    QString getStatus()const {return status;}
-    int getPriorite()const {return priorite;}
-    Date getDate_echeance()const{return echeance;}
-    ~Tache();
-
-}
-
-
-
-
-
-
-
-class NotesManager {
-private:
-    Note** notes;
-    unsigned int nbNotes;
-    unsigned int nbMaxNotes;
-    void addNotes(Note* a);  //
-    mutable QString filename;
-    struct Handler {
-        NotesManager* instance; // pointeur sur l'unique instance
-        Handler():instance(nullptr){}
-        ~Handler() { delete instance; }
-    };
-    static Handler handler;
-    NotesManager();
-    ~NotesManager();
-    NotesManager(const NotesManager& m);
-    NotesManager& operator=(const NotesManager& m);
-public:
-    Note& getNote(const QString& id); // return the article with identificator id (create a new one if it not exists)
-    QString getFilename() const { return filename; }
-    void setFilename(const QString& f) { filename=f; }
-    void load(); // load notes from file filename
-    void save() const; // save notes in file filename
-    static NotesManager& getManager();
-    static void freeManager(); // free the memory used by the NotesManager; it can be rebuild later
-
-    class Iterator {
-            friend class NotesManager;
-            Article** currentA;
-            unsigned int nbRemain;
-            Iterator(Article** a, unsigned nb):currentA(a),nbRemain(nb){}
-        public:
-            Iterator():currentA(nullptr),nbRemain(0){}
-            bool isDone() const { return nbRemain==0; }
-            void next() {
-                if (isDone())
-                    throw NotesException("error, next on an iterator which is done");
-                nbRemain--;
-                currentA++;
-            }
-            Article& current() const {
-                if (isDone())
-                    throw NotesException("error, indirection on an iterator which is done");
-                return **currentA;
-            }
-        };
-        Iterator getIterator() {
-            return Iterator(articles,nbArticles);
-        }
-
-        class ConstIterator {   //non modifiable
-            friend class NotesManager;
-            Article** currentA;
-            unsigned int nbRemain;
-            ConstIterator(Article** a, unsigned nb):currentA(a),nbRemain(nb){}
-        public:
-            ConstIterator():nbRemain(0),currentA(0){}
-            bool isDone() const { return nbRemain==0; }
-            void next() {
-                if (isDone())
-                    throw NotesException("error, next on an iterator which is done");
-                nbRemain--;
-                currentA++;
-            }
-            const Article& current() const {
-                if (isDone())
-                    throw NotesException("error, indirection on an iterator which is done");
-                return **currentA;
-            }
-        };
-        ConstIterator getIterator() const {
-            return ConstIterator(articles,nbArticles);
-        }
-};
-#endif
+#endif // ARTICLEEDITEUR
