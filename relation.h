@@ -36,7 +36,8 @@ public:
     };
     static Handler handler;
 };
-
+class Reference:public Relation{
+};
 class ReManager{
     Relation** relations;
     unsigned int nbRe;
