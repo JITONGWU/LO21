@@ -36,7 +36,11 @@ public:
     };
     static Handler handler;
 };
-class Reference:public Relation{
+class Reference:public Relation{ // orient == true par défaut 
+public:
+    void addCouple(Couple* c);
+    void addCouple(Note** x,Note** y);    
+    
 };
 class ReManager{
     Relation** relations;
