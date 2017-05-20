@@ -19,6 +19,8 @@ class Note {
     QString title;
     Date creat;
     Date der_modf;
+    enum {C,N,A} emplacement;
+    friend class Suppression;
 public:
     Note(const QString & i,const QString & t, Date c, date d):id(i),title(t),create(c),der_modf(d){}
      QString getId() const{return id ;}
