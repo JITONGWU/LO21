@@ -142,6 +142,7 @@ private:
     void addAudio(const QString& i,const QString& t, Date c, Date d,const QString& des, const QString& f,const QString& aud);
     void addVideo(const QString& i,const QString& t, Date c, Date d,const QString& des, const QString& f,const QString& vid);
 public:
+     //Note* at(int i)const{return notes.at(i);}  //utiliser avec QList
     Note& getNote(const QString& id); // return the article with identificator id
     void setFilename(const QString& f) { filename=f; }
     void load(); // load notes from file filename
