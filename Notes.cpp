@@ -3,7 +3,7 @@
 #include <QTextCodec>
 #include <QtXml>
 #include <QMessageBox>
-#include "time.h"
+
 
 
 NotesManager::Handler NotesManager::handler=Handler();
@@ -32,30 +32,60 @@ void NotesManager::addNote(Note* a){
     }
     notes[nbNotes++]=a;
 }
-
-void NotesManager::addNote(const QString& id, const QString& ti, const QString& te){
+//utiliser template pour simplifier???
+void NotesManager::addTache(const QString & id,const QString & t, Date c, Date d,const QString& a,int p, Date e,enum Status s=en_attente)
+{
     for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==id) throw NotesException("Erreur : identificateur d existant");
+        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
     }
-    Note* a=new Note(id,ti,te);
+    Tache* t=new Tache(id,t,c,d,a,p,e,s);
+    addNote(t);
+}
+void NotesManager::addArticle(const QString & id,const QString & t, Date c, Date d,const QString& te)
+{
+    for(unsigned int i=0; i<nbNotes; i++){
+        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
+    }
+    Article* a=new Article(id,t,c,d,te);
     addNote(a);
 }
-
+void NotesManager::addImage(const QString& id,const QString& t, Date c, Date d,const QString& des, const QString& f,int i=3)
+{
+    for(unsigned int i=0; i<nbNotes; i++){
+        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
+    }
+    Image* im=new Image(id,t,c,d,des,f,i);
+    addNote(im);
+}
+void NotesManager::addAudio(const QString& id,const QString& t, Date c, Date d,const QString& des, const QString& f,const QString& aud)
+{
+    for(unsigned int i=0; i<nbNotes; i++){
+        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
+    }
+    Audio* t=new Audio(id,t,c,d,des,f,aud);
+    addNote(t);
+}
+void NotesManager::addVideo(const QString& id,const QString& t, Date c, Date d,const QString& d, const QString& f,const QString& vid)
+{
+    for(unsigned int i=0; i<nbNotes; i++){
+        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
+    }
+    Video* t=new Video(id,t,c,d,d,f,vid);
+    addNote(t);
+}
 Note& NotesManager::getNote(const QString& id){
     // si l'Note existe d, on en renvoie une rrence
     for(unsigned int i=0; i<nbNotes; i++){
         if (Notes[i]->getId()==id) return *Notes[i];
     }
-    // sinon il est cr
-    Note* a=new Note(id,"","");
-    addNote(a);
-    return *a;
+
+    throw NotesException("error, échoué de trouver ce note");
 }
 
 NotesManager::NotesManager():Notes(nullptr),nbNotes(0),nbMaxNotes(0),filename(""){}
 
 NotesManager::~NotesManager(){
-    if (filename!="") save();
+    if (filename!="") save();//
     for(unsigned int i=0; i<nbNotes; i++) delete Notes[i];
     delete[] Notes;
 }
@@ -68,16 +98,13 @@ void NotesManager::save() const {
     stream.setAutoFormatting(true);
     stream.writeStartDocument();
     stream.writeStartElement("notes");
-    for(unsigned int i=0; i<nbNotes; i++){
-        switch(typeid(*notes[i]).name()):
-        case "Article": 
                         stream.writeStartElement("Article");
                         stream.writeTextElement("id",notes[i]->getId());
                         stream.writeTextElement("title",notes[i]->getTitle());
-                        stream.writeTextElement("date de creation",notes[i]->getDate
+                        stream.writeTextElement("date de creation",notes[i]->getDate());
         stream.writeTextElement("text",Notes[i]->getText());
         stream.writeEndElement();
-    }
+
     stream.writeEndElement();
     stream.writeEndDocument();
     newfile.close();
