@@ -2,7 +2,7 @@
 #include <QString>
 #include <QDate> // remplir time.h ???
 #include <iostream>
-
+#include <Qlist> // remplir tableau de pointeur???
 using namespace std;
 #include "time.h"
 
@@ -119,7 +119,7 @@ class Image : public Note {
 
 class NotesManager {
 private:
-    Note** notes;
+    Note** notes;  //QList<Note*> notes;
     unsigned int nbNotes;
     unsigned int nbMaxNotes;
     void addNote(Note* n);  // sauvegarder version ancienne
