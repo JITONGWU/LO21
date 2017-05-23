@@ -1,8 +1,4 @@
 #include "Notes.h"
-#include <QFile>
-#include <QTextCodec>
-#include <QtXml>
-#include <QMessageBox>
 
 
 
@@ -33,7 +29,7 @@ void NotesManager::addNote(Note* a){
     notes[nbNotes++]=a;
 }
 //utiliser template pour simplifier???
-void NotesManager::addTache(const QString & id,const QString & t, Date c, Date d,const QString& a,int p, Date e,enum Status s=en_attente)
+void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate d,const QString& a,int p, QDate e,enum Status s=en_attente)
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
@@ -41,7 +37,7 @@ void NotesManager::addTache(const QString & id,const QString & t, Date c, Date d
     Tache* t=new Tache(id,t,c,d,a,p,e,s);
     addNote(t);
 }
-void NotesManager::addArticle(const QString & id,const QString & t, Date c, Date d,const QString& te)
+void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDate d,const QString& te)
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
@@ -49,7 +45,7 @@ void NotesManager::addArticle(const QString & id,const QString & t, Date c, Date
     Article* a=new Article(id,t,c,d,te);
     addNote(a);
 }
-void NotesManager::addImage(const QString& id,const QString& t, Date c, Date d,const QString& des, const QString& f,int i=3)
+void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d,const QString& des, const QString& f,int i=3)
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
@@ -57,7 +53,7 @@ void NotesManager::addImage(const QString& id,const QString& t, Date c, Date d,c
     Image* im=new Image(id,t,c,d,des,f,i);
     addNote(im);
 }
-void NotesManager::addAudio(const QString& id,const QString& t, Date c, Date d,const QString& des, const QString& f,const QString& aud)
+void NotesManager::addAudio(const QString& id,const QString& t, QDate c, QDate d,const QString& des, const QString& f,const QString& aud)
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
@@ -65,7 +61,7 @@ void NotesManager::addAudio(const QString& id,const QString& t, Date c, Date d,c
     Audio* t=new Audio(id,t,c,d,des,f,aud);
     addNote(t);
 }
-void NotesManager::addVideo(const QString& id,const QString& t, Date c, Date d,const QString& d, const QString& f,const QString& vid)
+void NotesManager::addVideo(const QString& id,const QString& t, QDate c, QDate d,const QString& d, const QString& f,const QString& vid)
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
