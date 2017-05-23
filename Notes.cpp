@@ -94,13 +94,58 @@ void NotesManager::save() const {
     stream.setAutoFormatting(true);
     stream.writeStartDocument();
     stream.writeStartElement("notes");
-                        stream.writeStartElement("Article");
+       for(unsigned int i=0; i<nbArticles; i++){
+       int type=notes[i]->type();
+       switch(type){
+           case 2:      { stream.writeStartElement("Article");
                         stream.writeTextElement("id",notes[i]->getId());
                         stream.writeTextElement("title",notes[i]->getTitle());
-                        stream.writeTextElement("date de creation",notes[i]->getDate());
-        stream.writeTextElement("text",Notes[i]->getText());
-        stream.writeEndElement();
+                        stream.writeTextElement("date de creation",notes[i]->getDateCreat().toString(dd.MM.yyyy));
+                        stream.writeTextElement("date de update",notes[i]->getDateDernier().toString(dd.MM.yyyy));
+                        stream.writeTextElement("text",Notes[i]->getText());
+                        stream.writeEndElement();} break;
+           case 1:     {stream.writeStartElement("Tache");
+                        stream.writeTextElement("id",notes[i]->getId());
+                        stream.writeTextElement("title",notes[i]->getTitle());
+                        stream.writeTextElement("date de creation",notes[i]->getDateCreat());
+                        stream.writeTextElement("date de update",notes[i]->getDateDernier());
+                        stream.writeTextElement("action",Notes[i]->getAction());
+                        stream.writeTextElement("status",Notes[i]->getStatus());
+                        stream.writeTextElement("priority",Notes[i]->getPriority());
+                        stream.writeTextElement("echeance",Notes[i]->getExpDate().toString(dd.MM.yyyy));
+                        stream.writeEndElement();}break;
+           case 3:     {stream.writeStartElement("Image");
+                        stream.writeTextElement("id",notes[i]->getId());
+                        stream.writeTextElement("title",notes[i]->getTitle());
+                        stream.writeTextElement("date de creation",notes[i]->getDateCreat().toString(dd.MM.yyyy));
+                        stream.writeTextElement("date de update",notes[i]->getDateDernier().toString(dd.MM.yyyy));
+                        stream.writeTextElement("descp",Notes[i]->getDescpt());
+                        stream.writeTextElement("ficher",Notes[i]->getFicher());
+                        stream.writeEndElement();}break;
 
+           case 4:     {stream.writeStartElement("Audio");
+                        stream.writeTextElement("id",notes[i]->getId());
+                        stream.writeTextElement("title",notes[i]->getTitle());
+                        stream.writeTextElement("date de creation",notes[i]->getDateCreat().toString(dd.MM.yyyy));
+                        stream.writeTextElement("date de update",notes[i]->getDateDernier().toString(dd.MM.yyyy));
+                        stream.writeTextElement("descp",Notes[i]->getDescpt());
+                        stream.writeTextElement("ficher",Notes[i]->getFicher());
+                        stream.writeTextElement("A_ficher",Notes[i]->getAFile());
+                        stream.writeEndElement();}break;
+           case 5:     {stream.writeStartElement("Video");
+                        stream.writeTextElement("id",notes[i]->getId());
+                        stream.writeTextElement("title",notes[i]->getTitle());
+                        stream.writeTextElement("date de creation",notes[i]->getDateCreat().toString(dd.MM.yyyy));
+                        stream.writeTextElement("date de update",notes[i]->getDateDernier().toString(dd.MM.yyyy));
+                        stream.writeTextElement("descp",Notes[i]->getDescpt());
+                        stream.writeTextElement("ficher",Notes[i]->getFicher());
+                        stream.writeTextElement("V_ficher",Notes[i]->getVFile());
+                        stream.writeEndElement();}break;
+
+
+
+
+       }}
     stream.writeEndElement();
     stream.writeEndDocument();
     newfile.close();
@@ -126,40 +171,249 @@ void NotesManager::load() {
             // If it's named taches, we'll go to the next.
             if(xml.name() == "notes") continue;
             // If it's named tache, we'll dig the information from there.
-            if(xml.name() == "Note") {
-                qDebug()<<"new Note\n";
+            if(xml.name() == "article")
+
+            QString typename=xml.name();
+            switch(typename){
+
+
+            case "Article": {
+                qDebug()<<"new article\n";
                 QString identificateur;
                 QString titre;
                 QString text;
+                QDate creat;
+                QDate der_modif;
                 QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
                 //We're going to loop over the things because the order might change.
-                //We'll continue the loop until we hit an EndElement named Note.
-                while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Note")) {
+                //We'll continue the loop until we hit an EndElement named article.
+                while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Article")) {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
                         if(xml.name() == "id") {
-                            xml.readNext(); identificateur=xml.text().toString();
-                            qDebug()<<"id="<<identificateur<<"\n";
+                            xml.readNext(); identificateur=xml.text().toString();                            
                         }
 
                         // We've found titre.
                         if(xml.name() == "title") {
-                            xml.readNext(); titre=xml.text().toString();
-                            qDebug()<<"titre="<<titre<<"\n";
+                            xml.readNext(); titre=xml.text().toString();                            
                         }
-                        // We've found text
-                        if(xml.name() == "text") {
+                        if(xml.name() == "date de creation") {
+                            xml.readNext(); creat=creat.fromString(xml.text().toString(),dd.MM.yyyy);                         
+                        }
+                        if(xml.name() == "date de update") {
+                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),dd.MM.yyyy);                            
+                        }                      
+                      if(xml.name() == "text") {
                             xml.readNext();
-                            text=xml.text().toString();
-                            qDebug()<<"text="<<text<<"\n";
+                            text=xml.text().toString();                            
                         }
-                    }
-                    // ...and next...
+                    }                    
                     xml.readNext();
                 }
-                qDebug()<<"ajout note "<<identificateur<<"\n";
-                addNote(identificateur,titre,text);
+                
+                addArticle(identificateur,titre,creat,der_modif,text);
+            } break;
+            case "Tache":{
+                qDebug()<<"new article\n";
+                QString identificateur;
+                QString titre;                
+                QDate creat;
+                QDate der_modif;
+                QString action;
+                int priorite;
+                QDate echeance;
+                QString status;
+                QXmlStreamAttributes attributes = xml.attributes();
+                xml.readNext();
+                //We're going to loop over the things because the order might change.
+                //We'll continue the loop until we hit an EndElement named article.
+                while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Article")) {
+                    if(xml.tokenType() == QXmlStreamReader::StartElement) {
+                        // We've found identificteur.
+                        if(xml.name() == "id") {
+                            xml.readNext(); identificateur=xml.text().toString();                            
+                        }
+
+                        // We've found titre.
+                        if(xml.name() == "title") {
+                            xml.readNext(); titre=xml.text().toString();                            
+                        }
+                        if(xml.name() == "date de creation") {
+                            xml.readNext(); creat=creat.fromString(xml.text().toString(),dd.MM.yyyy);                         
+                        }
+                        if(xml.name() == "date de update") {
+                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),dd.MM.yyyy);                            
+                        }                      
+                      if(xml.name() == "action") {
+                            xml.readNext();
+                            action=xml.text().toString();                            
+                        }
+                      if(xml.name() == "priorite") {
+                            xml.readNext();
+                            priorite=xml.text().toString();                            
+                        }
+                      if(xml.name() == "echeance") {
+                            xml.readNext();
+                            echeance=echeance.fromString(xml.text().toString(),dd.MM.yyyy);                            
+                        }
+                      if(xml.name() == "status") {
+                            xml.readNext();
+                            status=xml.text().toString();                            
+                        }
+                    }                    
+                    xml.readNext();
+                }
+                
+                addArticle(identificateur,titre,creat,der_modif,action,priorite,echeance,status);
+            } break;
+            case "Image" :{
+                qDebug()<<"new article\n";
+                QString identificateur;
+                QString titre;
+                
+                QDate creat;
+                QDate der_modif;
+                QString desc;
+                QString file;
+                QXmlStreamAttributes attributes = xml.attributes();
+                xml.readNext();
+                //We're going to loop over the things because the order might change.
+                //We'll continue the loop until we hit an EndElement named article.
+                while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Article")) {
+                    if(xml.tokenType() == QXmlStreamReader::StartElement) {
+                        // We've found identificteur.
+                        if(xml.name() == "id") {
+                            xml.readNext(); identificateur=xml.text().toString();                            
+                        }
+
+                        // We've found titre.
+                        if(xml.name() == "title") {
+                            xml.readNext(); titre=xml.text().toString();                            
+                        }
+                        if(xml.name() == "date de creation") {
+                            xml.readNext(); creat=creat.fromString(xml.text().toString(),dd.MM.yyyy);                         
+                        }
+                        if(xml.name() == "date de update") {
+                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),dd.MM.yyyy);                            
+                        }                      
+                      if(xml.name() == "descp") {
+                            xml.readNext();
+                            desc=xml.text().toString();                            
+                        }
+                      if(xml.name() == "ficher") {
+                            xml.readNext();
+                            file=xml.text().toString();                            
+                        }
+                    }                    
+                    xml.readNext();
+                }
+                
+                addArticle(identificateur,titre,creat,der_modif,desc,file);
+            } break;
+            case "Audio" :{
+                qDebug()<<"new article\n";
+                QString identificateur;
+                QString titre;
+                
+                QDate creat;
+                QDate der_modif;
+                QString desc;
+                QString file;
+                QString afile;
+                QXmlStreamAttributes attributes = xml.attributes();
+                xml.readNext();
+                //We're going to loop over the things because the order might change.
+                //We'll continue the loop until we hit an EndElement named article.
+                while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Article")) {
+                    if(xml.tokenType() == QXmlStreamReader::StartElement) {
+                        // We've found identificteur.
+                        if(xml.name() == "id") {
+                            xml.readNext(); identificateur=xml.text().toString();                            
+                        }
+
+                        // We've found titre.
+                        if(xml.name() == "title") {
+                            xml.readNext(); titre=xml.text().toString();                            
+                        }
+                        if(xml.name() == "date de creation") {
+                            xml.readNext(); creat=creat.fromString(xml.text().toString(),dd.MM.yyyy);                         
+                        }
+                        if(xml.name() == "date de update") {
+                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),dd.MM.yyyy);                            
+                        }                      
+                      if(xml.name() == "descp") {
+                            xml.readNext();
+                            desc=xml.text().toString();                            
+                        }
+                      if(xml.name() == "ficher") {
+                            xml.readNext();
+                            file=xml.text().toString();                            
+                        }
+                      if(xml.name() == "A_ficher") {
+                            xml.readNext();
+                            afile=xml.text().toString();                            
+                        }
+                    }                    
+                    xml.readNext();
+                }
+                
+                addArticle(identificateur,titre,creat,der_modif,desc,file,afile);
+            } break;
+                
+            case "Video" :{
+                qDebug()<<"new article\n";
+                QString identificateur;
+                QString titre;
+                
+                QDate creat;
+                QDate der_modif;
+                QString desc;
+                QString file;
+                QString vfile;
+                QXmlStreamAttributes attributes = xml.attributes();
+                xml.readNext();
+                //We're going to loop over the things because the order might change.
+                //We'll continue the loop until we hit an EndElement named article.
+                while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Article")) {
+                    if(xml.tokenType() == QXmlStreamReader::StartElement) {
+                        // We've found identificteur.
+                        if(xml.name() == "id") {
+                            xml.readNext(); identificateur=xml.text().toString();                            
+                        }
+
+                        // We've found titre.
+                        if(xml.name() == "title") {
+                            xml.readNext(); titre=xml.text().toString();                            
+                        }
+                        if(xml.name() == "date de creation") {
+                            xml.readNext(); creat=creat.fromString(xml.text().toString(),dd.MM.yyyy);                         
+                        }
+                        if(xml.name() == "date de update") {
+                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),dd.MM.yyyy);                            
+                        }                      
+                      if(xml.name() == "descp") {
+                            xml.readNext();
+                            desc=xml.text().toString();                            
+                        }
+                      if(xml.name() == "ficher") {
+                            xml.readNext();
+                            file=xml.text().toString();                            
+                        }
+                      if(xml.name() == "V_ficher") {
+                            xml.readNext();
+                            vfile=xml.text().toString();                            
+                        }
+                    }                    
+                    xml.readNext();
+                }
+                
+                addArticle(identificateur,titre,creat,der_modif,desc,file,vfile);
+            } break;
+
+
+
             }
         }
     }
@@ -171,4 +425,3 @@ void NotesManager::load() {
     xml.clear();
     qDebug()<<"fin load\n";
 }
-
