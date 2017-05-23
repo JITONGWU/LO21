@@ -43,9 +43,9 @@ public:
 enum Status {en_attente,en_cours,terminee};
 class Tache : public Note {
     QString action;
-    int priorite;
+    QString priorite;
     QDate echeance;
-    Status status;
+    QString status;
 public :
     Tache(const QString & i,const QString & t, QDate c, QDate d,const QString& a,int p, QDate e,enum Status s=en_attente):
         Note(i,t,c,d),action(a),priorite(p),echeance(e),status(s){}
