@@ -4,7 +4,7 @@
 #include <iostream>
 #include <Qlist> // remplir tableau de pointeur???
 using namespace std;
-#include "time.h"
+
 
 
 class NotesException{
