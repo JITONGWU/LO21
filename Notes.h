@@ -1,6 +1,6 @@
 #define _NOTES_H
 #include <QString>
-#include <QDate> // remplir time.h ???
+#include <QDate>
 #include <iostream>
 #include <Qlist> // remplir tableau de pointeur???
 using namespace std;
@@ -19,18 +19,18 @@ enum Emplacement{C,N,A} ;
 class Note {
     QString id;
     QString title;
-    Date creat;
-    Date der_modif;
+    QDate creat;
+    QDate der_modif;
     Emplacement emplacement;
     friend class Suppression;
 
 public:
-    Note(const QString & i,const QString & t, Date c, Date d):
+    Note(const QString & i,const QString & t, QDate c, QDate d):
         id(i),title(t),creat(c),der_modif(d){}
     QString getId() const{return id ;}
     QString getTitle()const {return title; }
-    Date getDateCreat() const {return creat;}
-    Date getDateDernier() const {return der_modif;}
+    QDate getDateCreat() const {return creat;}
+    QDate getDateDernier() const {return der_modif;}
     void setTitle(const QString& t){title=t;}
     void setDateCreat();//ajouter
     void setDateDerModif();//modifier
@@ -44,19 +44,19 @@ enum Status {en_attente,en_cours,terminee};
 class Tache : public Note {
     QString action;
     int priorite;
-    Date echeance;
+    QDate echeance;
     Status status;
 public :
-    Tache(const QString & i,const QString & t, Date c, Date d,const QString& a,int p, Date e,enum Status s=en_attente):
+    Tache(const QString & i,const QString & t, QDate c, QDate d,const QString& a,int p, QDate e,enum Status s=en_attente):
         Note(i,t,c,d),action(a),priorite(p),echeance(e),status(s){}
     QString getAction()const {return action;}
     QString getStatus()const {return status;}
     int getPriority()const {return priorite;}
-    Date getExpDate()const{return echeance;}
+    QDate getExpDate()const{return echeance;}
     void setAction(const QString& s){action=s;}
     void setStatus(const QString& s){action=s;}
     void setPriority(const int p){priorite=p;}
-    void setExpDate(const Date e){echeance=e;}
+    void setExpDate(const QDate e){echeance=e;}
     int type()const {return 1;}
     ~Tache();
 
@@ -68,7 +68,7 @@ class Article : public Note{
 
     QString text;
 public:
-    Article(const QString & i,const QString & t, Date c, Date d,const QString& te):
+    Article(const QString & i,const QString & t, QDate c, QDate d,const QString& te):
         Note(i,t,c,d),text(te){}
     QString getText() const { return text; }
     void setText(const QString& t){text=t;}
@@ -80,7 +80,7 @@ class Image : public Note {
     QString desc;
     QString file;
    public:
-    Image(const QString& i,const QString& t, Date c, Date d,const QString& des, const QString& f):
+    Image(const QString& i,const QString& t, QDate c, QDate d,const QString& des, const QString& f):
         Note(i,t,c,d),desc(des),file(f){}
     QString getDescpt() const {return desc;}
     QString getFicher() const {return file;} // la valeur de retour est de type QString ou de type Image?
@@ -95,7 +95,7 @@ class Image : public Note {
 
      QString aud_file;
     public:
-     Audio(const QString& i,const QString& t, Date c, Date d,const QString& des, const QString& f,const QString& aud):
+     Audio(const QString& i,const QString& t, QDate c, QDate d,const QString& des, const QString& f,const QString& aud):
          Image(i,t,c,d,des,f),aud_file(aud){}
      QString getAFile() const {return aud_file;}
      void setAFile(const QString& af){aud_file=af;}
@@ -104,7 +104,7 @@ class Image : public Note {
  class Video : public Image{
       QString vid_file;
      public:
-      Video(const QString& i,const QString& t, Date c, Date d,const QString& des,const QString& f,const QString& vid):
+      Video(const QString& i,const QString& t, QDate c, QDate d,const QString& des,const QString& f,const QString& vid):
          Image(i,t,c,d,des,f),vid_file(vid){}
       QString getVFile() const {return vid_file;}
       void setVFile(const QString& vf){vid_file=vf;}
@@ -136,11 +136,11 @@ private:
     ~NotesManager();
     NotesManager(const NotesManager& m);
     NotesManager& operator=(const NotesManager& m);
-    void addTache(const QString & i,const QString & t, Date c, Date d,const QString& a,int p, Date e,enum Status s=en_attente);
-    void addArticle(const QString & i,const QString & t, Date c, Date d,const QString& te);
-    void addImage(const QString& i,const QString& t, Date c, Date d,const QString& des, const QString& f);
-    void addAudio(const QString& i,const QString& t, Date c, Date d,const QString& des, const QString& f,const QString& aud);
-    void addVideo(const QString& i,const QString& t, Date c, Date d,const QString& des, const QString& f,const QString& vid);
+    void addTache(const QString & i,const QString & t, QDate c, QDate d,const QString& a,int p, QDate e,enum Status s=en_attente);
+    void addArticle(const QString & i,const QString & t, QDate c, QDate d,const QString& te);
+    void addImage(const QString& i,const QString& t, QDate c, QDate d,const QString& des, const QString& f);
+    void addAudio(const QString& i,const QString& t, QDate c, QDate d,const QString& des, const QString& f,const QString& aud);
+    void addVideo(const QString& i,const QString& t, QDate c, QDate d,const QString& des, const QString& f,const QString& vid);
 public:
      //Note* at(int i)const{return notes.at(i);}  //utiliser avec QList
     Note& getNote(const QString& id); // return the article with identificator id
