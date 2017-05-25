@@ -1,54 +1,101 @@
-#ifndef RELATION_H_INCLUDED
-#define RELATION_H_INCLUDED
-#include <QString>
-#include "note.h"
+#ifndef RELATION_H
+#define RELATION_H
+#include<QStringList>
+#include "Notes.h"
 class Couple{
     QString label;
     Note* x;
     Note* y;
 public:
-    Couple(Note* a,Note* b):x(a),y(b){}
-    QString& getLabel(){return label;}
-    Note* getX(){return x;}
-    Note* getY(){return y;}
-    bool getOrient()const {return orient;}
+    Couple(const QString& l, Note* a,Note* b):label(l),x(a),y(b){}
+    QString getLabel()const{return label;}
+    Note* getX() const {return x;}
+    Note* getY() const {return y;}
+    void setLabel(const QString& l){label=l;}
     void setCouple(Note* a, Note* b){x=a;y=b;}
 };
+
 class Relation{
+protected:
     QString titre;
     QString desc;
     Couple** couples ;
     bool orient;
     unsigned int nb;
     unsigned int nbmax;
-
-public:
     void addCouple(Couple* c);
-    void addCouple(Note** x,Note** y);
-    void retireCouple(QString& label);
-    QString& getTitre()const {return titre;}
-    QString& getDesc()const{return desc;}
+public:
+    Relation(const QString& t, const QString& d,bool o=true,Couple** c=nullptr,int n=0,int m=0):
+        titre(t),desc(d),couples(c),orient(o),nb(n),nbmax(m){}
 
+    void addCouple(const QString& lab,Note* x,Note* y);// seulement pour les notes de dernière version!
+    void retirerCouple(QString& label);//
+    QString getTitre()const {return titre;}
+    QString getDesc()const{return desc;}
+    unsigned int getNb()const {return nb;}
+    bool getOrient()const {return orient;}
+    Couple* getCouple(const QString& l);//get couple par label
+    Couple* getCouple(unsigned int i);//get couple par la position dans le tableau
+    QString AfficherCouple(Couple* c);
+    class Iterator {
+            friend class Relation;
+            Couple** currentC;
+            unsigned int nbRemain;
+            Iterator(Couple** a, unsigned nb):currentC(a),nbRemain(nb){}
+        public:
+            Iterator():currentC(nullptr),nbRemain(0){}
+            bool isDone() const { return nbRemain==0; }
+            void next() {
+                if (isDone())
+                    throw NotesException("error, next on an iterator which is done");
+                nbRemain--;
+                currentC++;
+            }
+           Couple& current() const {
+                if (isDone())
+                    throw NotesException("error, indirection on an iterator which is done");
+                return **currentC;
+            }
+        };
+        Iterator getIterator() {
+            return Iterator(couples,nb);
+        }
+
+// for(
+};
+
+class Reference:public Relation{  //singleton
+private:
     struct Handler {
-        NotesManager* instance; // pointeur sur l'unique instance
-        Handler():instance(nullptr){}
-        ~Handler() { delete instance; }
-    };
-    static Handler handler;
-};
-class Reference:public Relation{ // orient == true par défaut 
+            Reference* reference; // pointeur sur l'unique instance
+            Handler():reference(nullptr){}//affectation pour objet unique
+            ~Handler() { delete reference; }
+        };
 public:
-    void addCouple(Couple* c);
-    void addCouple(Note** x,Note** y);    
-    
-};
-class ReManager{
-    Relation** relations;
-    unsigned int nbRe;
-    unsigned int nbMaxRe;
-public:
-    void afficherAscendents(Note* y);
-    void afficherDescendenets(Note* x);
-};
+    Reference():Relation("Référence","\ref{idNote}"){}
 
-#endif // RELATION_H_INCLUDED
+
+    static Handler handler;
+    static Reference& getRef();
+    static void freeRef();
+
+};
+/*
+
+void addReference(QString& s){
+    // lier tous les attributs de type string
+    QStringList lst=s.split("\ref{",QString::SkipEmptyParts,Qt::CaseSensitive);  // majuscule  ? minuscule ?
+    for(int i=1;i<lst.count();i++)
+    {
+        QStringList l=lst.at(i).split("}",QString::SkipEmptyParts, Qt::CaseSensitive);
+        std::cout<<l.at(0).trimmed().toStdString()<<std::endl;
+        //if(getNote(l.at(0)) )  //si on trouve les notes avec id= l.at(0)
+        // reference.addCouple(Couple::setCouple(getNote(id),getNote(l.at(0))));
+    }
+
+}*/
+#endif // RELATION_H
+//créer une note --- choisir le type --- remplir les attribues --- sauvegarder ( si on trouve \ref, addCouple()dans reference)
+//choisir une note existant --- modifier / supprimer ce note --- sauvegarder ( si on trouve \ref, addCouple()dans reference)
+//création d'une relation --- remplir le titre , description etc...
+//choisir une relation existant --- supprimer/ ajouter les couples
