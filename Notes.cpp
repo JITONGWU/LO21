@@ -29,7 +29,8 @@ void NotesManager::addNote(Note* a){
     notes[nbNotes++]=a;
 }
 //utiliser template pour simplifier???
-void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate d,const QString& a,int p, QDate e,enum Status s=en_attente)
+void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate d,const QString& a,
+                            const QString& p, QDate e,const QString& s="en_attente")
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
@@ -45,12 +46,12 @@ void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDa
     Article* a=new Article(id,t,c,d,te);
     addNote(a);
 }
-void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d,const QString& des, const QString& f,int i=3)
+void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d,const QString& des, const QString& f)
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
     }
-    Image* im=new Image(id,t,c,d,des,f,i);
+    Image* im=new Image(id,t,c,d,des,f);
     addNote(im);
 }
 void NotesManager::addAudio(const QString& id,const QString& t, QDate c, QDate d,const QString& des, const QString& f,const QString& aud)
@@ -222,7 +223,7 @@ void NotesManager::load() {
                 QDate creat;
                 QDate der_modif;
                 QString action;
-                int priorite;
+                QString priorite;
                 QDate echeance;
                 QString status;
                 QXmlStreamAttributes attributes = xml.attributes();
