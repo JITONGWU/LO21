@@ -94,52 +94,52 @@ void NotesManager::save() const {
     stream.setAutoFormatting(true);
     stream.writeStartDocument();
     stream.writeStartElement("notes");
-       for(unsigned int i=0; i<nbArticles; i++){
-       int type=notes[i]->type();
+       for(unsigned int i=0; i<nbNotes; i++){
+       int type=(notes[i])->type();
        switch(type){
            case 2:      { stream.writeStartElement("Article");
-                        stream.writeTextElement("id",notes[i]->getId());
-                        stream.writeTextElement("title",notes[i]->getTitle());
-                        stream.writeTextElement("date de creation",notes[i]->getDateCreat().toString(dd.MM.yyyy));
-                        stream.writeTextElement("date de update",notes[i]->getDateDernier().toString(dd.MM.yyyy));
-                        stream.writeTextElement("text",Notes[i]->getText());
+                        stream.writeTextElement("id",dynamic_cast<Article*>((notes[i]))->getId());
+                        stream.writeTextElement("title",dynamic_cast<Article*>((notes[i]))->getTitle());
+                        stream.writeTextElement("date de creation",dynamic_cast<Article*>((notes[i]))->getDateCreat().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("date de update",dynamic_cast<Article*>((notes[i]))->getDateDernier().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("text",dynamic_cast<Article*>((notes[i]))->getText());
                         stream.writeEndElement();} break;
            case 1:     {stream.writeStartElement("Tache");
-                        stream.writeTextElement("id",notes[i]->getId());
-                        stream.writeTextElement("title",notes[i]->getTitle());
-                        stream.writeTextElement("date de creation",notes[i]->getDateCreat());
-                        stream.writeTextElement("date de update",notes[i]->getDateDernier());
-                        stream.writeTextElement("action",Notes[i]->getAction());
-                        stream.writeTextElement("status",Notes[i]->getStatus());
-                        stream.writeTextElement("priority",Notes[i]->getPriority());
-                        stream.writeTextElement("echeance",Notes[i]->getExpDate().toString(dd.MM.yyyy));
+                        stream.writeTextElement("id",dynamic_cast<Tache*>(notes[i])->getId());
+                        stream.writeTextElement("title",dynamic_cast<Tache*>(notes[i])->getTitle());
+                        stream.writeTextElement("date de creation",dynamic_cast<Tache*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("date de update",dynamic_cast<Tache*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("action",dynamic_cast<Tache*>(notes[i])->getAction());
+                        stream.writeTextElement("status",dynamic_cast<Tache*>(notes[i])->getStatus());
+                        stream.writeTextElement("priority",dynamic_cast<Tache*>(notes[i])->getPriority());
+                        stream.writeTextElement("echeance",dynamic_cast<Tache*>(notes[i])->getExpDate().toString("dd.MM.yyyy"));
                         stream.writeEndElement();}break;
            case 3:     {stream.writeStartElement("Image");
-                        stream.writeTextElement("id",notes[i]->getId());
-                        stream.writeTextElement("title",notes[i]->getTitle());
-                        stream.writeTextElement("date de creation",notes[i]->getDateCreat().toString(dd.MM.yyyy));
-                        stream.writeTextElement("date de update",notes[i]->getDateDernier().toString(dd.MM.yyyy));
-                        stream.writeTextElement("descp",Notes[i]->getDescpt());
-                        stream.writeTextElement("ficher",Notes[i]->getFicher());
+                        stream.writeTextElement("id",dynamic_cast<Image*>(notes[i])->getId());
+                        stream.writeTextElement("title",dynamic_cast<Image*>(notes[i])->getTitle());
+                        stream.writeTextElement("date de creation",dynamic_cast<Image*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("date de update",dynamic_cast<Image*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("descp",dynamic_cast<Image*>(notes[i])->getDescpt());
+                        stream.writeTextElement("ficher",dynamic_cast<Image*>(notes[i])->getFicher());
                         stream.writeEndElement();}break;
 
            case 4:     {stream.writeStartElement("Audio");
-                        stream.writeTextElement("id",notes[i]->getId());
-                        stream.writeTextElement("title",notes[i]->getTitle());
-                        stream.writeTextElement("date de creation",notes[i]->getDateCreat().toString(dd.MM.yyyy));
-                        stream.writeTextElement("date de update",notes[i]->getDateDernier().toString(dd.MM.yyyy));
-                        stream.writeTextElement("descp",Notes[i]->getDescpt());
-                        stream.writeTextElement("ficher",Notes[i]->getFicher());
-                        stream.writeTextElement("A_ficher",Notes[i]->getAFile());
+                        stream.writeTextElement("id",dynamic_cast<Audio*>(notes[i])->getId());
+                        stream.writeTextElement("title",dynamic_cast<Audio*>(notes[i])->getTitle());
+                        stream.writeTextElement("date de creation",dynamic_cast<Audio*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("date de update",dynamic_cast<Audio*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("descp",dynamic_cast<Audio*>(notes[i])->getDescpt());
+                        stream.writeTextElement("ficher",dynamic_cast<Audio*>(notes[i])->getFicher());
+                        stream.writeTextElement("A_ficher",dynamic_cast<Audio*>(notes[i])->getAFile());
                         stream.writeEndElement();}break;
            case 5:     {stream.writeStartElement("Video");
-                        stream.writeTextElement("id",notes[i]->getId());
-                        stream.writeTextElement("title",notes[i]->getTitle());
-                        stream.writeTextElement("date de creation",notes[i]->getDateCreat().toString(dd.MM.yyyy));
-                        stream.writeTextElement("date de update",notes[i]->getDateDernier().toString(dd.MM.yyyy));
-                        stream.writeTextElement("descp",Notes[i]->getDescpt());
-                        stream.writeTextElement("ficher",Notes[i]->getFicher());
-                        stream.writeTextElement("V_ficher",Notes[i]->getVFile());
+                        stream.writeTextElement("id",dynamic_cast<Video*>(notes[i])->getId());
+                        stream.writeTextElement("title",dynamic_cast<Video*>(notes[i])->getTitle());
+                        stream.writeTextElement("date de creation",dynamic_cast<Video*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("date de update",dynamic_cast<Video*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("descp",dynamic_cast<Video*>(notes[i])->getDescpt());
+                        stream.writeTextElement("ficher",dynamic_cast<Video*>(notes[i])->getFicher());
+                        stream.writeTextElement("V_ficher",dynamic_cast<Video*>(notes[i])->getVFile());
                         stream.writeEndElement();}break;
 
 
@@ -171,14 +171,14 @@ void NotesManager::load() {
             // If it's named taches, we'll go to the next.
             if(xml.name() == "notes") continue;
             // If it's named tache, we'll dig the information from there.
-            if(xml.name() == "article")
-
-            QString typename=xml.name();
-            switch(typename){
+            //if(xml.name() == "article")
 
 
-            case "Article": {
-                qDebug()<<"new article\n";
+
+
+
+            if(xml.name()== "Article") {
+
                 QString identificateur;
                 QString titre;
                 QString text;
@@ -192,33 +192,33 @@ void NotesManager::load() {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
                         if(xml.name() == "id") {
-                            xml.readNext(); identificateur=xml.text().toString();                            
+                            xml.readNext(); identificateur=xml.text().toString();
                         }
 
                         // We've found titre.
                         if(xml.name() == "title") {
-                            xml.readNext(); titre=xml.text().toString();                            
+                            xml.readNext(); titre=xml.text().toString();
                         }
                         if(xml.name() == "date de creation") {
-                            xml.readNext(); creat=creat.fromString(xml.text().toString(),dd.MM.yyyy);                         
+                            xml.readNext(); creat=creat.fromString(xml.text().toString(),"dd.MM.yyyy");
                         }
                         if(xml.name() == "date de update") {
-                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),dd.MM.yyyy);                            
-                        }                      
+                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),"dd.MM.yyyy");
+                        }
                       if(xml.name() == "text") {
                             xml.readNext();
-                            text=xml.text().toString();                            
+                            text=xml.text().toString();
                         }
-                    }                    
+                    }
                     xml.readNext();
                 }
-                
+
                 addArticle(identificateur,titre,creat,der_modif,text);
             } break;
-            case "Tache":{
-                qDebug()<<"new article\n";
+            if(xml.name()== "Tache"){
+
                 QString identificateur;
-                QString titre;                
+                QString titre;
                 QDate creat;
                 QDate der_modif;
                 QString action;
@@ -233,46 +233,46 @@ void NotesManager::load() {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
                         if(xml.name() == "id") {
-                            xml.readNext(); identificateur=xml.text().toString();                            
+                            xml.readNext(); identificateur=xml.text().toString();
                         }
 
                         // We've found titre.
                         if(xml.name() == "title") {
-                            xml.readNext(); titre=xml.text().toString();                            
+                            xml.readNext(); titre=xml.text().toString();
                         }
                         if(xml.name() == "date de creation") {
-                            xml.readNext(); creat=creat.fromString(xml.text().toString(),dd.MM.yyyy);                         
+                            xml.readNext(); creat=creat.fromString(xml.text().toString(),"dd.MM.yyyy");
                         }
                         if(xml.name() == "date de update") {
-                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),dd.MM.yyyy);                            
-                        }                      
+                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),"dd.MM.yyyy");
+                        }
                       if(xml.name() == "action") {
                             xml.readNext();
-                            action=xml.text().toString();                            
+                            action=xml.text().toString();
                         }
                       if(xml.name() == "priorite") {
                             xml.readNext();
-                            priorite=xml.text().toString();                            
+                            priorite=xml.text().toString();
                         }
                       if(xml.name() == "echeance") {
                             xml.readNext();
-                            echeance=echeance.fromString(xml.text().toString(),dd.MM.yyyy);                            
+                            echeance=echeance.fromString(xml.text().toString(),"dd.MM.yyyy");
                         }
                       if(xml.name() == "status") {
                             xml.readNext();
-                            status=xml.text().toString();                            
+                            status=xml.text().toString();
                         }
-                    }                    
+                    }
                     xml.readNext();
                 }
-                
+
                 addArticle(identificateur,titre,creat,der_modif,action,priorite,echeance,status);
             } break;
-            case "Image" :{
-                qDebug()<<"new article\n";
+            if(xml.name()== "Image" ){
+
                 QString identificateur;
                 QString titre;
-                
+
                 QDate creat;
                 QDate der_modif;
                 QString desc;
@@ -285,38 +285,38 @@ void NotesManager::load() {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
                         if(xml.name() == "id") {
-                            xml.readNext(); identificateur=xml.text().toString();                            
+                            xml.readNext(); identificateur=xml.text().toString();
                         }
 
                         // We've found titre.
                         if(xml.name() == "title") {
-                            xml.readNext(); titre=xml.text().toString();                            
+                            xml.readNext(); titre=xml.text().toString();
                         }
                         if(xml.name() == "date de creation") {
-                            xml.readNext(); creat=creat.fromString(xml.text().toString(),dd.MM.yyyy);                         
+                            xml.readNext(); creat=creat.fromString(xml.text().toString(),"dd.MM.yyyy");
                         }
                         if(xml.name() == "date de update") {
-                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),dd.MM.yyyy);                            
-                        }                      
+                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),"dd.MM.yyyy");
+                        }
                       if(xml.name() == "descp") {
                             xml.readNext();
-                            desc=xml.text().toString();                            
+                            desc=xml.text().toString();
                         }
                       if(xml.name() == "ficher") {
                             xml.readNext();
-                            file=xml.text().toString();                            
+                            file=xml.text().toString();
                         }
-                    }                    
+                    }
                     xml.readNext();
                 }
-                
+
                 addArticle(identificateur,titre,creat,der_modif,desc,file);
             } break;
-            case "Audio" :{
-                qDebug()<<"new article\n";
+           if(xml.name()==  "Audio" ){
+
                 QString identificateur;
                 QString titre;
-                
+
                 QDate creat;
                 QDate der_modif;
                 QString desc;
@@ -330,43 +330,43 @@ void NotesManager::load() {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
                         if(xml.name() == "id") {
-                            xml.readNext(); identificateur=xml.text().toString();                            
+                            xml.readNext(); identificateur=xml.text().toString();
                         }
 
                         // We've found titre.
                         if(xml.name() == "title") {
-                            xml.readNext(); titre=xml.text().toString();                            
+                            xml.readNext(); titre=xml.text().toString();
                         }
                         if(xml.name() == "date de creation") {
-                            xml.readNext(); creat=creat.fromString(xml.text().toString(),dd.MM.yyyy);                         
+                            xml.readNext(); creat=creat.fromString(xml.text().toString(),"dd.MM.yyyy");
                         }
                         if(xml.name() == "date de update") {
-                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),dd.MM.yyyy);                            
-                        }                      
+                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),"dd.MM.yyyy");
+                        }
                       if(xml.name() == "descp") {
                             xml.readNext();
-                            desc=xml.text().toString();                            
+                            desc=xml.text().toString();
                         }
                       if(xml.name() == "ficher") {
                             xml.readNext();
-                            file=xml.text().toString();                            
+                            file=xml.text().toString();
                         }
                       if(xml.name() == "A_ficher") {
                             xml.readNext();
-                            afile=xml.text().toString();                            
+                            afile=xml.text().toString();
                         }
-                    }                    
+                    }
                     xml.readNext();
                 }
-                
+
                 addArticle(identificateur,titre,creat,der_modif,desc,file,afile);
             } break;
-                
-            case "Video" :{
-                qDebug()<<"new article\n";
+
+            if(xml.name()=="Video" ){
+
                 QString identificateur;
                 QString titre;
-                
+
                 QDate creat;
                 QDate der_modif;
                 QString desc;
@@ -380,35 +380,35 @@ void NotesManager::load() {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
                         if(xml.name() == "id") {
-                            xml.readNext(); identificateur=xml.text().toString();                            
+                            xml.readNext(); identificateur=xml.text().toString();
                         }
 
                         // We've found titre.
                         if(xml.name() == "title") {
-                            xml.readNext(); titre=xml.text().toString();                            
+                            xml.readNext(); titre=xml.text().toString();
                         }
                         if(xml.name() == "date de creation") {
-                            xml.readNext(); creat=creat.fromString(xml.text().toString(),dd.MM.yyyy);                         
+                            xml.readNext(); creat=creat.fromString(xml.text().toString(),"dd.MM.yyyy");
                         }
                         if(xml.name() == "date de update") {
-                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),dd.MM.yyyy);                            
-                        }                      
+                            xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),"dd.MM.yyyy");
+                        }
                       if(xml.name() == "descp") {
                             xml.readNext();
-                            desc=xml.text().toString();                            
+                            desc=xml.text().toString();
                         }
                       if(xml.name() == "ficher") {
                             xml.readNext();
-                            file=xml.text().toString();                            
+                            file=xml.text().toString();
                         }
                       if(xml.name() == "V_ficher") {
                             xml.readNext();
-                            vfile=xml.text().toString();                            
+                            vfile=xml.text().toString();
                         }
-                    }                    
+                    }
                     xml.readNext();
                 }
-                
+
                 addArticle(identificateur,titre,creat,der_modif,desc,file,vfile);
             } break;
 
@@ -416,7 +416,7 @@ void NotesManager::load() {
 
             }
         }
-    }
+
     // Error handling.
     if(xml.hasError()) {
         throw NotesException("Erreur lecteur fichier notes, parser xml");
