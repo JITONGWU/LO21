@@ -266,7 +266,7 @@ void NotesManager::load() {
                     xml.readNext();
                 }
 
-                addArticle(identificateur,titre,creat,der_modif,action,priorite,echeance,status);
+                addTache(identificateur,titre,creat,der_modif,action,priorite,echeance,status);
             } break;
             if(xml.name()== "Image" ){
 
@@ -310,7 +310,7 @@ void NotesManager::load() {
                     xml.readNext();
                 }
 
-                addArticle(identificateur,titre,creat,der_modif,desc,file);
+                addImage(identificateur,titre,creat,der_modif,desc,file);
             } break;
            if(xml.name()==  "Audio" ){
 
@@ -359,7 +359,7 @@ void NotesManager::load() {
                     xml.readNext();
                 }
 
-                addArticle(identificateur,titre,creat,der_modif,desc,file,afile);
+                addAudio(identificateur,titre,creat,der_modif,desc,file,afile);
             } break;
 
             if(xml.name()=="Video" ){
@@ -409,7 +409,7 @@ void NotesManager::load() {
                     xml.readNext();
                 }
 
-                addArticle(identificateur,titre,creat,der_modif,desc,file,vfile);
+                addVideo(identificateur,titre,creat,der_modif,desc,file,vfile);
             } break;
 
 
