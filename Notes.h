@@ -40,22 +40,23 @@ public:
 
 
 
-enum Status {en_attente,en_cours,terminee};
+
 class Tache : public Note {
     QString action;
     QString priorite;
     QDate echeance;
     QString status;
 public :
-    Tache(const QString & i,const QString & t, QDate c, QDate d,const QString& a,int p, QDate e,enum Status s=en_attente):
+    Tache(const QString & i,const QString & t, QDate c, QDate d,const QString& a,
+          const QString& p, QDate e,const QString& s="en_attente"):
         Note(i,t,c,d),action(a),priorite(p),echeance(e),status(s){}
     QString getAction()const {return action;}
     QString getStatus()const {return status;}
-    int getPriority()const {return priorite;}
+    QString getPriority()const {return priorite;}
     QDate getExpDate()const{return echeance;}
     void setAction(const QString& s){action=s;}
     void setStatus(const QString& s){action=s;}
-    void setPriority(const int p){priorite=p;}
+    void setPriority(const QString& p){priorite=p;}
     void setExpDate(const QDate e){echeance=e;}
     int type()const {return 1;}
     ~Tache();
@@ -136,7 +137,8 @@ private:
     ~NotesManager();
     NotesManager(const NotesManager& m);
     NotesManager& operator=(const NotesManager& m);
-    void addTache(const QString & i,const QString & t, QDate c, QDate d,const QString& a,int p, QDate e,enum Status s=en_attente);
+    void addTache(const QString & i,const QString & t, QDate c, QDate d,const QString& a,
+                  const QString& p, QDate e,const QString& s="en_attente");
     void addArticle(const QString & i,const QString & t, QDate c, QDate d,const QString& te);
     void addImage(const QString& i,const QString& t, QDate c, QDate d,const QString& des, const QString& f);
     void addAudio(const QString& i,const QString& t, QDate c, QDate d,const QString& des, const QString& f,const QString& aud);
