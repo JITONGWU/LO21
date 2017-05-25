@@ -29,62 +29,62 @@ void NotesManager::addNote(Note* a){
     notes[nbNotes++]=a;
 }
 //utiliser template pour simplifier???
-void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate d,const QString& a,
+void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate d,Emplacement em,const QString& a,
                             const QString& p, QDate e,const QString& s="en_attente")
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
     }
-    Tache* t=new Tache(id,t,c,d,a,p,e,s);
-    addNote(t);
+    Tache* tache=new Tache(id,t,c,d,em,a,p,e,s);
+    addNote(tache);
 }
-void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDate d,const QString& te)
+void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDate d,Emplacement em,const QString& te)
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
     }
-    Article* a=new Article(id,t,c,d,te);
+    Article* a=new Article(id,t,c,d,em,te);
     addNote(a);
 }
-void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d,const QString& des, const QString& f)
+void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d,Emplacement em,const QString& des, const QString& f)
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
     }
-    Image* im=new Image(id,t,c,d,des,f);
+    Image* im=new Image(id,t,c,d,em,des,f);
     addNote(im);
 }
-void NotesManager::addAudio(const QString& id,const QString& t, QDate c, QDate d,const QString& des, const QString& f,const QString& aud)
+void NotesManager::addAudio(const QString& id,const QString& t, QDate c, QDate d,Emplacement em,const QString& des, const QString& f,const QString& aud)
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
     }
-    Audio* t=new Audio(id,t,c,d,des,f,aud);
-    addNote(t);
+    Audio* audio=new Audio(id,t,c,d,em,des,f,aud);
+    addNote(audio);
 }
-void NotesManager::addVideo(const QString& id,const QString& t, QDate c, QDate d,const QString& d, const QString& f,const QString& vid)
+void NotesManager::addVideo(const QString& id,const QString& t, QDate c, QDate d,Emplacement em,const QString& des, const QString& f,const QString& vid)
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
     }
-    Video* t=new Video(id,t,c,d,d,f,vid);
-    addNote(t);
+    Video* video=new Video(id,t,c,d,em,des,f,vid);
+    addNote(video);
 }
 Note& NotesManager::getNote(const QString& id){
     // si l'Note existe d, on en renvoie une rrence
     for(unsigned int i=0; i<nbNotes; i++){
-        if (Notes[i]->getId()==id) return *Notes[i];
+        if (notes[i]->getId()==id) return *notes[i];
     }
 
     throw NotesException("error, échoué de trouver ce note");
 }
 
-NotesManager::NotesManager():Notes(nullptr),nbNotes(0),nbMaxNotes(0),filename(""){}
+NotesManager::NotesManager():notes(nullptr),nbNotes(0),nbMaxNotes(0),filename(""){}
 
 NotesManager::~NotesManager(){
     if (filename!="") save();//
-    for(unsigned int i=0; i<nbNotes; i++) delete Notes[i];
-    delete[] Notes;
+    for(unsigned int i=0; i<nbNotes; i++) delete notes[i];
+    delete[] notes;
 }
 
 void NotesManager::save() const {
@@ -423,6 +423,6 @@ void NotesManager::load() {
         throw NotesException("Erreur lecteur fichier notes, parser xml");
     }
     // Removes any device() or data from the reader * and resets its internal state to the initial state.
-    xml.clear();
+    xml.clear();`
     qDebug()<<"fin load\n";
 }
