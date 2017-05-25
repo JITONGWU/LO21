@@ -25,8 +25,8 @@ class Note {
     friend class Suppression;
 
 public:
-    Note(const QString & i,const QString & t, QDate c, QDate d):
-        id(i),title(t),creat(c),der_modif(d){}
+    Note(const QString & i,const QString & t, QDate c, QDate d, Emplacement e=N):
+        id(i),title(t),creat(c),der_modif(d),emplacement(e){}
     QString getId() const{return id ;}
     QString getTitle()const {return title; }
     QDate getDateCreat() const {return creat;}
