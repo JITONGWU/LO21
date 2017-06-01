@@ -147,7 +147,16 @@ private:
     void addAudio(const QString& i,const QString& t, QDate c, QDate d,Emplacement em,const QString& des, const QString& f,const QString& aud);
     void addVideo(const QString& i,const QString& t, QDate c, QDate d,Emplacement em,const QString& des, const QString& f,const QString& vid);
 public:
-     //Note* at(int i)const{return notes.at(i);}  //utiliser avec QList
+    Note * dern_version(QSting id)
+{   QDate t(1,0,0); Note* n;
+    for(NotesManager::Iterator it=nm.getIterator; it.next(); !it.isDone())
+    {
+        if(it.currentN->getId()==id){if(it.currentN->der_modif>t){n=it.currentN;t=it.currentN->der_modif;}
+    }
+    return n;
+} 
+
+     
     Note& getNote(const QString& id); // return the article with identificator id
     void setFilename(const QString& f) { filename=f; }
     void load(); // load notes from file filename
