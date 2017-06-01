@@ -17,18 +17,19 @@ private:
     QString info;
 };
 
-enum Emplacement{C,N,A} ;
+
 class Note {
     QString id;
     QString title;
     QDate creat;
     QDate der_modif;
-    Emplacement emplacement;
+    QString emplacement;
     friend class Suppression;
 
 public:
-    Note(const QString & i,const QString & t, QDate c, QDate d,Emplacement e):
+    Note(const QString & i,const QString & t, QDate c, QDate d,QString e):
         id(i),title(t),creat(c),der_modif(d),emplacement(e){}
+    QString getEmp()const{return emplacement;}
     QString getId() const{return id ;}
     QString getTitle()const {return title; }
     QDate getDateCreat() const {return creat;}
@@ -49,7 +50,7 @@ class Tache : public Note {
     QDate echeance;
     QString status;
 public :
-    Tache(const QString & i,const QString & t, QDate c, QDate d,Emplacement em,const QString& a,
+    Tache(const QString & i,const QString & t, QDate c, QDate d,QString em,const QString& a,
           const QString& p, QDate e,const QString& s):
         Note(i,t,c,d,em),action(a),priorite(p),echeance(e),status(s){}
     QString getAction()const {return action;}
@@ -71,7 +72,7 @@ class Article : public Note{
 
     QString text;
 public:
-    Article(const QString & i,const QString & t, QDate c, QDate d,Emplacement em,const QString& te):
+    Article(const QString & i,const QString & t, QDate c, QDate d,QString em,const QString& te):
         Note(i,t,c,d,em),text(te){}
     QString getText() const { return text; }
     void setText(const QString& t){text=t;}
@@ -83,7 +84,7 @@ class Image : public Note {
     QString desc;
     QString file;
    public:
-    Image(const QString& i,const QString& t, QDate c, QDate d,Emplacement em,const QString& des, const QString& f):
+    Image(const QString& i,const QString& t, QDate c, QDate d,QString em,const QString& des, const QString& f):
         Note(i,t,c,d,em),desc(des),file(f){}
     QString getDescpt() const {return desc;}
     QString getFicher() const {return file;} // la valeur de retour est de type QString ou de type Image?
@@ -98,7 +99,7 @@ class Image : public Note {
 
      QString aud_file;
     public:
-     Audio(const QString& i,const QString& t, QDate c, QDate d,Emplacement em,const QString& des, const QString& f,const QString& aud):
+     Audio(const QString& i,const QString& t, QDate c, QDate d,QString em,const QString& des, const QString& f,const QString& aud):
          Image(i,t,c,d,em,des,f),aud_file(aud){}
      QString getAFile() const {return aud_file;}
      void setAFile(const QString& af){aud_file=af;}
@@ -107,7 +108,7 @@ class Image : public Note {
  class Video : public Image{
       QString vid_file;
      public:
-      Video(const QString& i,const QString& t, QDate c, QDate d,Emplacement em,const QString& des,const QString& f,const QString& vid):
+      Video(const QString& i,const QString& t, QDate c, QDate d,QString em,const QString& des,const QString& f,const QString& vid):
          Image(i,t,c,d,em,des,f),vid_file(vid){}
       QString getVFile() const {return vid_file;}
       void setVFile(const QString& vf){vid_file=vf;}
@@ -140,23 +141,23 @@ private:
     NotesManager(const NotesManager& m);
     NotesManager& operator=(const NotesManager& m);
 
-    void addTache(const QString & id,const QString & t, QDate c, QDate d,Emplacement em,const QString& a,
+    void addTache(const QString & id,const QString & t, QDate c, QDate d,QString em,const QString& a,
                   const QString& p, QDate e,const QString& s);
-    void addArticle(const QString & i,const QString & t, QDate c, QDate d,Emplacement em,const QString& te);
-    void addImage(const QString& i,const QString& t, QDate c, QDate d,Emplacement em,const QString& des, const QString& f);
-    void addAudio(const QString& i,const QString& t, QDate c, QDate d,Emplacement em,const QString& des, const QString& f,const QString& aud);
-    void addVideo(const QString& i,const QString& t, QDate c, QDate d,Emplacement em,const QString& des, const QString& f,const QString& vid);
+    void addArticle(const QString & i,const QString & t, QDate c, QDate d,QString em,const QString& te);
+    void addImage(const QString& i,const QString& t, QDate c, QDate d,QString em,const QString& des, const QString& f);
+    void addAudio(const QString& i,const QString& t, QDate c, QDate d,QString em,const QString& des, const QString& f,const QString& aud);
+    void addVideo(const QString& i,const QString& t, QDate c, QDate d,QString em,const QString& des, const QString& f,const QString& vid);
 public:
-    Note * dern_version(QSting id)
+  /*  Note * dern_version(QSting id)
 {   QDate t(1,0,0); Note* n;
     for(NotesManager::Iterator it=nm.getIterator; it.next(); !it.isDone())
     {
         if(it.currentN->getId()==id){if(it.currentN->der_modif>t){n=it.currentN;t=it.currentN->der_modif;}
     }
     return n;
-} 
+}； */
 
-     
+
     Note& getNote(const QString& id); // return the article with identificator id
     void setFilename(const QString& f) { filename=f; }
     void load(); // load notes from file filename
