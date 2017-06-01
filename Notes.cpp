@@ -1,4 +1,4 @@
-#include "Notes.h"
+Notes.h"
 
 
 
@@ -29,7 +29,7 @@ void NotesManager::addNote(Note* a){
     notes[nbNotes++]=a;
 }
 //utiliser template pour simplifier???
-void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate d,Emplacement em,const QString& a,
+void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate d,QString em,const QString& a,
                             const QString& p, QDate e,const QString& s="en_attente")
 {
     for(unsigned int i=0; i<nbNotes; i++){
@@ -38,7 +38,7 @@ void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate
     Tache* tache=new Tache(id,t,c,d,em,a,p,e,s);
     addNote(tache);
 }
-void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDate d,Emplacement em,const QString& te)
+void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDate d,QString em,const QString& te)
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
@@ -46,7 +46,7 @@ void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDa
     Article* a=new Article(id,t,c,d,em,te);
     addNote(a);
 }
-void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d,Emplacement em,const QString& des, const QString& f)
+void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d,QString em,const QString& des, const QString& f)
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
@@ -54,7 +54,7 @@ void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d
     Image* im=new Image(id,t,c,d,em,des,f);
     addNote(im);
 }
-void NotesManager::addAudio(const QString& id,const QString& t, QDate c, QDate d,Emplacement em,const QString& des, const QString& f,const QString& aud)
+void NotesManager::addAudio(const QString& id,const QString& t, QDate c, QDate d,QString em,const QString& des, const QString& f,const QString& aud)
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
@@ -62,7 +62,7 @@ void NotesManager::addAudio(const QString& id,const QString& t, QDate c, QDate d
     Audio* audio=new Audio(id,t,c,d,em,des,f,aud);
     addNote(audio);
 }
-void NotesManager::addVideo(const QString& id,const QString& t, QDate c, QDate d,Emplacement em,const QString& des, const QString& f,const QString& vid)
+void NotesManager::addVideo(const QString& id,const QString& t, QDate c, QDate d,QString em,const QString& des, const QString& f,const QString& vid)
 {
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
@@ -102,7 +102,9 @@ void NotesManager::save() const {
                         stream.writeTextElement("id",dynamic_cast<Article*>((notes[i]))->getId());
                         stream.writeTextElement("title",dynamic_cast<Article*>((notes[i]))->getTitle());
                         stream.writeTextElement("date de creation",dynamic_cast<Article*>((notes[i]))->getDateCreat().toString("dd.MM.yyyy"));
+
                         stream.writeTextElement("date de update",dynamic_cast<Article*>((notes[i]))->getDateDernier().toString("dd.MM.yyyy"));
+                         stream.writeTextElement("enplacement",dynamic_cast<Video*>(notes[i])->getEmp());
                         stream.writeTextElement("text",dynamic_cast<Article*>((notes[i]))->getText());
                         stream.writeEndElement();} break;
            case 1:     {stream.writeStartElement("Tache");
@@ -110,6 +112,7 @@ void NotesManager::save() const {
                         stream.writeTextElement("title",dynamic_cast<Tache*>(notes[i])->getTitle());
                         stream.writeTextElement("date de creation",dynamic_cast<Tache*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
                         stream.writeTextElement("date de update",dynamic_cast<Tache*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
+                         stream.writeTextElement("enplacement",dynamic_cast<Video*>(notes[i])->getEmp());
                         stream.writeTextElement("action",dynamic_cast<Tache*>(notes[i])->getAction());
                         stream.writeTextElement("status",dynamic_cast<Tache*>(notes[i])->getStatus());
                         stream.writeTextElement("priority",dynamic_cast<Tache*>(notes[i])->getPriority());
@@ -120,6 +123,7 @@ void NotesManager::save() const {
                         stream.writeTextElement("title",dynamic_cast<Image*>(notes[i])->getTitle());
                         stream.writeTextElement("date de creation",dynamic_cast<Image*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
                         stream.writeTextElement("date de update",dynamic_cast<Image*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("enplacement",dynamic_cast<Video*>(notes[i])->getEmp());
                         stream.writeTextElement("descp",dynamic_cast<Image*>(notes[i])->getDescpt());
                         stream.writeTextElement("ficher",dynamic_cast<Image*>(notes[i])->getFicher());
                         stream.writeEndElement();}break;
@@ -130,6 +134,7 @@ void NotesManager::save() const {
                         stream.writeTextElement("date de creation",dynamic_cast<Audio*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
                         stream.writeTextElement("date de update",dynamic_cast<Audio*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
                         stream.writeTextElement("descp",dynamic_cast<Audio*>(notes[i])->getDescpt());
+                         stream.writeTextElement("enplacement",dynamic_cast<Video*>(notes[i])->getEmp());
                         stream.writeTextElement("ficher",dynamic_cast<Audio*>(notes[i])->getFicher());
                         stream.writeTextElement("A_ficher",dynamic_cast<Audio*>(notes[i])->getAFile());
                         stream.writeEndElement();}break;
@@ -138,6 +143,7 @@ void NotesManager::save() const {
                         stream.writeTextElement("title",dynamic_cast<Video*>(notes[i])->getTitle());
                         stream.writeTextElement("date de creation",dynamic_cast<Video*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
                         stream.writeTextElement("date de update",dynamic_cast<Video*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("enplacement",dynamic_cast<Video*>(notes[i])->getEmp());
                         stream.writeTextElement("descp",dynamic_cast<Video*>(notes[i])->getDescpt());
                         stream.writeTextElement("ficher",dynamic_cast<Video*>(notes[i])->getFicher());
                         stream.writeTextElement("V_ficher",dynamic_cast<Video*>(notes[i])->getVFile());
@@ -184,7 +190,7 @@ void NotesManager::load() {
                 QString titre;
                 QString text;
                 QDate creat;
-                QDate der_modif;
+                QDate der_modif;QString enpl;
                 QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
                 //We're going to loop over the things because the order might change.
@@ -206,6 +212,9 @@ void NotesManager::load() {
                         if(xml.name() == "date de update") {
                             xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),"dd.MM.yyyy");
                         }
+                        if(xml.name() == "emplacement") {
+                            xml.readNext(); enpl=xml.text().toString();
+                        }
                       if(xml.name() == "text") {
                             xml.readNext();
                             text=xml.text().toString();
@@ -214,7 +223,7 @@ void NotesManager::load() {
                     xml.readNext();
                 }
 
-                addArticle(identificateur,titre,creat,der_modif,text);
+                addArticle(identificateur,titre,creat,der_modif,enpl,text);
             } break;
             if(xml.name()== "Tache"){
 
@@ -225,7 +234,7 @@ void NotesManager::load() {
                 QString action;
                 QString priorite;
                 QDate echeance;
-                QString status;
+                QString status;QString enpl;
                 QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
                 //We're going to loop over the things because the order might change.
@@ -246,6 +255,9 @@ void NotesManager::load() {
                         }
                         if(xml.name() == "date de update") {
                             xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),"dd.MM.yyyy");
+                        }
+                        if(xml.name() == "emplacement") {
+                            xml.readNext(); enpl=xml.text().toString();
                         }
                       if(xml.name() == "action") {
                             xml.readNext();
@@ -267,7 +279,7 @@ void NotesManager::load() {
                     xml.readNext();
                 }
 
-                addTache(identificateur,titre,creat,der_modif,action,priorite,echeance,status);
+                addTache(identificateur,titre,creat,der_modif,enpl,action,priorite,echeance,status);
             } break;
             if(xml.name()== "Image" ){
 
@@ -277,7 +289,7 @@ void NotesManager::load() {
                 QDate creat;
                 QDate der_modif;
                 QString desc;
-                QString file;
+                QString file;QString enpl;
                 QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
                 //We're going to loop over the things because the order might change.
@@ -298,6 +310,9 @@ void NotesManager::load() {
                         }
                         if(xml.name() == "date de update") {
                             xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),"dd.MM.yyyy");
+                        }
+                        if(xml.name() == "emplacement") {
+                            xml.readNext(); enpl=xml.text().toString();
                         }
                       if(xml.name() == "descp") {
                             xml.readNext();
@@ -311,7 +326,7 @@ void NotesManager::load() {
                     xml.readNext();
                 }
 
-                addImage(identificateur,titre,creat,der_modif,desc,file);
+                addImage(identificateur,titre,creat,der_modif,enpl,desc,file);
             } break;
            if(xml.name()==  "Audio" ){
 
@@ -322,7 +337,7 @@ void NotesManager::load() {
                 QDate der_modif;
                 QString desc;
                 QString file;
-                QString afile;
+                QString afile;QString enpl;
                 QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
                 //We're going to loop over the things because the order might change.
@@ -343,6 +358,9 @@ void NotesManager::load() {
                         }
                         if(xml.name() == "date de update") {
                             xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),"dd.MM.yyyy");
+                        }
+                        if(xml.name() == "emplacement") {
+                            xml.readNext(); enpl=xml.text().toString();
                         }
                       if(xml.name() == "descp") {
                             xml.readNext();
@@ -360,7 +378,7 @@ void NotesManager::load() {
                     xml.readNext();
                 }
 
-                addAudio(identificateur,titre,creat,der_modif,desc,file,afile);
+                addAudio(identificateur,titre,creat,der_modif, enpl,desc,file,afile);
             } break;
 
             if(xml.name()=="Video" ){
@@ -373,6 +391,7 @@ void NotesManager::load() {
                 QString desc;
                 QString file;
                 QString vfile;
+                QString enpl;
                 QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
                 //We're going to loop over the things because the order might change.
@@ -394,6 +413,9 @@ void NotesManager::load() {
                         if(xml.name() == "date de update") {
                             xml.readNext(); der_modif=der_modif.fromString(xml.text().toString(),"dd.MM.yyyy");
                         }
+                        if(xml.name() == "emplacement") {
+                            xml.readNext(); enpl=xml.text().toString();
+                        }
                       if(xml.name() == "descp") {
                             xml.readNext();
                             desc=xml.text().toString();
@@ -410,7 +432,7 @@ void NotesManager::load() {
                     xml.readNext();
                 }
 
-                addVideo(identificateur,titre,creat,der_modif,desc,file,vfile);
+                addVideo(identificateur,titre,creat,der_modif,enpl,desc,file,vfile);
             } break;
 
 
@@ -423,6 +445,7 @@ void NotesManager::load() {
         throw NotesException("Erreur lecteur fichier notes, parser xml");
     }
     // Removes any device() or data from the reader * and resets its internal state to the initial state.
-    xml.clear();`
-    qDebug()<<"fin load\n";
+  xml.clear();
+
 }
+
