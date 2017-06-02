@@ -31,12 +31,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
         mainwindow.cpp \
     relation.cpp \
-    Notes.cpp \
+    notes.cpp \
     relationmanager.cpp
 
 HEADERS  += mainwindow.h \
     relation.h \
-    Notes.h \
+    notes.h \
     relationmanager.h
 
 FORMS    += mainwindow.ui
