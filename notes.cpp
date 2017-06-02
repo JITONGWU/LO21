@@ -1,4 +1,4 @@
-#include "Notes.h"
+#include "notes.h"
 #include "relation.h"
 #include <QFile>
 NotesManager::Handler NotesManager::handler=Handler();
