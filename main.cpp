@@ -30,8 +30,8 @@ int main(int argc, char *argv[])
         m.setFilename(fichierNotes);
         r.setFilename(fichierRelations);
 
-        m.load();
-        r.load();
+        //m.load();
+        //r.load();
         //Note& a=m.getNote("id:avant_propos");
         //NoteEditeur fenetre(a);
         //fenetre.show();
