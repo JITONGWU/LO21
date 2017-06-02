@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<relations>
+    <titre> relation1 </titre>
+    <description> tester </description>
+    <couple>
+        <label>frere</label>
+        <idx>id:avant_propos</idx>
+        <idy>id:avant_propos</idy>
+    </couple>
+</relations>
