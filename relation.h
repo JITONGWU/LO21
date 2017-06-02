@@ -1,7 +1,7 @@
 #ifndef RELATION_H
 #define RELATION_H
 #include<QStringList>
-#include "Notes.h"
+#include "notes.h"
 class Couple{
     QString label;
     Note* x;
