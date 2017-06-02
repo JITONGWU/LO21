@@ -4,7 +4,7 @@
 #include"relation.h"
 #include<Qlist>
 #include<QMessageBox>
-#include "Notes.h"
+#include "notes.h"
 #include "relationmanager.h"
 #include <QApplication>
 #include <QWidget>
