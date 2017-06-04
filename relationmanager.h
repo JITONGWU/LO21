@@ -32,8 +32,8 @@ class RelationManager{
 public:
     void addRelation(Relation* r);
     void addRelation(const QString& t,const QString& d,bool o=true, Couple** c=nullptr,unsigned int nb=0);
-    void afficherAscendents(Note* y);//
-    void afficherDescendenets(Note* x);//
+    Note *getAscendents(Note* y);//
+    Note *getDescendenets(Note* x);//
 
     Relation& getRelation(const QString& t); // return the relation avec titre t
     Relation& getRelation(unsigned int i);
