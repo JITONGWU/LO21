@@ -13,7 +13,7 @@ void RelationManager::freeManager(){
     handler.RM=nullptr;
 }
 
-void RelationManager::addRelation(const QString& t, const QString& d, bool o, Couple **c=nullptr, unsigned int nb){
+void RelationManager::addRelation(const QString& t, const QString& d, bool o, Couple **c, unsigned int nb){
     for(unsigned int i=0; i<nbRe; i++){
         if (relations[i]->getTitre()==t) throw NotesException("error, creation of an already existent relation");
     }
@@ -37,7 +37,7 @@ void RelationManager::addRelation(Relation* r){
 }
 
 RelationManager::RelationManager():relations(nullptr),nbRe(0),nbMaxRe(0),filename(""){
-    addRelation(Reference::handler.reference);
+    addRelation(&Reference::getRef());
 }//ajouter Référence quand on crée le relationManager
 
 RelationManager::~RelationManager(){
@@ -54,6 +54,11 @@ Relation& RelationManager::getRelation(const QString& t){
     Relation* a=new Relation(t,"",true);
     addRelation(a);
     return *a;
+}
+Relation& RelationManager::getRelation(unsigned int i){
+    if(i<=nbRe) return *relations[i];
+    else throw NotesException("Erreur : didnt find relation");
+
 }
 /*
 void RelationManager::afficherAscendents(Note* y){
