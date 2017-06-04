@@ -61,22 +61,26 @@ Relation& RelationManager::getRelation(unsigned int i){
 
 }
 /*
-void RelationManager::afficherAscendents(Note* y){
+Note* RelationManager::getAscendents(Note* y){
     for(unsigned int i=0;i<nbRe; i++)
     {
         for(unsigned int j=0;j<relations[i]->getNb(); j++)
-            if(relations[i]->couples[j]->y==y) Couple[j]->x->afficherNote(); // ou getId();
-    }
-}
-void RelationManager::afficherDescendents(Note* x){
-    for(unsigned int i=0;i<nbRe; i++)
-    {
-        for(unsigned int j=0;j<relations[i]->nb; j++)
-            if(relations[i]->couples[j]->x==x) Couple[j]->y->afficherNote();
+
+            if(getRelation(i).getCouple(j)->getY()->getId()==y->getId())
+                 getRelation(i).getCouple(j)->getX();
     }
 }
 
+Note* RelationManager::getDescendents(Note* x){
+    for(unsigned int i=0;i<nbRe; i++)
+    {
+        for(unsigned int j=0;j<relations[i]->getNb(); j++)
+            if(getRelation(i).getCouple[j]->getX()->getId()==x->getId())
+                return getRelation(i).getCouple[j]->getY();
+    }
+}
 */
+
 void RelationManager::save() const {
     QFile newfile(filename);
     if (!newfile.open(QIODevice::WriteOnly | QIODevice::Text))
