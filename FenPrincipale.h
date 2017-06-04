@@ -1,7 +1,9 @@
 #ifndef HEADER_FENPRINCIPALE
 #define HEADER_FENPRINCIPALE
 
-#include "Notes.h"
+#include "notes.h"
+#include"articleediteur.h"
+#include"imageediteur.h"
 #include <QApplication>
 #include <QWidget>
 #include <QLabel>
@@ -30,28 +32,6 @@ class FenPrincipale : public QMainWindow {
     FenPrincipale();
 
 };
-
-class Page1 : public QMainWindow {
-
-    public:
-    Page1();
-
-    private:
-
-
-};
-
-
-
-class Page2 : public QMainWindow {
-
-    public:
-    Page2();
-
-    private:
-
-};
-
 class ListeNotes : public QListWidget {
 
     public:
@@ -60,6 +40,36 @@ class ListeNotes : public QListWidget {
     private:
 
 };
+
+class Page1 : public QMainWindow {
+    Q_OBJECT
+
+
+    QWidget *zoneCentrale;
+    QWidget *vide;
+    ArticleEditeur *ae;
+    ImageEditeur *ie;
+    QScrollArea *scrollNote;
+    ListeNotes *listWidget;
+    QHBoxLayout *layout;
+public:
+    Page1(QWidget *parent);
+public slots:
+    void afficherWidget(QListWidgetItem* item);
+
+};
+
+
+
+class Page2 : public QMainWindow {
+
+    public:
+    Page2(QWidget *parent);
+
+    private:
+
+};
+
 
 
 #endif
