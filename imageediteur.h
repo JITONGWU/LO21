@@ -1,5 +1,5 @@
-#ifndef ARTICLEEDITEUR
-#define ARTICLEEDITEUR
+#ifndef IMAGEEDITEUR_H
+#define IMAGEEDITEUR_H
 #include <QApplication>
 #include <QWidget>
 #include <QLabel>
@@ -11,28 +11,31 @@
 #include <QFileDialog>
 #include <QObject>
 #include "notes.h"
-class ArticleEditeur: public QWidget
+class ImageEditeur: public QWidget
 {
     Q_OBJECT     //macro pour pouvoir utiliser les signals et les slots
 
     QLineEdit *id;
     QLineEdit *titre;
-    QTextEdit *text;
+    QTextEdit *desc;
+    QLineEdit *file;
 
     QLabel *id1;
     QLabel *titre1;
-    QLabel *text1;
+    QLabel *desc1;
+    QLabel *file1;
 
     QPushButton *save;
     QHBoxLayout *cid;
     QHBoxLayout *ctitre;
-    QHBoxLayout *ctext;
+    QHBoxLayout *cdesc;
+    QHBoxLayout *cfile;
     QVBoxLayout *couche;
 
-    Article *article; //pointeur vers l'article à afficher par la fenetre
+    Image *image; //pointeur vers l'article à afficher par la fenetre
 
 public:
-    explicit ArticleEditeur (Article& article,QWidget *parent=0);
+    explicit ImageEditeur (Image& im,QWidget *parent=0);
     //explicit pour empêcher la conversion implicite de article vers Article
 
 signals:
@@ -41,11 +44,8 @@ private slots:
     //la valeur par défaut c'est pour pouvoir la connecter avec deux signals
     //l'un avec un parametre qstring et l'autre sans parametre
 public slots:
-    void saveArticle();
+    void saveImage();
 
 
 };
-
-#endif // ARTICLEEDITEUR
-
-
+#endif // IMAGEEDITEUR_H

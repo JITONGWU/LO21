@@ -1,5 +1,4 @@
 #include "articleediteur.h"
-#include "Notes.h"
 #include <QMessageBox>
 
 ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent):
@@ -40,7 +39,7 @@ ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent):
 
     id->setReadOnly(true);
 
-    id->setText(article->getText());
+    id->setText(article->getId());
     titre->setText(article->getTitle());
     text->setText(article->getText());
 
@@ -62,3 +61,4 @@ void ArticleEditeur::saveArticle(){
 void ArticleEditeur::activerSave(QString){
     save->setEnabled(true);
 }
+
