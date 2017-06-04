@@ -1,4 +1,4 @@
-#include "notes.h"
+#include "Notes.h"
 #include "relation.h"
 #include <QFile>
 NotesManager::Handler NotesManager::handler=Handler();
@@ -32,9 +32,9 @@ void NotesManager::addCoupleDansReference(const QString& id,QString& s){
     }
 }
 }
-void NotesManager::addNote(Note* a){
+void NotesManager::addNote(const Note& a){
     for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==a->getId()) throw NotesException("error, creation of an already existent note");
+        if (notes[i]->getId()==a.getId()) throw NotesException("error, creation of an already existent note");
     }
     if (nbNotes==nbMaxNotes){
         Note** newNotes= new Note*[nbMaxNotes+5];
@@ -44,7 +44,8 @@ void NotesManager::addNote(Note* a){
         nbMaxNotes+=5;
         if (oldNotes) delete[] oldNotes;
     }
-    notes[nbNotes++]=a;
+    notes[nbNotes++]=const_cast<Note*>(&a);
+
 }
 //utiliser template pour simplifier???
 void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate d,QString em,const QString& a,
@@ -54,7 +55,7 @@ void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
     }
     Tache* tache=new Tache(id,t,c,d,em,a,p,e,s);
-    addNote(tache);
+    addNote(*tache);
     QString string=id+t+a;
     addCoupleDansReference(id,string);
 }
@@ -64,7 +65,7 @@ void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDa
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
     }
     Article* a=new Article(id,t,c,d,em,te);
-    addNote(a);
+    addNote(*a);
     QString s=id+t;
     addCoupleDansReference(id,s);
 }
@@ -74,7 +75,7 @@ void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
     }
     Image* im=new Image(id,t,c,d,em,des,f);
-    addNote(im);
+    addNote(*im);
     QString s=id+t+des;
     addCoupleDansReference(id,s);
 }
@@ -84,7 +85,7 @@ void NotesManager::addAudio(const QString& id,const QString& t, QDate c, QDate d
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
     }
     Audio* audio=new Audio(id,t,c,d,em,des,f,aud);
-    addNote(audio);
+    addNote(*audio);
     QString s=id+t+des;
     addCoupleDansReference(id,s);
 }
@@ -94,7 +95,7 @@ void NotesManager::addVideo(const QString& id,const QString& t, QDate c, QDate d
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
     }
     Video* video=new Video(id,t,c,d,em,des,f,vid);
-    addNote(video);
+    addNote(*video);
     QString s=id+t+des;
     addCoupleDansReference(id,s);
 }
@@ -106,75 +107,84 @@ Note& NotesManager::getNote(const QString& id){
 
     throw NotesException("error, échoué de trouver ce note");
 }
-
+Note* NotesManager::getNote(unsigned int i){
+    if(i<nbNotes) return notes[i];
+    throw NotesException("erreur: didn't find note");
+}
 NotesManager::NotesManager():notes(nullptr),nbNotes(0),nbMaxNotes(0),filename(""){}
 
 NotesManager::~NotesManager(){
-    if (filename!="") save();//
+    if (filename!="") save();
     for(unsigned int i=0; i<nbNotes; i++) delete notes[i];
     delete[] notes;
 }
 
 void NotesManager::save() const {
     QFile newfile(filename);
+    std::cout<<"erreurxml"<<std::endl;
     if (!newfile.open(QIODevice::WriteOnly | QIODevice::Text))
+
         throw NotesException(QString("erreur sauvegarde notes : ouverture fichier xml"));
     QXmlStreamWriter stream(&newfile);
     stream.setAutoFormatting(true);
     stream.writeStartDocument();
     stream.writeStartElement("notes");
+
        for(unsigned int i=0; i<nbNotes; i++){
        int type=(notes[i])->type();
+       std::cout<< type <<std::endl;
        switch(type){
-           case 2:      { stream.writeStartElement("Article");
-                        stream.writeTextElement("id",dynamic_cast<Article*>((notes[i]))->getId());
-                        stream.writeTextElement("title",dynamic_cast<Article*>((notes[i]))->getTitle());
-                        stream.writeTextElement("date_de_creation",dynamic_cast<Article*>((notes[i]))->getDateCreat().toString("dd.MM.yyyy"));
+           case 2:      {
 
-                        stream.writeTextElement("date_de_update",dynamic_cast<Article*>((notes[i]))->getDateDernier().toString("dd.MM.yyyy"));
-                         stream.writeTextElement("enplacement",dynamic_cast<Video*>(notes[i])->getEmp());
-                        stream.writeTextElement("text",dynamic_cast<Article*>((notes[i]))->getText());
+                        stream.writeStartElement("Article");
+                        stream.writeTextElement("id",static_cast<Article*>(notes[i])->getId());
+                        stream.writeTextElement("title",static_cast<Article*>((notes[i]))->getTitle());
+                        stream.writeTextElement("date_de_creation",static_cast<Article*>((notes[i]))->getDateCreat().toString("dd.MM.yyyy"));
+
+                        stream.writeTextElement("date_de_update",static_cast<Article*>((notes[i]))->getDateDernier().toString("dd.MM.yyyy"));
+                         stream.writeTextElement("enplacement",static_cast<Video*>(notes[i])->getEmp());
+                        stream.writeTextElement("text",static_cast<Article*>((notes[i]))->getText());
                         stream.writeEndElement();} break;
            case 1:     {stream.writeStartElement("Tache");
-                        stream.writeTextElement("id",dynamic_cast<Tache*>(notes[i])->getId());
-                        stream.writeTextElement("title",dynamic_cast<Tache*>(notes[i])->getTitle());
-                        stream.writeTextElement("date_de_creation",dynamic_cast<Tache*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
-                        stream.writeTextElement("date_de_update",dynamic_cast<Tache*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
-                         stream.writeTextElement("enplacement",dynamic_cast<Video*>(notes[i])->getEmp());
-                        stream.writeTextElement("action",dynamic_cast<Tache*>(notes[i])->getAction());
-                        stream.writeTextElement("status",dynamic_cast<Tache*>(notes[i])->getStatus());
-                        stream.writeTextElement("priority",dynamic_cast<Tache*>(notes[i])->getPriority());
-                        stream.writeTextElement("echeance",dynamic_cast<Tache*>(notes[i])->getExpDate().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("id",static_cast<Tache*>(notes[i])->getId());
+                        stream.writeTextElement("title",static_cast<Tache*>(notes[i])->getTitle());
+                        stream.writeTextElement("date_de_creation",static_cast<Tache*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("date_de_update",static_cast<Tache*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
+                         stream.writeTextElement("enplacement",static_cast<Video*>(notes[i])->getEmp());
+                        stream.writeTextElement("action",static_cast<Tache*>(notes[i])->getAction());
+                        stream.writeTextElement("status",static_cast<Tache*>(notes[i])->getStatus());
+                        stream.writeTextElement("priority",static_cast<Tache*>(notes[i])->getPriority());
+                        stream.writeTextElement("echeance",static_cast<Tache*>(notes[i])->getExpDate().toString("dd.MM.yyyy"));
                         stream.writeEndElement();}break;
            case 3:     {stream.writeStartElement("Image");
-                        stream.writeTextElement("id",dynamic_cast<Image*>(notes[i])->getId());
-                        stream.writeTextElement("title",dynamic_cast<Image*>(notes[i])->getTitle());
-                        stream.writeTextElement("date_de_creation",dynamic_cast<Image*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
-                        stream.writeTextElement("date_de_update",dynamic_cast<Image*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
-                        stream.writeTextElement("enplacement",dynamic_cast<Video*>(notes[i])->getEmp());
-                        stream.writeTextElement("descp",dynamic_cast<Image*>(notes[i])->getDescpt());
-                        stream.writeTextElement("ficher",dynamic_cast<Image*>(notes[i])->getFicher());
+                        stream.writeTextElement("id",static_cast<Image*>(notes[i])->getId());
+                        stream.writeTextElement("title",static_cast<Image*>(notes[i])->getTitle());
+                        stream.writeTextElement("date_de_creation",static_cast<Image*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("date_de_update",static_cast<Image*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("enplacement",static_cast<Video*>(notes[i])->getEmp());
+                        stream.writeTextElement("descp",static_cast<Image*>(notes[i])->getDescpt());
+                        stream.writeTextElement("ficher",static_cast<Image*>(notes[i])->getFicher());
                         stream.writeEndElement();}break;
 
            case 4:     {stream.writeStartElement("Audio");
-                        stream.writeTextElement("id",dynamic_cast<Audio*>(notes[i])->getId());
-                        stream.writeTextElement("title",dynamic_cast<Audio*>(notes[i])->getTitle());
-                        stream.writeTextElement("date_de_creation",dynamic_cast<Audio*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
-                        stream.writeTextElement("date_de_update",dynamic_cast<Audio*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
-                        stream.writeTextElement("descp",dynamic_cast<Audio*>(notes[i])->getDescpt());
-                         stream.writeTextElement("enplacement",dynamic_cast<Video*>(notes[i])->getEmp());
-                        stream.writeTextElement("ficher",dynamic_cast<Audio*>(notes[i])->getFicher());
-                        stream.writeTextElement("A_ficher",dynamic_cast<Audio*>(notes[i])->getAFile());
+                        stream.writeTextElement("id",static_cast<Audio*>(notes[i])->getId());
+                        stream.writeTextElement("title",static_cast<Audio*>(notes[i])->getTitle());
+                        stream.writeTextElement("date_de_creation",static_cast<Audio*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("date_de_update",static_cast<Audio*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("descp",static_cast<Audio*>(notes[i])->getDescpt());
+                         stream.writeTextElement("enplacement",static_cast<Video*>(notes[i])->getEmp());
+                        stream.writeTextElement("ficher",static_cast<Audio*>(notes[i])->getFicher());
+                        stream.writeTextElement("A_ficher",static_cast<Audio*>(notes[i])->getAFile());
                         stream.writeEndElement();}break;
            case 5:     {stream.writeStartElement("Video");
-                        stream.writeTextElement("id",dynamic_cast<Video*>(notes[i])->getId());
-                        stream.writeTextElement("title",dynamic_cast<Video*>(notes[i])->getTitle());
-                        stream.writeTextElement("date_de_creation",dynamic_cast<Video*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
-                        stream.writeTextElement("date_de_update",dynamic_cast<Video*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
-                        stream.writeTextElement("enplacement",dynamic_cast<Video*>(notes[i])->getEmp());
-                        stream.writeTextElement("descp",dynamic_cast<Video*>(notes[i])->getDescpt());
-                        stream.writeTextElement("ficher",dynamic_cast<Video*>(notes[i])->getFicher());
-                        stream.writeTextElement("V_ficher",dynamic_cast<Video*>(notes[i])->getVFile());
+                        stream.writeTextElement("id",static_cast<Video*>(notes[i])->getId());
+                        stream.writeTextElement("title",static_cast<Video*>(notes[i])->getTitle());
+                        stream.writeTextElement("date_de_creation",static_cast<Video*>(notes[i])->getDateCreat().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("date_de_update",static_cast<Video*>(notes[i])->getDateDernier().toString("dd.MM.yyyy"));
+                        stream.writeTextElement("enplacement",static_cast<Video*>(notes[i])->getEmp());
+                        stream.writeTextElement("descp",static_cast<Video*>(notes[i])->getDescpt());
+                        stream.writeTextElement("ficher",static_cast<Video*>(notes[i])->getFicher());
+                        stream.writeTextElement("V_ficher",static_cast<Video*>(notes[i])->getVFile());
                         stream.writeEndElement();}break;
 
 
@@ -190,7 +200,7 @@ void NotesManager::load() {
     QFile fin(filename);
     // If we can't open it, let's show an error message.
     if (!fin.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        throw NotesException("Erreur ouverture fichier notes");
+        std::cout<<"Erreur ouverture fichier notes"<<std::endl;
     }
     // QXmlStreamReader takes any QIODevice.
     QXmlStreamReader xml(&fin);
