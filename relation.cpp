@@ -37,7 +37,7 @@ void Relation::addCouple(const QString& lab, Note* x, Note* y, const QString &e)
     Couple* c=new Couple(lab,x,y,e);
     addCouple(c);
     if (orient==false){ // relation non orienté
-        Couple* c2= new Couple(lab,y,x);
+        Couple* c2= new Couple(lab,y,x,e);
         addCouple(c2);
     }
 }
