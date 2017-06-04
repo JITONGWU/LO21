@@ -10,7 +10,7 @@ class RelationManager{
     Relation** relations;
     unsigned int nbRe;
     unsigned int nbMaxRe;
-    void addRelation(Relation* r);
+
     mutable QString filename;
 
     RelationManager();
@@ -30,12 +30,13 @@ class RelationManager{
 
 
 public:
-
-    void addRelation(const QString& t,const QString& d,bool o, Couple** c,unsigned int nb=0);
+    void addRelation(Relation* r);
+    void addRelation(const QString& t,const QString& d,bool o=true, Couple** c=nullptr,unsigned int nb=0);
     void afficherAscendents(Note* y);//
     void afficherDescendenets(Note* x);//
 
     Relation& getRelation(const QString& t); // return the relation avec titre t
+    Relation& getRelation(unsigned int i);
     void setFilename(const QString& f) { filename=f; }
     void load(); // load relation from file filename
     void save() const; // save relation in file filename
