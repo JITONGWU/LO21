@@ -1,22 +1,25 @@
 #include "FenPrincipale.h"
+#include "articleediteur.h"
+#include "imageediteur.h"
 
 #include <QFile>
 #include <QTextCodec>
 #include <QtXml>
 #include <QAction>
+#include <QHBoxLayout>
 
 FenPrincipale::FenPrincipale() {
 
     QTabWidget *onglet = new QTabWidget;
-    onglet->addTab(new Page1(), tr("Notes"));
-    onglet->addTab(new Page2(), tr("Relations"));
+    onglet->addTab(new Page1(this), tr("Notes"));
+    onglet->addTab(new Page2(this), tr("Relations"));
     setCentralWidget( onglet );
     QTabWidget::TabPosition(0);
     setWindowTitle(tr("Interface"));
 
 }
 
-Page1::Page1()
+Page1::Page1(QWidget *parent)
 {
 
 
@@ -36,7 +39,7 @@ Page1::Page1()
   //  QObject::connect(actionAjout,SIGNAL(triggered()),qApp,SLOT(editerArticle("id:citation_babage")));
 
 
-    QMenu *fichiersRecents = menuNotes->addMenu("Fichiers &récents");
+    QMenu *fichiersRecents = menuNotes->addMenu("Fichiers &rÃ©cents");
     fichiersRecents->addAction("Fichier_test.txt");
 
     // RELATIONS
@@ -87,44 +90,55 @@ Page1::Page1()
 
     /*** ZONE CENTRALE ***/
 
+    QDate d1(1997,3,5);
+    QDate d2(1998,2,1);
+    Article a("id_article","tiretitre",d1,d2,"N","sksdfdsfsdfaskd");
+    Image i("id_image","myimage",d1,d2,"A","this is my image","this is my file");
+    //initialiser les notes pour tester
 
+    zoneCentrale = new QWidget;
+    vide = new QWidget;
+    ae = new ArticleEditeur(a,this);
+    ie = new ImageEditeur(i,this);
+    scrollNote = new QScrollArea;
+    listWidget = new ListeNotes;
+    layout=new QHBoxLayout;
 
+    scrollNote->setWidgetResizable(true);
 
-    QWidget *zoneCentrale = new QWidget;
+    layout->addWidget(listWidget,1,0);
+    layout->addWidget(ae,1,0);
+    layout->addWidget(ie,1,0);
+    layout->addWidget(vide,1,0);
+    layout->addWidget(scrollNote,1,0);
+    ie->setVisible(false);
+    ae->setVisible(false);
+    vide->setVisible(true);
 
-    QLineEdit *id = new QLineEdit;
-    QLineEdit *title = new QLineEdit;
-    QLineEdit *text = new QLineEdit;
-
-    QGridLayout *layoutG = new QGridLayout;
-    QFormLayout *form = new QFormLayout;
-    form->addRow("id", id);
-    form->addRow("titre", title);
-    form->addRow("texte", text);
-
-    //QScrollArea *scrollNote = new QScrollArea;
-    //
-
-    ListeNotes *listWidget = new ListeNotes;
-
-
-    layoutG->addWidget(listWidget,1,0);
-    QScrollArea *scrollRelation = new QScrollArea;
-    scrollRelation->setWidgetResizable(true);
-    layoutG->addWidget(scrollRelation,1,2);
-
-
-    layoutG->addLayout(form, 1,1),
-    zoneCentrale->setLayout(layoutG);
+    zoneCentrale->setLayout(layout);
     setCentralWidget(zoneCentrale);
 
 
 
+    QObject::connect(listWidget,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(afficherWidget(QListWidgetItem*)));
+
+}
+void Page1::afficherWidget(QListWidgetItem* item){
+
+    if(item->text()=="id_article") {
+    ie->setVisible(false);
+    ae->setVisible(true);
+    vide->setVisible(false);
+    }
+    if(item->text()=="id_image") {
+    ae->setVisible(false);
+    ie->setVisible(true);
+    vide->setVisible(false);
+    }
 
 }
 
-
-Page2::Page2() {
+Page2::Page2(QWidget * parent) {
     QWidget *zoneCentrale = new QWidget;
 
     QLineEdit *nom = new QLineEdit;
@@ -150,12 +164,13 @@ Page2::Page2() {
 ListeNotes::ListeNotes() {
 
 
-insertItem(0, new QListWidgetItem("Note 1"));
-insertItem(1, new QListWidgetItem("Note 2"));
+insertItem(0, new QListWidgetItem("id_article"));
+insertItem(1, new QListWidgetItem("id_image"));
 insertItem(2, new QListWidgetItem("Note 3"));
 insertItem(3, new QListWidgetItem("Note 4"));
 
+
 //Faire une boucle de i=1 au nbNotes
-//Utiliser XML pour lire titre et associé note 1 à son titre;
+//Utiliser XML pour lire titre et associÃ© note 1 Ã  son titre;
 
 }
