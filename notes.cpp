@@ -20,15 +20,23 @@ bool NotesManager::rechercherNote(QString id){
 }
 
 void NotesManager::addCoupleDansReference(const QString& id,QString& s){
+    //std::cout<<"entrer dans la fonction"<<std::endl;
     // lier tous les attributs de type string
-    QStringList lst=s.split("\ref{",QString::SkipEmptyParts,Qt::CaseSensitive);  // majuscule  ? minuscule ?
+
+    QStringList lst=s.split("ref{",QString::SkipEmptyParts,Qt::CaseSensitive);  // majuscule  ? minuscule ?
+
    for(int i=1;i<lst.count();i++)
     {
+
         QStringList l=lst.at(i).split("}",QString::SkipEmptyParts, Qt::CaseSensitive);
         QString idy=l.at(0);
+        std::cout<<rechercherNote(idy)<<std::endl;
+
         if(rechercherNote(idy)) {//si on trouve les notes avec id= l.at(0)
-            Couple cp("ref"+id,&getNote(id),&getNote(idy));
-            Reference::getRef().addCouple(&cp);
+
+            Couple *cp=new Couple("ref"+id,&getNote(id),&getNote(idy));
+
+            Reference::getRef().addCouple(cp);
     }
 }
 }
@@ -66,7 +74,7 @@ void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDa
     }
     Article* a=new Article(id,t,c,d,em,te);
     addNote(*a);
-    QString s=id+t;
+    QString s=id+t+te;
     addCoupleDansReference(id,s);
 }
 void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d,QString em,const QString& des, const QString& f)
@@ -121,7 +129,7 @@ NotesManager::~NotesManager(){
 
 void NotesManager::save() const {
     QFile newfile(filename);
-    std::cout<<"erreurxml"<<std::endl;
+
     if (!newfile.open(QIODevice::WriteOnly | QIODevice::Text))
 
         throw NotesException(QString("erreur sauvegarde notes : ouverture fichier xml"));
@@ -132,7 +140,7 @@ void NotesManager::save() const {
 
        for(unsigned int i=0; i<nbNotes; i++){
        int type=(notes[i])->type();
-       std::cout<< type <<std::endl;
+
        switch(type){
            case 2:      {
 
