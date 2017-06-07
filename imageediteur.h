@@ -35,7 +35,7 @@ class ImageEditeur: public QWidget
     Image *image; //pointeur vers l'article à afficher par la fenetre
 
 public:
-    explicit ImageEditeur (Image& im,QWidget *parent=0);
+    explicit ImageEditeur (Image& im,QWidget *parent=0,bool n=false);
     //explicit pour empêcher la conversion implicite de article vers Article
 
 signals:

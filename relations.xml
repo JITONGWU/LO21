@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<relations>
-    <titre> relation1 </titre>
-    <description> tester </description>
-    <couple>
-        <label>frere</label>
-        <idx>id:avant_propos</idx>
-        <idy>id:avant_propos</idy>
-    </couple>
-</relations>
+<Relations>
+    <Relation>
+        <titre>Référence</titre>
+        <description>ef{idNote}</description>
+        <oriente>true</oriente>
+        <couple>
+            <label>ref12345</label>
+            <idx>12345</idx>
+            <idy>idsdsid</idy>
+            <etat>N</etat>
+        </couple>
+    </Relation>
+</Relations>

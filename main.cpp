@@ -1,11 +1,8 @@
-#include "mainwindow.h"
 #include <QApplication>
 #include<iostream>
-#include"relation.h"
 #include<Qlist>
+#include<QFile>
 #include<QMessageBox>
-#include "notes.h"
-#include "relationmanager.h"
 #include <QApplication>
 #include <QWidget>
 #include <QLabel>
@@ -15,25 +12,19 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFileDialog>
-//#include "NoteEditeur.h"
+
+#include "window.h"
+#include "notes.h"
+#include "relationmanager.h"
+#include "relation.h"
 
 using namespace std;
+
 int main(int argc, char *argv[])
 {
+    QApplication app(argc, argv);
+   FenPrincipale f;
+   f.show();
 
-        QApplication app(argc, argv);
-        QString fichierNotes = "notes.xml";
-        QString fichierRelations ="relations.xml";
-        NotesManager& m=NotesManager::getManager();
-        RelationManager & r=RelationManager::getManager();
-        //Reference & ref=Reference::getRef();
-        m.setFilename(fichierNotes);
-        r.setFilename(fichierRelations);
-
-        //m.load();
-        //r.load();
-        //Note& a=m.getNote("id:avant_propos");
-        //NoteEditeur fenetre(a);
-        //fenetre.show();
-        return app.exec();
+    return app.exec();
 }

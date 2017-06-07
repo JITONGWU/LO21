@@ -1,7 +1,7 @@
 #include "imageediteur.h"
 #include <QMessageBox>
 
-ImageEditeur::ImageEditeur(Image &im, QWidget *parent):
+ImageEditeur::ImageEditeur(Image &im, QWidget *parent,bool n):
 
     QWidget(parent),image(&im)
     //apple au constructeur de qwidget en lui donnant en parametre "parent"
@@ -43,13 +43,14 @@ ImageEditeur::ImageEditeur(Image &im, QWidget *parent):
     couche->addLayout(cdesc);
     couche->addLayout(cfile);
     couche->addWidget(save);
-
+    if(n==false){
     id->setReadOnly(true);
 
     id->setText(image->getId());
     titre->setText(image->getTitle());
     desc->setText(image->getDescpt());
     file->setText(image->getFicher());
+    }
 
     setLayout(couche);
 

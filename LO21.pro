@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-
+QMAKE = /FS
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 QT += xml
 
@@ -32,12 +32,21 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     relation.cpp \
     notes.cpp \
-    relationmanager.cpp
+    relationmanager.cpp \
+    window.cpp \
+    articleediteur.cpp \
+    imageediteur.cpp \
+    relationediteur.cpp \
+    page1.cpp
 
 HEADERS  += mainwindow.h \
     relation.h \
+    relationmanager.h \
+    window.h \
+    articleediteur.h \
     notes.h \
-    relationmanager.h
+    imageediteur.h \
+    relationediteur.h
 
 FORMS    += mainwindow.ui
 
