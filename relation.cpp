@@ -13,47 +13,27 @@ void Reference::freeRef(){
 }
 
 
-
-void Relation::addCouple(Couple* c){
-    for(unsigned int i=0; i<nb; i++){
-        if (couples[i]->getLabel()==c->getLabel()) throw NotesException("error, creation of an already existent relation");
-    }
-    if (nb==nbmax){
-        Couple** newCouples= new Couple*[nbmax+5];
-        for(unsigned int i=0; i<nb; i++) newCouples[i]=couples[i];
-        Couple** old=couples;
-        couples=newCouples;
-        nbmax+=5;
-        if (old) delete[] old;
-    }
-    couples[nb++]=c;
-}
-
 void Relation::addCouple(const QString& lab, Note* x, Note* y, const QString &e){
-    for(unsigned int i=0; i<nb; i++){
-        if (couples[i]->getLabel()==lab) throw NotesException("Erreur : creation of an already existent relation");
-    }
+    for(unsigned int i=0;i<couples.size();i++)
+        {
+            if (couples.at(i)->getLabel()==lab)
+                throw NotesException("Erreur : creation of an already existent relation");
+        }
     //tester si x et y sont les notes de dernière version
     Couple* c=new Couple(lab,x,y,e);
-    addCouple(c);
+    couples.append(c);
     if (orient==false){ // relation non orienté
         Couple* c2= new Couple(lab,y,x,e);
-        addCouple(c2);
+        couples.append(c2);
     }
 }
-void  Relation::retirerCouple(QString& lab){ //si non oriente ,retirer deux fois
-    Couple** supprimer= new Couple*[nbmax];
-    for(unsigned int i=0; i<nb; i++){
-        if (couples[i]->getLabel()==lab) supprimer[i]=couples[i];
-    }
-    if(supprimer) delete[] supprimer;
-
-    else throw NotesException("erreur: didn't find couple");
-}
+//retirer couple : couples.removeOne(Couple*)
 Couple* Relation::getCouple(const QString &l){
-    for(unsigned int i=0; i<nb; i++){
-        if (couples[i]->getLabel()==l) return couples[i];
-    }
+    for(unsigned int i=0;i<couples.size();i++)
+        {
+            if (couples.at(i)->getLabel()==l)
+               return couples.at(i);
+        }
 
     throw NotesException("erreur: didn't find couple");
 }
@@ -62,7 +42,4 @@ QString Couple::AfficherCouple(){
     QString s="("+this->getX()->getId()+","+this->getY()->getId()+")";
     return s;
 }
-Couple* Relation::getCouple(unsigned int i){
-    if(i<nb) return couples[i];
-    throw NotesException("erreur: didn't find couple");
-}
+//couples.at(i)
