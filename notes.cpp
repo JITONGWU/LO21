@@ -249,7 +249,7 @@ void NotesManager::load() {
                     xml.readNext();
                 }
                 addArticle(identificateur,titre,creat,der_modif,enpl,text);
-            } break;
+            } ;
             if(xml.name()== "Tache"){
 
                 QString identificateur;
@@ -305,7 +305,7 @@ void NotesManager::load() {
                 }
 
                 addTache(identificateur,titre,creat,der_modif,enpl,action,priorite,echeance,status);
-            } break;
+            } ;
             if(xml.name()== "Image" ){
 
                 QString identificateur;
@@ -352,7 +352,7 @@ void NotesManager::load() {
                 }
 
                 addImage(identificateur,titre,creat,der_modif,enpl,desc,file);
-            } break;
+            } ;
            if(xml.name()==  "Audio" ){
 
                 QString identificateur;
@@ -404,7 +404,7 @@ void NotesManager::load() {
                 }
 
                 addAudio(identificateur,titre,creat,der_modif, enpl,desc,file,afile);
-            } break;
+            } ;
 
             if(xml.name()=="Video" ){
 
@@ -458,7 +458,7 @@ void NotesManager::load() {
                 }
 
                 addVideo(identificateur,titre,creat,der_modif,enpl,desc,file,vfile);
-            } break;
+            } ;
 
 
 
