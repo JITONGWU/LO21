@@ -1,65 +1,43 @@
 #include "relationmanager.h"
 
-
-
 // relationManager singleton
-RelationManager::HandlerM RelationManager::handler=HandlerM();
+RelationManager::Handler RelationManager::handler=Handler();
+
 RelationManager& RelationManager::getManager(){
-    if (!handler.RM) handler.RM=new RelationManager;
-    return *handler.RM;
+    if (!handler.instance) handler.instance=new RelationManager;
+    return *handler.instance;
 }
+
 void RelationManager::freeManager(){
-    delete handler.RM;
-    handler.RM=nullptr;
+    delete handler.instance;
+    handler.instance=nullptr;
 }
 
-void RelationManager::addRelation(const QString& t, const QString& d, bool o, Couple **c, unsigned int nb){
-    for(unsigned int i=0; i<nbRe; i++){
-        if (relations[i]->getTitre()==t) throw NotesException("error, creation of an already existent relation");
-    }
-    Relation* r=new Relation(t,d,o,c,nb);
-    addRelation(r);
+void RelationManager::addRelation(const QString& t, const QString& d, bool o, QList<Couple *> c){
+    for(unsigned int i=0;i<relations.size();i++)
+        {
+            if (relations.at(i)->getTitre()==t)
+                throw NotesException("Erreur : creation of an already existent relation");
+        }
+    Relation* r=new Relation(t,d,o,&c);
+    relations.append(r);
 }
 
-void RelationManager::addRelation(Relation* r){
-    for(unsigned int i=0; i<nbRe; i++){
-        if (relations[i]->getTitre()==r->getTitre()) throw NotesException("error, creation of an already existent relation");
-    }
-    if (nbRe==nbMaxRe){
-        Relation** newRelations= new Relation*[nbMaxRe+5];
-        for(unsigned int i=0; i<nbRe; i++) newRelations[i]=relations[i];
-        Relation** old=relations;
-        relations=newRelations;
-        nbMaxRe+=5;
-        if (old) delete[] old;
-    }
-   relations[nbRe++]=r;
-}
-
-RelationManager::RelationManager():relations(nullptr),nbRe(0),nbMaxRe(0),filename(""){
-    addRelation(&Reference::getRef());
+RelationManager::RelationManager():filename(""){
+    relations.append(&Reference::getRef());// enlever apres la premiere fois
 }//ajouter Référence quand on crée le relationManager
 
 RelationManager::~RelationManager(){
     if (filename!="") save();//
-    for(unsigned int i=0; i<nbRe; i++) delete relations[i];
-    delete[] relations;
+    relations.clear();
 }
-Relation& RelationManager::getRelation(const QString& t){
-    // si Relation existe déjà, on en renvoie une référence
-    for(unsigned int i=0; i<nbRe; i++){
-        if (relations[i]->getTitre()==t) return *relations[i];
-    }
-    // sinon il est créé
-    Relation* a=new Relation(t,"",true);
-    addRelation(a);
-    return *a;
-}
-Relation& RelationManager::getRelation(unsigned int i){
-    if(i<=nbRe) return *relations[i];
-    else throw NotesException("Erreur : didnt find relation");
+Relation* RelationManager::getRelation(const QString& t){
+    for(unsigned int i=0;i<relations.size();i++)
+        if (relations.at(i)->getTitre()==t) return relations.at(i);
 
+    throw NotesException("Erreur : didnt find relation");
 }
+
 /*
 Note* RelationManager::getAscendents(Note* y){
     for(unsigned int i=0;i<nbRe; i++)
@@ -89,21 +67,21 @@ void RelationManager::save() const {
     stream.setAutoFormatting(true);
     stream.writeStartDocument();
     stream.writeStartElement("Relations");
-       for(unsigned int i=0; i<nbRe; i++){
+       for(unsigned int i=0;i<relations.size();i++){
                         stream.writeStartElement("Relation");
-                        stream.writeTextElement("titre",(relations[i])->getTitre());
-                        stream.writeTextElement("description",(relations[i])->getDesc());
-                        if(relations[i]->getOrient())
+                        stream.writeTextElement("titre",relations.at(i)->getTitre());
+                        stream.writeTextElement("description",relations.at(i)->getDesc());
+                        if(relations.at(i)->getOrient())
                             stream.writeTextElement("oriente","true");
                         else
                             stream.writeTextElement("oriente","false");
 
-                        for(unsigned int j=0;j<relations[i]->getNb();j++){
+                        for(unsigned int j=0;j<relations.at(i)->getCouples().size();i++){
                         stream.writeStartElement("couple");
-                        stream.writeTextElement("label",relations[i]->getCouple(j)->getLabel());
-                        stream.writeTextElement("idx",relations[i]->getCouple(j)->getX()->getId());
-                        stream.writeTextElement("idy",relations[i]->getCouple(j)->getY()->getId());
-                        stream.writeTextElement("etat",relations[i]->getCouple(j)->getEtat());
+                        stream.writeTextElement("label",relations.at(i)->getCouples().at(j)->getLabel());
+                        stream.writeTextElement("idx",relations.at(i)->getCouples().at(j)->getX()->getId());
+                        stream.writeTextElement("idy",relations.at(i)->getCouples().at(j)->getY()->getId());
+                        stream.writeTextElement("etat",relations.at(i)->getCouples().at(j)->getEtat());
                         stream.writeEndElement();
                         }
                         stream.writeEndElement();}
@@ -140,8 +118,7 @@ void RelationManager::load() {
                 QString titre;
                 QString description;
                 bool orient;
-                Couple** couples=new Couple*;
-                unsigned int nbCouple=0;
+                QList<Couple*> couples ;
                 //QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
                 //We're going to loop over the things because the order might change.
@@ -163,6 +140,8 @@ void RelationManager::load() {
                             xml.readNext();
                             if(xml.text().toString()=="true") orient=1;
                             if(xml.text().toString()=="false") orient=0;
+                            qDebug()<<"ajout couple \n";
+
                         }
                         if(xml.name() == "couple") {
                             QString idx;
@@ -180,23 +159,27 @@ void RelationManager::load() {
                                                 xml.readNext();idy=xml.text().toString();}
                                             if(xml.name()=='etat'){
                                                 xml.readNext();etat=xml.text().toString();}
+                                            qDebug()<<"ajout couple "<<label<<"\n";
+
 
                             }
 
                             xml.readNext();
                             }
-                             qDebug()<<"ajout couple "<<label<<"\n";
 
-                            Couple* cp=new Couple(label,&NotesManager::getManager().getNote(idx),&NotesManager::getManager().getNote(idy),etat);
-                            couples[nbCouple]=cp;
-                            nbCouple++;
+                            Note *x= NotesManager::getNoteManager().getNote(idx);
+                            Note *y = NotesManager::getNoteManager().getNote(idy);
+
+                            Couple *newC = new Couple(label,x,y,etat);
+
+                            couples.append(newC);
+
                         }
-
                     }
                     xml.readNext();
                 }
                 qDebug()<<"ajout relation "<<titre<<"\n";
-                addRelation(titre,description,orient,couples,nbCouple);
+               addRelation(titre,description,orient,couples);
             }
 
             }
@@ -208,5 +191,5 @@ void RelationManager::load() {
     }
     // Removes any device() or data from the reader * and resets its internal state to the initial state.
     xml.clear();
-    qDebug()<<"fin load\n";
+    qDebug()<<"fin load relation\n";
 }
