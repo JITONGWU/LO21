@@ -83,7 +83,7 @@ public:
     Article(const QString & i,const QString & t, QDate c, QDate d,QString em,const QString& te):
         Note(i,t,c,d,em),text(te){}
     const QString & getText() const { return text; }
-    void setText(const QString& t);
+    void setText(const QString& t){text=t;}
     int type()const {return 2;}
 };
 
@@ -96,7 +96,7 @@ class Image : public Note {
         Note(i,t,c,d,em),desc(des),file(f){}
     const QString & getDescpt() const {return desc;}
     const QString & getFicher() const {return file;} // la valeur de retour est de type QString ou de type Image?
-    void setDesc(const QString& des);
+    void setDesc(const QString& des){desc=des;}
     void setFile(const QString& f){file=f;}
     int type()const {return 3;}
 
@@ -131,10 +131,7 @@ class Image : public Note {
 
 class NotesManager {
 private:
-    Note** notes;  //QList<Note*> notes;
-    unsigned int nbNotes;
-    unsigned int nbMaxNotes;
-    void addNote(const Note& n);  // sauvegarder version ancienne
+    QList<Note*> notes;
     mutable QString filename;
 
     struct Handler {
@@ -166,64 +163,15 @@ public:
     void addAudio(const QString& i,const QString& t, QDate c, QDate d,QString em,const QString& des, const QString& f,const QString& aud);
     void addVideo(const QString& i,const QString& t, QDate c, QDate d,QString em,const QString& des, const QString& f,const QString& vid);
 
-    Note& getNote(const QString& id); // return the article with identificator id
-    Note* getNote(unsigned int i);
-
-    int getNb()const {return nbNotes;}
+    Note* getNote(const QString& id); // return the article with identificator id
     bool rechercherNote(QString id);
     void setFilename(QString f) { filename=f; }
     void load(); // load notes from file filename
     void save() const; // save notes in file filename
     void addCoupleDansReference(const QString& id,QString& s);
-    static NotesManager& getManager();
-    static void freeManager(); // free the memory used by the NotesManager; it can be rebuild later
 
-    class Iterator {
-            friend class NotesManager;
-            Note** currentN;
-            unsigned int nbRemain;
-            Iterator(Note** a, unsigned nb):currentN(a),nbRemain(nb){}
-        public:
-            Iterator():currentN(nullptr),nbRemain(0){}
-            bool isDone() const { return nbRemain==0; }
-            void next() {
-                if (isDone())
-                    throw NotesException("error, next on an iterator which is done");
-                nbRemain--;
-                currentN++;
-            }
-           Note& current() const {
-                if (isDone())
-                    throw NotesException("error, indirection on an iterator which is done");
-                return **currentN;
-            }
-        };
-        Iterator getIterator() {
-            return Iterator(notes,nbNotes);
-        }
+    static NotesManager& getNoteManager();
+    static void freeNoteManager(); // free the memory used by the NotesManager; it can be rebuild later
 
-        class ConstIterator {   //non modifiable
-            friend class NotesManager;
-           Note** currentNC;
-            unsigned int nbRemain;
-            ConstIterator(Note** a, unsigned nb):currentNC(a),nbRemain(nb){}
-        public:
-            ConstIterator():nbRemain(0),currentNC(0){}
-            bool isDone() const { return nbRemain==0; }
-            void next() {
-                if (isDone())
-                    throw NotesException("error, next on an iterator which is done");
-                nbRemain--;
-                currentNC++;
-            }
-            const Note& current() const {
-                if (isDone())
-                    throw NotesException("error, indirection on an iterator which is done");
-                return **currentNC;
-            }
-        };
-        ConstIterator getIterator() const {
-            return ConstIterator(notes,nbNotes);
-        }
 };
 #endif
