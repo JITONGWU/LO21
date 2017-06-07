@@ -1,19 +1,19 @@
-#include "Notes.h"
+#include "notes.h"
 #include "relation.h"
 #include <QFile>
 NotesManager::Handler NotesManager::handler=Handler();
 
-NotesManager& NotesManager::getManager(){
+NotesManager& NotesManager::getNoteManager(){
     if (!handler.instance) handler.instance=new NotesManager;
     return *handler.instance;
 }
 
-void NotesManager::freeManager(){
+void NotesManager::freeNoteManager(){
     delete handler.instance;
     handler.instance=nullptr;
 }
 bool NotesManager::rechercherNote(QString id){
-    for(unsigned int i=0; i<nbNotes; i++){
+    for(unsigned int i=0; i<notes.size(); i++){
         if (notes[i]->getId()==id) return true;
     }
     return false;
@@ -34,97 +34,77 @@ void NotesManager::addCoupleDansReference(const QString& id,QString& s){
 
         if(rechercherNote(idy)) {//si on trouve les notes avec id= l.at(0)
 
-            Couple *cp=new Couple("ref"+id,&getNote(id),&getNote(idy));
+            Couple *cp=new Couple("ref"+id,getNote(id),getNote(idy));
 
-            Reference::getRef().addCouple(cp);
+            Reference::getRef().getCouples().append(cp);
     }
 }
 }
-void NotesManager::addNote(const Note& a){
-    for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==a.getId()) throw NotesException("error, creation of an already existent note");
-    }
-    if (nbNotes==nbMaxNotes){
-        Note** newNotes= new Note*[nbMaxNotes+5];
-        for(unsigned int i=0; i<nbNotes; i++) newNotes[i]=notes[i];
-        Note** oldNotes=notes;
-        notes=newNotes;
-        nbMaxNotes+=5;
-        if (oldNotes) delete[] oldNotes;
-    }
-    notes[nbNotes++]=const_cast<Note*>(&a);
-
-}
-//utiliser template pour simplifier???
 void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate d,QString em,const QString& a,
                             const QString& p, QDate e,const QString& s="en_attente")
 {
-    for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
+    for(unsigned int i=0; i<notes.size(); i++){
+        if (notes.at(i)->getId()==id) throw NotesException("error, creation of an already existent note");
     }
     Tache* tache=new Tache(id,t,c,d,em,a,p,e,s);
-    addNote(*tache);
-    QString string=id+t+a;
-    addCoupleDansReference(id,string);
+    notes.append(tache);
+    //QString string=id+t+a;
+    //addCoupleDansReference(id,string);
 }
 void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDate d,QString em,const QString& te)
 {
-    for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
+    for(unsigned int i=0; i<notes.size(); i++){
+        if (notes.at(i)->getId()==id) throw NotesException("error, creation of an already existent note");
     }
     Article* a=new Article(id,t,c,d,em,te);
-    addNote(*a);
+    notes.append(a);
     QString s=id+t+te;
     addCoupleDansReference(id,s);
 }
 void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d,QString em,const QString& des, const QString& f)
 {
-    for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
+    for(unsigned int i=0; i<notes.size(); i++){
+        if (notes.at(i)->getId()==id) throw NotesException("error, creation of an already existent note");
     }
     Image* im=new Image(id,t,c,d,em,des,f);
-    addNote(*im);
+    notes.append(im);
     QString s=id+t+des;
     addCoupleDansReference(id,s);
 }
 void NotesManager::addAudio(const QString& id,const QString& t, QDate c, QDate d,QString em,const QString& des, const QString& f,const QString& aud)
 {
-    for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
+    for(unsigned int i=0; i<notes.size(); i++){
+        if (notes.at(i)->getId()==id) throw NotesException("error, creation of an already existent note");
     }
     Audio* audio=new Audio(id,t,c,d,em,des,f,aud);
-    addNote(*audio);
+    notes.append(audio);
     QString s=id+t+des;
     addCoupleDansReference(id,s);
 }
 void NotesManager::addVideo(const QString& id,const QString& t, QDate c, QDate d,QString em,const QString& des, const QString& f,const QString& vid)
 {
-    for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
+    for(unsigned int i=0; i<notes.size(); i++){
+        if (notes.at(i)->getId()==id) throw NotesException("error, creation of an already existent note");
     }
     Video* video=new Video(id,t,c,d,em,des,f,vid);
-    addNote(*video);
+   notes.append(video);
     QString s=id+t+des;
     addCoupleDansReference(id,s);
 }
-Note& NotesManager::getNote(const QString& id){
+Note* NotesManager::getNote(const QString& id){
     // si l'Note existe d, on en renvoie une rrence
-    for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==id) return *notes[i];
+    for(unsigned int i=0; i<notes.size(); i++){
+        if (notes.at(i)->getId()==id) return notes.at(i);
     }
-
     throw NotesException("error, échoué de trouver ce note");
 }
-Note* NotesManager::getNote(unsigned int i){
-    if(i<nbNotes) return notes[i];
-    throw NotesException("erreur: didn't find note");
-}
-NotesManager::NotesManager():notes(nullptr),nbNotes(0),nbMaxNotes(0),filename(""){}
+
+NotesManager::NotesManager():filename(""){}
 
 NotesManager::~NotesManager(){
     if (filename!="") save();
-    for(unsigned int i=0; i<nbNotes; i++) delete notes[i];
-    delete[] notes;
+    for(unsigned int i=0; i<notes.size(); i++) delete notes.at(i);
+     notes.clear();
 }
 
 void NotesManager::save() const {
@@ -138,8 +118,8 @@ void NotesManager::save() const {
     stream.writeStartDocument();
     stream.writeStartElement("notes");
 
-       for(unsigned int i=0; i<nbNotes; i++){
-       int type=(notes[i])->type();
+       for(unsigned int i=0; i<notes.size(); i++){
+       int type=(notes.at(i))->type();
 
        switch(type){
            case 2:      {
@@ -268,7 +248,6 @@ void NotesManager::load() {
                     }
                     xml.readNext();
                 }
-
                 addArticle(identificateur,titre,creat,der_modif,enpl,text);
             } break;
             if(xml.name()== "Tache"){
@@ -331,11 +310,11 @@ void NotesManager::load() {
 
                 QString identificateur;
                 QString titre;
-
                 QDate creat;
                 QDate der_modif;
                 QString desc;
-                QString file;QString enpl;
+                QString file;
+                QString enpl;
             //    QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
                 //We're going to loop over the things because the order might change.
@@ -492,7 +471,7 @@ void NotesManager::load() {
     }
     // Removes any device() or data from the reader * and resets its internal state to the initial state.
   xml.clear();
-  qDebug()<<"fin load\n";
+  qDebug()<<"fin load aaa\n";
 
 }
 
