@@ -1,4 +1,4 @@
-#include "Notes.h"
+#include "notes.h"
 #include "relation.h"
 #include <QFile>
 NotesManager::Handler NotesManager::handler=Handler();
@@ -10,7 +10,7 @@ NotesManager& NotesManager::getManager(){
 
 void NotesManager::freeManager(){
     delete handler.instance;
-    handler.instance=nullptr;
+    handler.instance=NULL;
 }
 bool NotesManager::rechercherNote(QString id){
     for(unsigned int i=0; i<nbNotes; i++){
@@ -19,6 +19,7 @@ bool NotesManager::rechercherNote(QString id){
     return false;
 }
 
+/*
 void NotesManager::addCoupleDansReference(const QString& id,QString& s){
     //std::cout<<"entrer dans la fonction"<<std::endl;
     // lier tous les attributs de type string
@@ -36,145 +37,71 @@ void NotesManager::addCoupleDansReference(const QString& id,QString& s){
 
             Couple *cp=new Couple("ref"+id,&getNote(id),&getNote(idy));
 
-            Reference::getRef().addCouple(cp);
+            Reference::getRef().getCouples().append(cp);
     }
 }
 }
+*/
+void NotesManager::addOldVersion(const Note* a) {
 
+    if (nbOldVersions==nbMaxOldVersions){
+        Note** newNotes= new Note*[nbMaxOldVersions+5];
+        for(unsigned int i=0; i<nbOldVersions; i++) newNotes[i]=oldVersions[i];
+        Note** oldNotes=oldVersions;
+        oldVersions=newNotes;
+        nbMaxOldVersions+=5;
+        if (oldNotes) delete[] oldNotes;
+       }
+
+    oldVersions[nbOldVersions++]=const_cast<Note*>(a); //On ajoute tmp dans oldVersions
+
+    Note* update_Version = &getNote(a->getId());
+    update_Version->setNbVersions(1);
+
+    return;
+
+
+}
+
+
+void NotesManager::nouvelleVersion(Note* a) { //si on Ã©dite une nouvelle version d'un article, on la met dans notes[i]
+// et on met l'ancienne version dans oldVersions
+    for(unsigned int i=0;i<nbNotes;i++) {
+        if(notes[i]->getId()==a->getId()) {
+
+    Note* actual_Version = &getNote(a->getId());
+
+    a->setEtat(actuelle);
+    a->setNbVersions(actual_Version->getNbVersions()+1);
+    *(notes[i])=*a;
+    actual_Version->setNbVersions(0);
+    actual_Version->setEtat(ancienne);
+     oldVersions[nbOldVersions++]=const_cast<Note*>(actual_Version);return;
+    }
+        }
+
+   // Note* tmp  = new Note(actual_Version);
+}
 
 void NotesManager::restaurerVersionNote(Note* n, int j) { //n est une note de oldversions[j] accessible par l'interface
     for(unsigned int i=0; i<nbNotes; i++) {
         if(notes[i]->getId()==n->getId()) {
 
-            int type=n->type();
-            switch(type){
-                       case 2:      {
-                Article* tmp = new Article(notes[i]->getId(),  notes[i]->getTitle(),notes[i]->getDateCreat(),
-                                                notes[i]->getDateDernier(), notes[i]->getEmp(), ancienne,0, static_cast<Article*>(notes[i])->getText());
-                                    } break;
-
-
-                       case 1:     {
-                                    Tache* tmp = new Tache(notes[i]->getId(),  notes[i]->getTitle(),notes[i]->getDateCreat(),
-                                              notes[i]->getDateDernier(), notes[i]->getEmp(), ancienne,0, static_cast<Tache*>(notes[i])->getAction(),
-                                             static_cast<Tache*>(notes[i])->getPriority(), static_cast<Tache*>(notes[i])->getExpDate(), static_cast<Tache*>(notes[i])->getStatus());
-                            }break;
-
-                       case 3:     {           Image *tmp = new Image(notes[i]->getId(),  notes[i]->getTitle(),notes[i]->getDateCreat(),
-                                                             notes[i]->getDateDernier(), notes[i]->getEmp(), ancienne,0, static_cast<Image*>(notes[i])->getDescpt(),
-                                                             static_cast<Image*>(notes[i])->getFicher() );
-
-                   }break;
-
-                       case 5:     {           Video *tmp = new Video(notes[i]->getId(),  notes[i]->getTitle(),notes[i]->getDateCreat(),
-                                                                      notes[i]->getDateDernier(), notes[i]->getEmp(), ancienne,0, static_cast<Video*>(notes[i])->getDescpt(),
-                                                                      static_cast<Video*>(notes[i])->getFicher(),static_cast<Video*>(notes[i])->getVFile());
-
-                                    }
-                       break;
-
-
-                       case 4:     {           Audio *tmp = new Audio(notes[i]->getId(),  notes[i]->getTitle(),notes[i]->getDateCreat(),
-                                                                      notes[i]->getDateDernier(), notes[i]->getEmp(), ancienne,0, static_cast<Audio*>(notes[i])->getDescpt(),
-                                                                      static_cast<Audio*>(notes[i])->getFicher(),static_cast<Audio*>(notes[i])->getAFile());
-
-                                         }break;}
-
+            Note* actual_Version = &getNote(n->getId());
+            actual_Version->setNbVersions(0);
+            actual_Version->setEtat(ancienne);
             n->setNbVersions(notes[i]->getNbVersions());
-            a->setEtat(actuelle);
-            *(oldVersions[j])=tmp;
-            *(articles[i])=*a;
+            n->setEtat(actuelle);
+            oldVersions[j]=const_cast<Note*>(actual_Version);
+            *(notes[i])=*n;
         }
     }
 
 
 }
+
 void NotesManager::addNote(const Note* a){
-/*    for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==a.getId()) throw NotesException("error, creation of an already existent note");
-    } */
 
-    for(unsigned int i=0; i<nbNotes; i++){
-
-        //Si l'id de l'article est dÃ©jÃ  prÃ©sent
-
-        if (notes[i]->getId()==a->getId() && a->getEtat()==non_traite) {
-
-            int type=a->type();
-            switch(type){
-                       case 2:      { Article *tmp = new Article(notes[i]->getId(),  notes[i]->getTitle(),notes[i]->getDateCreat(),
-                                                notes[i]->getDateDernier(), notes[i]->getEmp(), ancienne,0, static_cast<Article*>(notes[i])->getText());
-                                    } break;
-
-
-                       case 1:     {
-                                    Tache *tmp = new Tache(notes[i]->getId(),  notes[i]->getTitle(),notes[i]->getDateCreat(),
-                                              notes[i]->getDateDernier(), notes[i]->getEmp(), ancienne,0, static_cast<Tache*>(notes[i])->getAction(),
-                                             static_cast<Tache*>(notes[i])->getPriority(), static_cast<Tache*>(notes[i])->getExpDate(), static_cast<Tache*>(notes[i])->getStatus());
-                            }break;
-
-                       case 3:     {           Image *tmp = new Image(notes[i]->getId(),  notes[i]->getTitle(),notes[i]->getDateCreat(),
-                                                             notes[i]->getDateDernier(), notes[i]->getEmp(), ancienne,0, static_cast<Image*>(notes[i])->getDescpt(),
-                                                             static_cast<Image*>(notes[i])->getFicher() );
-
-                   }break;
-
-                       case 5:     {           Video *tmp = new Video(notes[i]->getId(),  notes[i]->getTitle(),notes[i]->getDateCreat(),
-                                                                      notes[i]->getDateDernier(), notes[i]->getEmp(), ancienne,0, static_cast<Video*>(notes[i])->getDescpt(),
-                                                                      static_cast<Video*>(notes[i])->getFicher(),static_cast<Video*>(notes[i])->getVFile());
-
-                                    }
-                       break;
-
-
-                       case 4:     {           Audio *tmp = new Audio(notes[i]->getId(),  notes[i]->getTitle(),notes[i]->getDateCreat(),
-                                                                      notes[i]->getDateDernier(), notes[i]->getEmp(), ancienne,0, static_cast<Audio*>(notes[i])->getDescpt(),
-                                                                      static_cast<Audio*>(notes[i])->getFicher(),static_cast<Audio*>(notes[i])->getAFile());
-
-                                         }break;}
-
-
-         //  tmp->setEtat(ancienne); tmp->setNbVersions(0);
-            a->setEtat(actuelle);
-            *(notes[i]) = *a;
-            notes[i]->setNbVersions(1); // IncrÃ©mentation du nombre de versions antÃ©ieures
-            // On met l'ancien notes[i] dans une variable temp.
-            // On met a comme nouveau notes[i]
-            if (nbOldVersions==nbMaxOldVersions){
-                Note** newNotes= new Note*[nbMaxOldVersions+5];
-                for(unsigned int i=0; i<nbOldVersions; i++) newNotes[i]=oldVersions[i];
-                Article** oldNotes=oldVersions;
-                oldVersions=newNotes;
-                nbMaxOldVersions+=5;
-                if (oldNotes) delete[] oldNotes;
-               }
-
-            oldVersions[nbOldVersions++]=const_cast<Note*>(&tmp); //On ajoute tmp dans oldVersions
-            notes[i]->setEtat(actuelle);
-            return;
-
-    }
-
-          else if (notes[i]->getId()==a->getId() && a->getEtat()==ancienne) {
-
-
-
-            if (nbOldVersions==nbMaxOldVersions){
-                Note** newNotes= new Note*[nbMaxOldVersions+5];
-                for(unsigned int i=0; i<nbOldVersions; i++) newNotes[i]=oldVersions[i];
-                Article** oldNotes=oldVersions;
-                oldVersions=newNotes;
-                nbMaxOldVersions+=5;
-                if (oldNotes) delete[] oldNotes;
-               }
-
-            notes[i]->setNbVersions(1);
-            oldVersions[nbOldVersions++]=const_cast<Note*>(&a); //On ajoute a dans oldVersions
-            return;
-
-        }
-
-    }
 
     if (nbNotes==nbMaxNotes){
         Note** newNotes= new Note*[nbMaxNotes+5];
@@ -184,44 +111,94 @@ void NotesManager::addNote(const Note* a){
         nbMaxNotes+=5;
         if (oldNotes) delete[] oldNotes;
     }
-    notes[nbNotes++]=const_cast<Note*>(&a);
+    notes[nbNotes++]=const_cast<Note*>(a);
 
 }
 
 
 
 //utiliser template pour simplifier???
-void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate d,QString em,Etat et=non_traite,const QString& a,
+void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate d,QString em,Etat et, int nb, const QString& a,
                             const QString& p, QDate e,const QString& s="en_attente")
 {
    /* for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
     } */
-    Tache* tache=new Tache(id,t,c,d,em,et,a,p,e,s);
-    addNote(tache);
+    Tache* tache=new Tache(id,t,c,d,em,et,nb,a,p,e,s);
+    if(et==ancienne) { addOldVersion(tache);}
+    if(et==actuelle) {addNote(tache);}
     QString string=id+t+a;
-    addCoupleDansReference(id,string);
+   // addCoupleDansReference(id,string);
 }
 
 
 
-void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDate d,QString em,Etat et=non_traite,const QString& te)
+void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDate d,QString em,Etat et,int nb,const QString& te)
 {
    /* for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
     } */
-    Article* a=new Article(id,t,c,d,em,et,te);
-    addNote(a);
+    Article* a=new Article(id,t,c,d,em,et,nb,te);
+    if(et==ancienne) { addOldVersion(a);}
+    if(et==actuelle) {addNote(a);}
     QString s=id+t+te;
-    addCoupleDansReference(id,s);
+  //  addCoupleDansReference(id,s);
 }
 
+
+void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f)
+{
+  /*  for(unsigned int i=0; i<nbNotes; i++){
+        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
+    } */
+    Image* im=new Image(id,t,c,d,em,et,nb,des,f);
+    if(et==ancienne) { addOldVersion(im);}
+    if(et==actuelle) {addNote(im);}
+    QString s=id+t+des;
+}
+
+
+
+void NotesManager::addAudio(const QString& id,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f,const QString& aud)
+{
+   /* for(unsigned int i=0; i<nbNotes; i++){
+        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
+    } */
+    Audio* audio=new Audio(id,t,c,d,em,et,nb,des,f,aud);
+    if(et==ancienne) { addOldVersion(audio);}
+    if(et==actuelle) {addNote(audio);}
+    QString s=id+t+des;
+}
+
+
+void NotesManager::addVideo(const QString& id,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f,const QString& vid)
+{
+    /* for(unsigned int i=0; i<nbNotes; i++){
+        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
+    } */
+    Video* video=new Video(id,t,c,d,em,et,nb,des,f,vid);
+    if(et==ancienne) { addOldVersion(video);}
+    if(et==actuelle) {addNote(video);}
+    QString s=id+t+des;
+}
+
+
+Note& NotesManager::getNote(const QString& id){
+    // si l'Note existe d, on en renvoie une rrence
+    for(unsigned int i=0; i<nbNotes; i++){
+        if (notes[i]->getId()==id) return *notes[i];
+    }
+
+    throw NotesException("error, Ã©chouÃ© de trouver ce note");
+}
+
+/*
 void NotesManager::addArticle(Article* a) {
 Article* art = a;
 art->setEtat(non_traite);
 addNote(art);
 
-//Couple référence?? à voir !
+//Couple rÃ©fÃ©rence?? Ã  voir !
 
 }
 
@@ -246,56 +223,7 @@ addNote(art); }
 void NotesManager::addImage(Image* a) {
 Image* art = a;
 art->setEtat(non_traite);
-addNote(art); }
-
-void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d,QString em,Etat et=non_traite,const QString& des, const QString& f)
-{
-  /*  for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
-    } */
-    Image* im=new Image(id,t,c,d,em,et,des,f);
-    addNote(im);
-    QString s=id+t+des;
-    addCoupleDansReference(id,s);
-}
-
-
-
-void NotesManager::addAudio(const QString& id,const QString& t, QDate c, QDate d,QString em,Etat et=non_traite,const QString& des, const QString& f,const QString& aud)
-{
-   /* for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
-    } */
-    Audio* audio=new Audio(id,t,c,d,em,et,des,f,aud);
-    addNote(audio);
-    QString s=id+t+des;
-    addCoupleDansReference(id,s);
-}
-
-
-void NotesManager::addVideo(const QString& id,const QString& t, QDate c, QDate d,QString em,Etat et=non_traite,const QString& des, const QString& f,const QString& vid)
-{
-    /* for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
-    } */
-    Video* video=new Video(id,t,c,d,em,et,des,f,vid);
-    addNote(video);
-    QString s=id+t+des;
-    addCoupleDansReference(id,s);
-}
-
-
-Note& NotesManager::getNote(const QString& id){
-    // si l'Note existe d, on en renvoie une rrence
-    for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==id) return *notes[i];
-    }
-
-    throw NotesException("error, échoué de trouver ce note");
-}
-
-
-
+addNote(art); } */
 
 Note* NotesManager::getNote(unsigned int i){
     if(i<nbNotes) return notes[i];
@@ -303,7 +231,7 @@ Note* NotesManager::getNote(unsigned int i){
 }
 
 
-NotesManager::NotesManager():notes(nullptr),nbNotes(0),nbMaxNotes(0),filename(""){}
+NotesManager::NotesManager():notes(NULL),nbNotes(0),nbMaxNotes(0),filename(""){}
 
 NotesManager::~NotesManager(){
     if (filename!="") save();
@@ -315,6 +243,7 @@ NotesManager::~NotesManager(){
 }
 
 void NotesManager::save() const {
+    std::cout<<"entree"<<std::endl;
     QFile newfile(filename);
 
     if (!newfile.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -329,7 +258,8 @@ void NotesManager::save() const {
        int type=(notes[i])->type();
 
        switch(type){
-           case 2:      {
+           case 2:      {    std::cout<<"article"<<std::endl;
+
 
                         stream.writeStartElement("Article");
                         stream.writeTextElement("id",static_cast<Article*>(notes[i])->getId());
@@ -342,7 +272,7 @@ void NotesManager::save() const {
                         stream.writeTextElement("text",static_cast<Article*>((notes[i]))->getText());
                         stream.writeEndElement();
 
-                        if(notes[i]->getNbVersions() > 0) {
+                       if(notes[i]->getNbVersions() > 0) {
                             for(unsigned int j=0; j<nbOldVersions; j++){
                                 if(notes[i]->getId() == oldVersions[j]->getId()) {
 
@@ -500,9 +430,9 @@ void NotesManager::save() const {
                                     stream.writeTextElement("title",static_cast<Video*>(oldVersions[j])->getTitle());
                                     stream.writeTextElement("date_de_creation",static_cast<Video*>(oldVersions[j])->getDateCreat().toString("dd.MM.yyyy"));
                                     stream.writeTextElement("date_de_update",static_cast<Video*>(oldVersions[j])->getDateDernier().toString("dd.MM.yyyy"));
-                                    stream.writeTextElement("enplacement",static_cast<Video*>oldVersions[j])->getEmp());
+                                    stream.writeTextElement("enplacement",static_cast<Video*>(oldVersions[j])->getEmp());
                                     stream.writeTextElement("descp",static_cast<Video*>(oldVersions[j])->getDescpt());
-                                    stream.writeTextElement("ficher",static_cast<Video*>oldVersions[j])->getFicher());
+                                    stream.writeTextElement("ficher",static_cast<Video*>(oldVersions[j])->getFicher());
                                     stream.writeTextElement("V_ficher",static_cast<Video*>(oldVersions[j])->getVFile());
                                     stream.writeEndElement();
 
@@ -565,6 +495,8 @@ void NotesManager::load() {
                         // We've found identificteur.
                         if(xml.name() == "id") {
                             xml.readNext(); identificateur=xml.text().toString();
+                            qDebug()<<"id="<<identificateur<<"\n";
+
                         }
 
                         if(xml.name() == "version") {
@@ -595,8 +527,8 @@ void NotesManager::load() {
                     xml.readNext();
                 }
 
-                addArticle(identificateur,titre,creat,der_modif,enpl,et,text);
-            } break;
+                addArticle(identificateur,titre,creat,der_modif,enpl,et,0,text);
+            }
             if(xml.name()== "Tache"){
 
                 QString identificateur;
@@ -659,8 +591,8 @@ void NotesManager::load() {
                     xml.readNext();
                 }
 
-                addTache(identificateur,titre,creat,der_modif,enpl,et,action,priorite,echeance,status);
-            } break;
+                addTache(identificateur,titre,creat,der_modif,enpl,et,0,action,priorite,echeance,status);
+            }
             if(xml.name()== "Image" ){
 
                 QString identificateur;
@@ -713,8 +645,8 @@ void NotesManager::load() {
                     xml.readNext();
                 }
 
-                addImage(identificateur,titre,creat,der_modif,enpl,et,desc,file);
-            } break;
+                addImage(identificateur,titre,creat,der_modif,enpl,et,0,desc,file);
+            }
            if(xml.name()==  "Audio" ){
 
                 QString identificateur;
@@ -772,8 +704,8 @@ void NotesManager::load() {
                     xml.readNext();
                 }
 
-                addAudio(identificateur,titre,creat,der_modif, enpl,et,desc,file,afile);
-            } break;
+                addAudio(identificateur,titre,creat,der_modif, enpl,et,0,desc,file,afile);
+            }
 
             if(xml.name()=="Video" ){
 
@@ -833,8 +765,8 @@ void NotesManager::load() {
                     xml.readNext();
                 }
 
-                addVideo(identificateur,titre,creat,der_modif,enpl,et,desc,file,vfile);
-            } break;
+                addVideo(identificateur,titre,creat,der_modif,enpl,et,0,desc,file,vfile);
+            }
 
 
 
@@ -850,4 +782,3 @@ void NotesManager::load() {
   qDebug()<<"fin load\n";
 
 }
-
