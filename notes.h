@@ -48,12 +48,14 @@ public:
     void setDateCreat();//ajouter
     void setDateDerModif();//modifier
 
+
     unsigned int getNbVersions() const {return nbVersions;}
     Etat getEtat() {return etat;}
     void setEtat(Etat et) {etat=et;}
     void setNbVersions(unsigned int i) { nbVersions = nbVersions + i;}
 
     virtual int type()const=0;
+
     virtual ~Note(){}
 
 };
@@ -67,6 +69,7 @@ class Tache : public Note {
     QDate echeance;
     QString status;
 public :
+
     Tache(const QString & i,const QString & t, QDate c, QDate d,QString em, Etat et, unsigned int n, const QString& a,
           const QString& p, QDate e,const QString& s):
         Note(i,t,c,d,em,et,n),action(a),priorite(p),echeance(e),status(s){}
@@ -143,7 +146,7 @@ private:
     Note** notes;  //QList<Note*> notes;
     unsigned int nbNotes;
     unsigned int nbMaxNotes;
-    void addNote(const Note& n);  // sauvegarder version ancienne
+    void addNote(const Note* n);  // sauvegarder version ancienne
     mutable QString filename;
 
     Note** oldVersions;
@@ -153,14 +156,14 @@ private:
 
     struct Handler {
         NotesManager* instance; // pointeur sur l'unique instance
-        Handler():instance(nullptr){}
+        Handler():instance(NULL){}
         ~Handler() { delete instance; }
     };
     static Handler handler;
 
     NotesManager();
     ~NotesManager();
-    NotesManager(const NotesManager& m);
+     NotesManager(const NotesManager& m);
     NotesManager& operator=(const NotesManager& m);
 
 
@@ -173,19 +176,21 @@ public:
     }
     return n;
 }； */
-    void addTache(const QString & id,const QString & t, QDate c, QDate d,QString em, Etat et,const QString& a,
-                  const QString& p, QDate e,const QString& s);
-    void addArticle(const QString & i,const QString & t, QDate c, QDate d,QString em, Etat et, const QString& te);
-    void addImage(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,const QString& des, const QString& f);
-    void addAudio(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,const QString& des, const QString& f,const QString& aud);
-    void addVideo(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,const QString& des, const QString& f,const QString& vid);
 
 
+    void addTache(const QString & id, const QString & t, QDate c, QDate d, QString em, Etat et, int nb, const QString& a,
+                  const QString& p, QDate e, const QString& s);
+    void addArticle(const QString & i,const QString & t, QDate c, QDate d,QString em, Etat et, int nb,const QString& te);
+    void addImage(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f);
+    void addAudio(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f,const QString& aud);
+    void addVideo(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f,const QString& vid);
+
+/*
     void addTache(Tache* t);
     void addArticle(Article* a);
     void addImage(Image* i);
     void addAudio(Audio* ad);
-    void addVideo(Video* v);
+    void addVideo(Video* v); */
 
     void restaurerVersionNote(Note* note, int j);
 
@@ -202,13 +207,15 @@ public:
     static NotesManager& getManager();
     static void freeManager(); // free the memory used by the NotesManager; it can be rebuild later
 
+    void addOldVersion(const Note* a);
+    void nouvelleVersion(Note* a);
     class Iterator {
             friend class NotesManager;
             Note** currentN;
             unsigned int nbRemain;
             Iterator(Note** a, unsigned nb):currentN(a),nbRemain(nb){}
         public:
-            Iterator():currentN(nullptr),nbRemain(0){}
+            Iterator():currentN(NULL),nbRemain(0){}
             bool isDone() const { return nbRemain==0; }
             void next() {
                 if (isDone())
