@@ -194,7 +194,7 @@ public:
 
     void restaurerVersionNote(Note* note, int j);
 
-
+    Note* copieNote(const QString& id);
     Note& getNote(const QString& id); // return the article with identificator id
     Note* getNote(unsigned int i);
 
