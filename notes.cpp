@@ -66,17 +66,40 @@ void NotesManager::addOldVersion(const Note* a) {
 
 void NotesManager::nouvelleVersion(Note* a) { //si on Ã©dite une nouvelle version d'un article, on la met dans notes[i]
 // et on met l'ancienne version dans oldVersions
-    for(unsigned int i=0;i<nbNotes;i++) {
-        if(notes[i]->getId()==a->getId()) {
 
-    Note* actual_Version = &getNote(a->getId());
+    for(unsigned int i=0;i<nbNotes;i++) {
+
+        if(notes[i]->getId() == a->getId()) {
+
+    Note* actual_Version = copieNote(a->getId());
 
     a->setEtat(actuelle);
     a->setNbVersions(actual_Version->getNbVersions()+1);
     *(notes[i])=*a;
+    qDebug()<<"notes"<<i<<notes[i]->getTitle();
+
     actual_Version->setNbVersions(0);
     actual_Version->setEtat(ancienne);
-     oldVersions[nbOldVersions++]=const_cast<Note*>(actual_Version);return;
+
+    if (nbOldVersions==nbMaxOldVersions){
+        Note** newNotes= new Note*[nbMaxOldVersions+5];
+        for(unsigned int i=0; i<nbOldVersions; i++) newNotes[i]=oldVersions[i];
+        Note** oldNotes=oldVersions;
+        oldVersions=newNotes;
+        nbMaxOldVersions+=5;
+        if (oldNotes) delete[] oldNotes;
+    }
+
+     oldVersions[nbOldVersions++]=const_cast<Note*>(actual_Version);
+    qDebug()<<"oldVersions[0]"<<oldVersions[0]->getTitle();
+    if(nbOldVersions>1) { qDebug()<<"oldVersions[1]"<<oldVersions[1]->getTitle();}
+    if(nbOldVersions>2) { qDebug()<<"oldVersions[2]"<<oldVersions[2]->getTitle();}
+
+     return;
+
+
+
+
     }
         }
 
@@ -87,11 +110,20 @@ void NotesManager::restaurerVersionNote(Note* n, int j) { //n est une note de ol
     for(unsigned int i=0; i<nbNotes; i++) {
         if(notes[i]->getId()==n->getId()) {
 
-            Note* actual_Version = &getNote(n->getId());
+            Note* actual_Version = copieNote(notes[i]->getId());
             actual_Version->setNbVersions(0);
             actual_Version->setEtat(ancienne);
             n->setNbVersions(notes[i]->getNbVersions());
             n->setEtat(actuelle);
+
+            if (nbOldVersions==nbMaxOldVersions){
+                Note** newNotes= new Note*[nbMaxOldVersions+5];
+                for(unsigned int i=0; i<nbNotes; i++) newNotes[i]=oldVersions[i];
+                Note** oldNotes=oldVersions;
+                oldVersions=newNotes;
+                nbMaxOldVersions+=5;
+                if (oldNotes) delete[] oldNotes;
+            }
             oldVersions[j]=const_cast<Note*>(actual_Version);
             *(notes[i])=*n;
         }
@@ -197,6 +229,60 @@ Note& NotesManager::getNote(const QString& id){
     throw NotesException("error, Ã©chouÃ© de trouver ce note");
 }
 
+Note* NotesManager::copieNote(const QString& id){
+    // si l'Note existe d, on en renvoie une rrence
+
+    for(unsigned int i=0; i<nbNotes; i++){
+        if (notes[i]->getId()==id) {
+
+          switch(notes[i]->type()) {
+          case 2:{
+              Article* tmp=new Article(notes[i]->getId(), notes[i]->getTitle(), notes[i]->getDateCreat(), notes[i]->getDateDernier(),
+                                       notes[i]->getEmp(), notes[i]->getEtat(),notes[i]->getNbVersions(), static_cast<Article*>(notes[i])->getText());
+              return tmp;
+
+          }break;
+          case 1:{
+              Tache* tmp=new Tache(notes[i]->getId(), notes[i]->getTitle(), notes[i]->getDateCreat(), notes[i]->getDateDernier(),
+                                       notes[i]->getEmp(), notes[i]->getEtat(),notes[i]->getNbVersions(), static_cast<Tache*>(notes[i])->getAction(),
+                                   static_cast<Tache*>(notes[i])->getPriority(), static_cast<Tache*>(notes[i])->getExpDate(), static_cast<Tache*>(notes[i])->getStatus());
+              return tmp;
+
+          }break;
+
+          case 3:{
+              Image* tmp=new Image(notes[i]->getId(), notes[i]->getTitle(), notes[i]->getDateCreat(), notes[i]->getDateDernier(),
+                                       notes[i]->getEmp(), notes[i]->getEtat(),notes[i]->getNbVersions(), static_cast<Image*>(notes[i])->getDescpt(),
+                                        static_cast<Image*>(notes[i])->getFicher());
+              return tmp;
+
+          }break;
+
+          case 4:{
+              Audio* tmp=new Audio(notes[i]->getId(), notes[i]->getTitle(), notes[i]->getDateCreat(), notes[i]->getDateDernier(),
+                                       notes[i]->getEmp(), notes[i]->getEtat(),notes[i]->getNbVersions(), static_cast<Audio*>(notes[i])->getDescpt(),
+                                        static_cast<Audio*>(notes[i])->getFicher(),static_cast<Audio*>(notes[i])->getAFile());
+              return tmp;
+
+          }break;
+
+          case 5:{
+              Video* tmp=new Video(notes[i]->getId(), notes[i]->getTitle(), notes[i]->getDateCreat(), notes[i]->getDateDernier(),
+                                       notes[i]->getEmp(), notes[i]->getEtat(),notes[i]->getNbVersions(), static_cast<Video*>(notes[i])->getDescpt(),
+                                        static_cast<Video*>(notes[i])->getFicher(),static_cast<Video*>(notes[i])->getVFile());
+              return tmp;
+
+          }break;
+
+           default: qDebug()<<"default"; break;
+          }
+
+    }
+}
+    throw NotesException("error, Ã©chouÃ© de trouver ce note");
+
+}
+
 /*
 void NotesManager::addArticle(Article* a) {
 Article* art = a;
@@ -236,7 +322,7 @@ Note* NotesManager::getNote(unsigned int i){
 }
 
 
-NotesManager::NotesManager():notes(NULL),nbNotes(0),nbMaxNotes(0),filename(""){}
+NotesManager::NotesManager():notes(NULL),nbNotes(0),nbMaxNotes(0),nbOldVersions(0), nbMaxOldVersions(0), oldVersions(NULL), filename(""){}
 
 NotesManager::~NotesManager(){
     if (filename!="") save();
