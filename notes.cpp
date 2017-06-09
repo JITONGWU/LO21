@@ -80,7 +80,7 @@ void NotesManager::nouvelleVersion(Note* a) { //si on Ã©dite une nouvelle vers
     }
         }
 
-   // Note* tmp  = new Note(actual_Version);
+    addNote(const_cast<Note*>(a));
 }
 
 void NotesManager::restaurerVersionNote(Note* n, int j) { //n est une note de oldversions[j] accessible par l'interface
@@ -126,6 +126,7 @@ void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate
     } */
     Tache* tache=new Tache(id,t,c,d,em,et,nb,a,p,e,s);
     if(et==ancienne) { addOldVersion(tache);}
+    if(et==non_traite) {nouvelleVersion(tache);}
     if(et==actuelle) {addNote(tache);}
     QString string=id+t+a;
    // addCoupleDansReference(id,string);
@@ -140,6 +141,7 @@ void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDa
     } */
     Article* a=new Article(id,t,c,d,em,et,nb,te);
     if(et==ancienne) { addOldVersion(a);}
+    if(et==non_traite) {nouvelleVersion(a);}
     if(et==actuelle) {addNote(a);}
     QString s=id+t+te;
   //  addCoupleDansReference(id,s);
@@ -153,6 +155,7 @@ void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d
     } */
     Image* im=new Image(id,t,c,d,em,et,nb,des,f);
     if(et==ancienne) { addOldVersion(im);}
+    if(et==non_traite) {nouvelleVersion(im);}
     if(et==actuelle) {addNote(im);}
     QString s=id+t+des;
 }
@@ -166,6 +169,7 @@ void NotesManager::addAudio(const QString& id,const QString& t, QDate c, QDate d
     } */
     Audio* audio=new Audio(id,t,c,d,em,et,nb,des,f,aud);
     if(et==ancienne) { addOldVersion(audio);}
+    if(et==non_traite) {nouvelleVersion(audio);}
     if(et==actuelle) {addNote(audio);}
     QString s=id+t+des;
 }
@@ -178,6 +182,7 @@ void NotesManager::addVideo(const QString& id,const QString& t, QDate c, QDate d
     } */
     Video* video=new Video(id,t,c,d,em,et,nb,des,f,vid);
     if(et==ancienne) { addOldVersion(video);}
+    if(et==non_traite) {nouvelleVersion(video);}
     if(et==actuelle) {addNote(video);}
     QString s=id+t+des;
 }
