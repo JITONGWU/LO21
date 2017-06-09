@@ -1,10 +1,6 @@
 #ifndef HEADER_FENPRINCIPALE
 #define HEADER_FENPRINCIPALE
 
-#include "notes.h"
-#include"articleediteur.h"
-#include"imageediteur.h"
-#include "relationediteur.h"
 #include <QApplication>
 #include <QWidget>
 #include <QLabel>
@@ -27,31 +23,29 @@
 #include <QComboBox>
 #include <QMdiArea>
 #include <QScrollArea>
-
+#include "relationmanager.h"
+#include "articleediteur.h"
+#include "imageediteur.h"
+#include "relationediteur.h"
 class FenPrincipale : public QMainWindow {
   public:
-    FenPrincipale(NotesManager &n,RelationManager &r);
+    FenPrincipale();
 
 };
 class ListeNotes : public QListWidget {
 
     public:
+
     ListeNotes();
 
     private:
 
 };
-class ListeRelations : public QListWidget {
-
-    public:
-    ListeRelations(RelationManager& rm);
-
-    private:
-
-};
-
 class Page1 : public QMainWindow {
     Q_OBJECT
+    friend class NotesManager;
+    friend class RelationManager;
+    QWidget *zoneCentrale;
 
     QPushButton *AjoutArticle;
     QPushButton *AjoutTache;
@@ -59,13 +53,13 @@ class Page1 : public QMainWindow {
     QPushButton *AjoutAudio;
     QPushButton *AjoutVideo;
 
-    QWidget *zoneCentrale;
+
     QWidget *vide;
 
-    ArticleEditeur *ae;
+ //   ArticleEditeur *ae;
     ArticleEditeur *av;
 
-    ImageEditeur *ie;
+  //  ImageEditeur *ie;
     ImageEditeur *iv;
 
     QScrollArea *scrollNote;
@@ -74,6 +68,7 @@ class Page1 : public QMainWindow {
     QHBoxLayout *buttons;
     QVBoxLayout *couche;
 public:
+
     Page1(QWidget *parent);
 public slots:
     void afficherWidget(QListWidgetItem* item);
@@ -84,9 +79,11 @@ public slots:
 };
 
 
-
+class RelationEditeur;
 class Page2 : public QMainWindow
 {
+    friend class NotesManager;
+    friend class RelationManager;
 
     Q_OBJECT
 
@@ -97,21 +94,20 @@ class Page2 : public QMainWindow
     RelationEditeur *re;
     RelationEditeur *rv;
     QScrollArea *scrollRelation;
-    ListeRelations *listR;
     QHBoxLayout *layout;
     QVBoxLayout *couche;
-    NotesManager nm;
-    RelationManager rm;
+
 
 public:
-    Page2(NotesManager &n,RelationManager &r,QWidget *parent);
+    QListWidget *listR;
+
+    Page2(QWidget *parent);
 
 public slots:
     void afficherWidget(QListWidgetItem* item);
     void RelationEditeurVide();
 
 };
-
 
 
 #endif

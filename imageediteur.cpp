@@ -61,8 +61,9 @@ ImageEditeur::ImageEditeur(Image &im, QWidget *parent,bool n):
 
 }
 void ImageEditeur::saveImage(){
-    image->setTitle(titre->text());
-    image->setDesc(desc->toPlainText());
+ //   image->setTitle(titre->text());
+  //
+    //image->setDesc(desc->toPlainText());
     QMessageBox::information(this,"sauvegarder","bien sauvegarder");
     save->setEnabled(false);
 

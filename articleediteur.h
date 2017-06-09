@@ -15,24 +15,25 @@ class ArticleEditeur: public QWidget
 {
     Q_OBJECT     //macro pour pouvoir utiliser les signals et les slots
 
-    QLineEdit *id;
-    QLineEdit *titre;
-    QTextEdit *text;
+
 
     QLabel *id1;
     QLabel *titre1;
-    QLabel *text1;
+    QLabel *t1;
 
     QPushButton *save;
     QHBoxLayout *cid;
     QHBoxLayout *ctitre;
-    QHBoxLayout *ctext;
+    QHBoxLayout *ct;
     QVBoxLayout *couche;
 
     Article *article; //pointeur vers l'article à afficher par la fenetre
 
 public:
-    explicit ArticleEditeur (Article& article,QWidget *parent=0,bool n=false);
+    QLineEdit *id;
+    QLineEdit *titre;
+    QTextEdit *t;
+    explicit ArticleEditeur (Article& article,QWidget *parent=0,bool n=true);
     //explicit pour empêcher la conversion implicite de article vers Article
 
 signals:

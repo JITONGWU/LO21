@@ -1,14 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Relations>
     <Relation>
-        <titre>Référence</titre>
-        <description>ef{idNote}</description>
-        <oriente>true</oriente>
+        <titre>titre1</titre>
+        <description>desc1</description>
+        <oriente>false</oriente>
         <couple>
-            <label>ref12345</label>
-            <idx>12345</idx>
-            <idy>idsdsid</idy>
-            <etat>N</etat>
+            <label>ajout</label>
+            <idx>id3</idx>
+            <idy>id4</idy>
+            <etat></etat>
         </couple>
+        <couple>
+            <label>ajout</label>
+            <idx>id4</idx>
+            <idy>id3</idy>
+            <etat></etat>
+        </couple>
+    </Relation>
+    <Relation>
+        <titre>titre2</titre>
+        <description>desc2qsd</description>
+        <oriente>false</oriente>
+        <couple>
+            <label>label3</label>
+            <idx>id1</idx>
+            <idy>id6</idy>
+            <etat></etat>
+        </couple>
+        <couple>
+            <label>label4</label>
+            <idx>id2</idx>
+            <idy>id5</idy>
+            <etat></etat>
+        </couple>
+    </Relation>
+    <Relation>
+        <titre>my relation</titre>
+        <description>desc1</description>
+        <oriente>false</oriente>
+        <couple>
+            <label>lo21</label>
+            <idx>id1</idx>
+            <idy>id2</idy>
+            <etat></etat>
+        </couple>
+        <couple>
+            <label>nf17</label>
+            <idx>id3</idx>
+            <idy>id1</idy>
+            <etat></etat>
+        </couple>
+    </Relation>
+    <Relation>
+        <titre>Référence</titre>
+        <description>ef{idNote}</description>
+        <oriente>false</oriente>
     </Relation>
 </Relations>

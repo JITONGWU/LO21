@@ -3,7 +3,7 @@
 #include <QString>
 #include <QDate>
 #include <iostream>
-#include <Qlist> // remplir tableau de pointeur???
+#include <QList>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QtXml>
@@ -77,8 +77,8 @@ public :
     const QString & getStatus()const {return status;}
     const QString & getPriority()const {return priorite;}
     QDate getExpDate()const{return echeance;}
-    void setAction(const QString& a);
-    void setStatus(const QString& s){action=s;}
+    void setAction(const QString& a){action=a;}
+    void setStatus(const QString& s){status=s;}
     void setPriority(const QString& p){priorite=p;}
     void setExpDate(const QDate e){echeance=e;}
     int type()const {return 1;}
@@ -94,8 +94,8 @@ class Article : public Note{
 public:
     Article(const QString & i,const QString & t, QDate c, QDate d,QString em, Etat et, unsigned int n, const QString& te):
         Note(i,t,c,d,em,et,n),text(te){}
-    const QString & getText() const { return text; }
-    void setText(const QString& t);
+    const QString & getT() const { return text; }
+    void setT(const QString& t){text=t;}
     int type()const {return 2;}
 };
 
@@ -108,7 +108,7 @@ class Image : public Note {
         Note(i,t,c,d,em,et,n),desc(des),file(f){}
     const QString & getDescpt() const {return desc;}
     const QString & getFicher() const {return file;} // la valeur de retour est de type QString ou de type Image?
-    void setDesc(const QString& des);
+    void setDesc(const QString& des){desc=des;}
     void setFile(const QString& f){file=f;}
     int type()const {return 3;}
 
@@ -146,7 +146,7 @@ private:
     Note** notes;  //QList<Note*> notes;
     unsigned int nbNotes;
     unsigned int nbMaxNotes;
-    void addNote(const Note* n);  // sauvegarder version ancienne
+
     mutable QString filename;
 
     Note** oldVersions;
@@ -156,45 +156,38 @@ private:
 
     struct Handler {
         NotesManager* instance; // pointeur sur l'unique instance
-        Handler():instance(nullptr){}
+        Handler():instance(NULL){}
         ~Handler() { delete instance; }
     };
     static Handler handler;
 
     NotesManager();
     ~NotesManager();
-     NotesManager(const NotesManager& m);
+    NotesManager(const NotesManager& m);
     NotesManager& operator=(const NotesManager& m);
 
 
 public:
-  /*  Note * dern_version(QSting id)
-{   QDate t(1,0,0); Note* n;
-    for(NotesManager::Iterator it=nm.getIterator; it.next(); !it.isDone())
-    {
-        if(it.currentN->getId()==id){if(it.currentN->der_modif>t){n=it.currentN;t=it.currentN->der_modif;}
-    }
-    return n;
-}； */
 
 
-    void addTache(const QString & id, const QString & t, QDate c, QDate d, QString em, Etat et, int nb=0, const QString& a,
+    void addNote(const Note* n);
+    void addTache(const QString & id, const QString & t, QDate c, QDate d, QString em, Etat et, int nb, const QString& a,
                   const QString& p, QDate e, const QString& s);
-    void addArticle(const QString & i,const QString & t, QDate c, QDate d,QString em, Etat et, int nb=0,const QString& te);
-    void addImage(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,int nb=0,const QString& des, const QString& f);
-    void addAudio(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,int nb=0,const QString& des, const QString& f,const QString& aud);
-    void addVideo(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,int nb=0,const QString& des, const QString& f,const QString& vid);
+    void addArticle(const QString & i,const QString & t, QDate c, QDate d,QString em, Etat et, int nb,const QString& te);
+    void addImage(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f);
+    void addAudio(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f,const QString& aud);
+    void addVideo(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f,const QString& vid);
 
-
+/*
     void addTache(Tache* t);
     void addArticle(Article* a);
     void addImage(Image* i);
     void addAudio(Audio* ad);
-    void addVideo(Video* v);
+    void addVideo(Video* v); */
 
     void restaurerVersionNote(Note* note, int j);
 
-
+    Note* copieNote(const QString& id);
     Note& getNote(const QString& id); // return the article with identificator id
     Note* getNote(unsigned int i);
 
@@ -209,13 +202,14 @@ public:
 
     void addOldVersion(const Note* a);
     void nouvelleVersion(Note* a);
+    int getNbOldVersions()const{return nbOldVersions;}
     class Iterator {
             friend class NotesManager;
             Note** currentN;
             unsigned int nbRemain;
             Iterator(Note** a, unsigned nb):currentN(a),nbRemain(nb){}
         public:
-            Iterator():currentN(nullptr),nbRemain(0){}
+            Iterator():currentN(NULL),nbRemain(0){}
             bool isDone() const { return nbRemain==0; }
             void next() {
                 if (isDone())
@@ -253,7 +247,7 @@ public:
                 return **currentNC;
             }
         };
-        ConstIterator getIterator() const {
+        ConstIterator getConstIterator() const {
             return ConstIterator(notes,nbNotes);
         }
 };

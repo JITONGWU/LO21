@@ -16,8 +16,9 @@
 #include <QDialog>
 #include "relation.h"
 #include "relationmanager.h"
-#include "window.h"
+
 class CoupleEditeur;
+
 class RelationEditeur: public QWidget
 {
     Q_OBJECT     //macro pour pouvoir utiliser les signals et les slots
@@ -27,13 +28,15 @@ class RelationEditeur: public QWidget
     QLabel *titre1;
     QLabel *desc1;
     QLabel *couples1;
+    QLabel *orient1;
 
     QPushButton *save;
     QPushButton *ajouter;
-    QPushButton *supprimer;
+    QPushButton *supprimer;//pour supprimer une couple dans la relation choisi!!! par pour supprimer relation
 
     QHBoxLayout *ctitre;
     QHBoxLayout *cdesc;
+    QHBoxLayout *corient;
     QHBoxLayout *ccouples;
     QHBoxLayout *button;
     QVBoxLayout *couche;
@@ -45,9 +48,11 @@ public:
     QLineEdit *titre;
     QTextEdit *desc;
     QListWidget *couples;
-    Relation *relation;
+    QRadioButton *orient;
 
-    explicit RelationEditeur (Relation& re,QWidget *parent=0);
+    Relation *relation;
+    bool newRelation;
+    explicit RelationEditeur (Relation& re, QWidget *parent=0, bool newR=true);
     //explicit pour empêcher la conversion implicite de article vers Article
 
 signals:
@@ -56,8 +61,10 @@ private slots:
     //la valeur par défaut c'est pour pouvoir la connecter avec deux signals
     //l'un avec un parametre qstring et l'autre sans parametre
 public slots:
-    void saveRelation();
+     void saveRelation();
     void ajouterCouple();
+   void IsOriente();
+   void supprimerCouple();
 
 
 };
@@ -69,11 +76,13 @@ class CoupleEditeur:public QDialog{
     QLineEdit *idx;
     QLineEdit *idy;
     QLineEdit *label;
+    QListWidget *notes;
 
 
     QLabel *idx1;
     QLabel *idy1;
     QLabel *label1;
+    QLabel *notes1;
 
     QPushButton *save;
 
@@ -82,16 +91,19 @@ class CoupleEditeur:public QDialog{
     QHBoxLayout *cidx;
     QHBoxLayout *cidy;
     QHBoxLayout *clabel;
+    QHBoxLayout *cnotes;
     QVBoxLayout *couche;
-    ListeNotes *notes;
+
     Couple *couple;
     Relation *relation;
+    RelationEditeur *relationediteur;
 public:
-    CoupleEditeur(Relation &re,QWidget *parent=0);
+    CoupleEditeur(Relation &relation, QWidget *parent, RelationEditeur& re);
 public slots:
     void afficherId(QListWidgetItem* item);
     void saveCouple();
-    void activerSave(QString);
+
+
 
 };
 

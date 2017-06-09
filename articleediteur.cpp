@@ -11,12 +11,12 @@ ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
 
     id=new QLineEdit(this);
     titre=new QLineEdit(this);
-    text=new QTextEdit(this);
+    t=new QTextEdit(this);
     save=new QPushButton("sauvegarder",this);
 
     id1=new QLabel("identificateur",this);
     titre1=new QLabel("Titre",this);
-    text1=new QLabel("Texte",this);
+    t1=new QLabel("Texte",this);
 
     cid=new QHBoxLayout;
     cid->addWidget(id1);
@@ -27,14 +27,14 @@ ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
     ctitre->addWidget(titre1);
     ctitre->addWidget(titre);
 
-    ctext=new QHBoxLayout ;
-    ctext->addWidget(text1);
-    ctext->addWidget(text);
+    ct=new QHBoxLayout ;
+    ct->addWidget(t1);
+    ct->addWidget(t);
 
     couche=new QVBoxLayout;
     couche->addLayout(cid);
     couche->addLayout(ctitre);
-    couche->addLayout(ctext);
+    couche->addLayout(ct);
     couche->addWidget(save);
 
      if(n==false){
@@ -42,7 +42,7 @@ ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
 
     id->setText(article->getId());
     titre->setText(article->getTitle());
-    text->setText(article->getText());
+    t->setText(article->getT());
     }
 
     setLayout(couche);
@@ -50,12 +50,12 @@ ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
     save->setEnabled(false);
     QObject::connect(save,SIGNAL(clicked()),this,SLOT(saveArticle()));
     QObject::connect(titre,SIGNAL(textEdited(QString)),this,SLOT(activerSave()));
-    QObject::connect(text,SIGNAL(textChanged()),this,SLOT(activerSave()));
+    QObject::connect(t,SIGNAL(textChanged()),this,SLOT(activerSave()));
 
 }
 void ArticleEditeur::saveArticle(){
-    article->setTitle(titre->text());
-    article->setText(text->toPlainText());
+   article->setTitle(titre->text());
+   article->setT(t->toPlainText());
     QMessageBox::information(this,"sauvegarder","bien sauvegarder");
     save->setEnabled(false);
 
