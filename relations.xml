@@ -1,38 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Relations>
     <Relation>
-        <titre>Myrelation</titre>
-        <description>desctiqsdf</description>
+        <titre>my relation</titre>
+        <description>desc1qsdfS</description>
         <oriente>true</oriente>
         <couple>
-            <label>zefqsd</label>
-            <idx>id3</idx>
-            <idy>id4</idy>
-            <etat>N</etat>
+            <label>lo21</label>
+            <idx>0001</idx>
+            <idy>0002</idy>
+            <etat></etat>
         </couple>
         <couple>
-            <label>zefqsd</label>
-            <idx>id3</idx>
-            <idy>id4</idy>
-            <etat>N</etat>
+            <label>nf17</label>
+            <idx>0003</idx>
+            <idy>0001</idy>
+            <etat></etat>
+        </couple>
+    </Relation>
+    <Relation>
+        <titre>my relation2</titre>
+        <description>desc2</description>
+        <oriente>true</oriente>
+        <couple>
+            <label>label3</label>
+            <idx>0001</idx>
+            <idy>id6</idy>
+            <etat></etat>
         </couple>
         <couple>
-            <label>zefsdfq</label>
-            <idx>id2</idx>
-            <idy>id1</idy>
-            <etat>N</etat>
+            <label>label4</label>
+            <idx>0002</idx>
+            <idy>id5</idy>
+            <etat></etat>
+        </couple>
+    </Relation>
+    <Relation>
+        <titre>AZER</titre>
+        <description>AZERqdsfsd</description>
+        <oriente>true</oriente>
+        <couple>
+            <label>ffff</label>
+            <idx>0001</idx>
+            <idy>0002</idy>
+            <etat></etat>
         </couple>
         <couple>
-            <label>zefqsd</label>
-            <idx>id3</idx>
-            <idy>id4</idy>
-            <etat>N</etat>
+            <label>ffff</label>
+            <idx>0001</idx>
+            <idy>0002</idy>
+            <etat></etat>
         </couple>
         <couple>
-            <label>zefsdfq</label>
-            <idx>id2</idx>
-            <idy>id1</idy>
-            <etat>N</etat>
+            <label>qsfsdf</label>
+            <idx>id4</idx>
+            <idy>id5</idy>
+            <etat></etat>
+        </couple>
+        <couple>
+            <label>qsdfqzdsfc</label>
+            <idx>0001</idx>
+            <idy>0001</idy>
+            <etat></etat>
+        </couple>
+    </Relation>
+    <Relation>
+        <titre>zefzqef</titre>
+        <description>sdfqsdf</description>
+        <oriente>true</oriente>
+        <couple>
+            <label>AEZFDzef</label>
+            <idx>id5</idx>
+            <idy>id6</idy>
+            <etat></etat>
         </couple>
     </Relation>
 </Relations>

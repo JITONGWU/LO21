@@ -41,7 +41,28 @@ class ListeNotes : public QListWidget {
     private:
 
 };
+class Page3 : public QMainWindow {
+    friend class NotesManager;
+    friend class RelationManager;
+    Q_OBJECT
+    QWidget *zoneCentrale;
+
+    QPushButton *restaurer;
+    QPushButton *supprimer;
+    QListWidget *corbeille;
+    QHBoxLayout *buttons;
+    QVBoxLayout *couche;
+public:
+
+    Page3(QWidget *parent);
+public slots:
+    void Restaurer();
+    void Supprimer();
+
+};
 class Page1 : public QMainWindow {
+    friend class NotesManager;
+    friend class RelationManager;
     Q_OBJECT
     QWidget *zoneCentrale;
 
@@ -61,7 +82,7 @@ class Page1 : public QMainWindow {
     ImageEditeur *iv;
 
     QScrollArea *scrollNote;
-    ListeNotes *listWidget;
+    QListWidget *listWidget;
     QListWidget *NotesArchieve;
     QListWidget *Taches;
     QVBoxLayout *List;
@@ -109,6 +130,7 @@ public slots:
     void RelationEditeurVide();
 
 };
+
 
 
 #endif

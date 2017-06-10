@@ -10,9 +10,8 @@ class Couple{
     Note* y;
     QString etat;
 public:
-    Couple(const QString& l, Note& a,Note& b,const QString& e="N"):label(l),x(&a),y(&b),etat(e){}
- /*   ~Couple(){
-        delete[] x;delete[] y;
+    Couple(const QString& l, Note* a,Note* b,const QString& e="N"):label(l),x(a),y(b),etat(e){}
+  /*  ~Couple(){
     qDebug()<<"destructeur de couple\n";
     }*/
     QString getLabel()const{return label;}
@@ -37,18 +36,19 @@ protected:
 public:
     Relation(const QString& t, const QString& d,bool o=true,Couple** c=nullptr,unsigned int nbC=0,unsigned int nbm=0):
         titre(t),desc(d),orient(o),couples(c),nbCouples(nbC),nbMaxCouples(nbm){}
-  /*  ~Relation(){
+  /* ~Relation(){
         for(unsigned int i=0;i<nbCouples;i++)delete couples[i];
         delete[] couples;
         qDebug()<<"destructeur de relation\n";
     }*/
     void addCouple(const Couple *c);
-    void addCouple(const QString& lab,Note& x,Note& y,const QString& e);// seulement pour les notes de dernière version!
+    void addCouple(const QString& lab, Note *x, Note *y, const QString& e="N");// seulement pour les notes de dernière version!
     void retirerCouple(unsigned int i);
     QString getTitre()const {return titre;}
     QString getDesc()const{return desc;}
     bool getOrient()const {return orient;}
     unsigned int getNbCouples()const {return nbCouples;}
+    unsigned int getNbMaxCouples()const {return nbMaxCouples;}
 
     void setTitre(const QString& t){titre=t;}
     void setDesc(const QString& d){desc=d;}

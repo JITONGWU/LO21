@@ -13,22 +13,31 @@ void Reference::freeRef(){
     handler.reference=nullptr;
 }
 void Relation::addCouple(const Couple* c){
+    qDebug()<<"addcouple réussi!\n";
+
     if (nbCouples==nbMaxCouples){
+        qDebug()<<"addcouple réussi!\n";
+
         Couple** newCouples= new Couple*[nbMaxCouples+5];
         for(unsigned int i=0; i<nbCouples; i++) newCouples[i]=couples[i];
         Couple** oldCouples=couples;
         couples=newCouples;
-        nbMaxCouples+=5;
-        if (oldCouples) delete[] oldCouples;
-        qDebug()<<"addcouple réussi!\n";
+        nbMaxCouples+=10;
+        if (oldCouples) {
+            for(unsigned int i=0; i<nbCouples; i++) delete oldCouples[i];
+            qDebug()<<"addcouple réussi!\n";
+            //delete[] oldCouples;
+            //qDebug()<<"addcouple réussi!\n";
 
+
+        }
     }
     couples[nbCouples++]=const_cast<Couple*>(c);
 
 }
 
 
-void Relation::addCouple(const QString& lab, Note &x, Note &y, const QString &e){
+void Relation::addCouple(const QString& lab, Note *x, Note *y, const QString &e){
 
 
     for(unsigned int i=0;i<getNbCouples();i++)
@@ -51,17 +60,14 @@ void Relation::retirerCouple(unsigned int i){
     if(i<nbCouples) {
         Couple * supprimer=couples[i];
         delete supprimer;
-    qDebug()<<"retirer couple réussi\n";}
-
     else throw NotesException("didn't find couple\n");
     nbCouples--;
-    qDebug()<<"retirer couple réussi\n";
+
 
     while(i<nbCouples){
         couples[i]=couples[i+1];
         i++;
     }
-    qDebug()<<"retirer couple réussi\n";
 
 }
 */

@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     articleediteur.cpp \
     imageediteur.cpp \
     relationediteur.cpp \
-    window.cpp
+    window.cpp \
+    page3.cpp
 
 HEADERS  += mainwindow.h \
     notes.h \

@@ -514,7 +514,7 @@ void NotesManager::load() {
     QFile fin(filename);
     // If we can't open it, let's show an error message.
     if (!fin.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        std::cout<<"Erreur ouverture fichier notes"<<std::endl;
+        qDebug()<<"Erreur ouverture fichier notes\n";
     }
     // QXmlStreamReader takes any QIODevice.
     QXmlStreamReader xml(&fin);

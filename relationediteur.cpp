@@ -160,13 +160,14 @@ void CoupleEditeur::afficherId(QListWidgetItem *item){
     if(idx->text()!=nullptr && idy ->text()!=nullptr) save->setEnabled(true);
 }
 void CoupleEditeur::saveCouple(){
-
-    NotesManager &nm = NotesManager::getManager();
-    relationediteur->relation->addCouple(label->text(),nm.getNote(idx->text()),nm.getNote(idy->text()),"N");
     relationediteur->couples->addItem(label->text());
+    NotesManager &nm = NotesManager::getManager();
+    Note& x=nm.getNote(idx->text());
+    Note& y=nm.getNote(idy->text());
+    relationediteur->relation->addCouple(label->text(),&x,&y);
     QMessageBox::information(this,"sauvegarder","bien sauvegarder");
     save->setEnabled(false);
     this->close();
-    for(unsigned int i=0; i<relationediteur->couples->count();i++)
-    relationediteur->relation->addCouple(relationediteur->relation->getCouple(relationediteur->couples->item(i)->text()));
+    //for(unsigned int i=0; i<relationediteur->couples->count();i++)
+    //relationediteur->relation->addCouple(relationediteur->relation->getCouple(relationediteur->couples->item(i)->text()));
 }

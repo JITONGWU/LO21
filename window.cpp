@@ -12,6 +12,8 @@ FenPrincipale::FenPrincipale() {
     QTabWidget *onglet = new QTabWidget;
     onglet->addTab(new Page1(this), tr("Notes"));
     onglet->addTab(new Page2(this), tr("Relations"));
+    onglet->addTab(new Page3(this), tr("Corbeille"));
+
     setCentralWidget( onglet );
     QTabWidget::TabPosition(0);
     setWindowTitle(tr("Interface"));
@@ -86,9 +88,19 @@ Page1::Page1(QWidget *parent):QMainWindow(parent){
 
 
     scrollNote = new QScrollArea;
-    listWidget = new ListeNotes;
+    listWidget = new QListWidget;
     NotesArchieve = new QListWidget;
     Taches = new QListWidget;
+
+    NotesManager &nm = NotesManager::getManager();
+    for(NotesManager::Iterator it= nm.getIterator();!it.isDone();it.next()){
+        if(it.current().getEmp()=="A") NotesArchieve->addItem(it.current().getId());
+        else{
+            if(it.current().type()==1) Taches->addItem(it.current().getId());
+            else listWidget->addItem(it.current().getId());
+        }
+    }
+
     List = new QVBoxLayout;
     List->addWidget(listWidget);
     List->addWidget(NotesArchieve);
@@ -120,9 +132,6 @@ Page1::Page1(QWidget *parent):QMainWindow(parent){
 
     zoneCentrale->setLayout(couche);
     setCentralWidget(zoneCentrale);
-
-
-
     QObject::connect(listWidget,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(afficherWidget(QListWidgetItem*)));
 
 }
@@ -206,14 +215,14 @@ Page2::Page2(QWidget *parent):QMainWindow(parent)
 void Page2::afficherWidget(QListWidgetItem* item){
 
     Relation *choisir=RelationManager::getManager().getRelation(item->text());
+    re->relation=choisir;
     re->titre->setText(item->text());
     re->desc->setText(choisir->getDesc());
     if(choisir->getOrient())
-        re->orient->clicked(true);
+        re->orient->setChecked(true);
     re->couples->clear();
     for(unsigned int i=0;i<choisir->getNbCouples();i++)
     re->couples->insertItem(i,choisir->getCoupleParIndice(i)->getLabel());
-    re->relation=choisir;
 
     rv->setVisible(false);
     vide->setVisible(false);
@@ -222,17 +231,11 @@ void Page2::afficherWidget(QListWidgetItem* item){
 
 }
 void Page2::RelationEditeurVide(){
-    rv->setVisible(true);
     vide->setVisible(false);
     re->setVisible(false);
+    rv->setVisible(true);
+
 
 }
 
-
-ListeNotes::ListeNotes() {
-    NotesManager &nm = NotesManager::getManager();
-    for(unsigned int i=0;i<nm.getNb();i++)
-        insertItem(i,new QListWidgetItem(nm.getNote(i)->getId()));
-
-    }
 

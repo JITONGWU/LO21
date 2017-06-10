@@ -210,22 +210,22 @@ void RelationManager::load() {
                             NotesManager &nm=NotesManager::getManager();
                             Note &x= nm.getNote(idx);
                             Note &y =nm.getNote(idy);
-                            Couple *newC = new Couple(label,x,y,etat);
+                            Couple *newC = new Couple(label,&x,&y,etat);
                             couples[nbCouples++]=newC;
-                            //qDebug()<<"ajout couple "<<label<<"\n";
+                            qDebug()<<"ajout couple "<<label<<"\n";
 
                         }
                     }
                     xml.readNext();
                 }
                // qDebug()<<"ajout relation "<<titre<<"\n";
-               addRelation(titre,description,orient,couples,nbCouples,nbCouples);
+               addRelation(titre,description,orient,couples,nbCouples,nbCouples+20);
             }
             }
         }
     // Error handling.
     if(xml.hasError()) {
-        throw NotesException("Erreur lecteur fichier notes, parser xml");
+        throw NotesException("Erreur lecteur fichier relation, parser xml");
     }
     // Removes any device() or data from the reader * and resets its internal state to the initial state.
     xml.clear();
