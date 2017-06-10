@@ -1,13 +1,13 @@
 #include "imageediteur.h"
 #include <QMessageBox>
 
-ImageEditeur::ImageEditeur(Image &im, QWidget *parent):
+ImageEditeur::ImageEditeur(Image &im, QWidget *parent,bool n):
 
-    QWidget(parent),image(&im)
+    QDialog(parent),image(&im)
     //apple au constructeur de qwidget en lui donnant en parametre "parent"
     //initialisation de image avec le parametre im
 {
-    //tous les widget créés ont comme parent l'objet de type ImageEditeur
+    //tous les widget crÃ©Ã©s ont comme parent l'objet de type ImageEditeur
 
     id=new QLineEdit(this);
     titre=new QLineEdit(this);
@@ -43,13 +43,14 @@ ImageEditeur::ImageEditeur(Image &im, QWidget *parent):
     couche->addLayout(cdesc);
     couche->addLayout(cfile);
     couche->addWidget(save);
-
+    if(n==false){
     id->setReadOnly(true);
 
     id->setText(image->getId());
     titre->setText(image->getTitle());
     desc->setText(image->getDescpt());
     file->setText(image->getFicher());
+    }
 
     setLayout(couche);
 
@@ -60,10 +61,33 @@ ImageEditeur::ImageEditeur(Image &im, QWidget *parent):
 
 }
 void ImageEditeur::saveImage(){
-    image->setTitle(titre->text());
-    image->setDesc(desc->toPlainText());
+
+ //   image->setTitle(titre->text());
+  //  image->setDesc(desc->toPlainText());
+
+
+    QString ident=id->text();
+    qDebug()<<ident;
+    if(NotesManager::getManager().copieNote(ident)!= NULL) {
+        qDebug()<<"entre condition";
+        Note* imTemp= NotesManager::getManager().copieNote(ident); // dÃ©finir un constructeur de recopie s'il n'existe pas dÃ©jÃ 
+        imTemp->setTitle(titre->text());// Tester référence
+        imTemp->setDateDerModif(QDate::currentDate());
+        static_cast<Image*>(imTemp)->setDesc(desc->toPlainText()); // Tester référence
+        static_cast<Image*>(imTemp)->setFile(file->text());//Tester référence
+
+
+        NotesManager::getManager().nouvelleVersion(imTemp); }
+
+    else {
+        //Tester reférence ici
+        Image *n_image = new Image(id->text(), titre->text(), QDate::currentDate(), QDate::currentDate(), "N", non_traite,0,desc->toPlainText(),file->text());
+        NotesManager::getManager().nouvelleVersion(n_image);}
+
+
     QMessageBox::information(this,"sauvegarder","bien sauvegarder");
     save->setEnabled(false);
+
 
 }
 void ImageEditeur::activerSave(QString){
