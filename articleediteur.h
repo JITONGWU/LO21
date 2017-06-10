@@ -22,6 +22,9 @@ class ArticleEditeur: public QWidget
     QLabel *t1;
 
     QPushButton *save;
+    QPushButton *archieve;
+    QPushButton *supprimer;
+    QHBoxLayout *buttons;
     QHBoxLayout *cid;
     QHBoxLayout *ctitre;
     QHBoxLayout *ct;

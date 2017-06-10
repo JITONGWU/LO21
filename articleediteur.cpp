@@ -12,7 +12,6 @@ ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
     id=new QLineEdit(this);
     titre=new QLineEdit(this);
     t=new QTextEdit(this);
-    save=new QPushButton("sauvegarder",this);
 
     id1=new QLabel("identificateur",this);
     titre1=new QLabel("Titre",this);
@@ -31,11 +30,19 @@ ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
     ct->addWidget(t1);
     ct->addWidget(t);
 
+    save=new QPushButton("sauvegarder",this);
+    archieve=new QPushButton("archiever",this);
+    supprimer =new QPushButton("supprimer",this);
+    buttons = new QHBoxLayout;
+    buttons->addWidget(archieve);
+    buttons->addWidget(save);
+    buttons->addWidget(supprimer);
+
     couche=new QVBoxLayout;
     couche->addLayout(cid);
     couche->addLayout(ctitre);
     couche->addLayout(ct);
-    couche->addWidget(save);
+    couche->addLayout(buttons);
 
      if(n==false){
     id->setReadOnly(true);

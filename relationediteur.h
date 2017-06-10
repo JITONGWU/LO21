@@ -64,7 +64,7 @@ public slots:
      void saveRelation();
     void ajouterCouple();
    void IsOriente();
-   void supprimerCouple();
+ //  void supprimerCouple();
 
 
 };

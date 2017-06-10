@@ -87,6 +87,12 @@ Page1::Page1(QWidget *parent):QMainWindow(parent){
 
     scrollNote = new QScrollArea;
     listWidget = new ListeNotes;
+    NotesArchieve = new QListWidget;
+    Taches = new QListWidget;
+    List = new QVBoxLayout;
+    List->addWidget(listWidget);
+    List->addWidget(NotesArchieve);
+    List->addWidget(Taches);
     layout=new QHBoxLayout;
     couche = new QVBoxLayout;
     couche->addLayout(buttons);
@@ -98,7 +104,7 @@ Page1::Page1(QWidget *parent):QMainWindow(parent){
     av = new ArticleEditeur(avide,this,true);
     iv = new ImageEditeur(ivide,this,true);
 
-    layout->addWidget(listWidget,1,0);
+    layout->addLayout(List);
 
     layout->addWidget(av,1,0);
     layout->addWidget(iv,1,0);

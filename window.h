@@ -43,8 +43,6 @@ class ListeNotes : public QListWidget {
 };
 class Page1 : public QMainWindow {
     Q_OBJECT
-    friend class NotesManager;
-    friend class RelationManager;
     QWidget *zoneCentrale;
 
     QPushButton *AjoutArticle;
@@ -64,6 +62,9 @@ class Page1 : public QMainWindow {
 
     QScrollArea *scrollNote;
     ListeNotes *listWidget;
+    QListWidget *NotesArchieve;
+    QListWidget *Taches;
+    QVBoxLayout *List;
     QHBoxLayout *layout;
     QHBoxLayout *buttons;
     QVBoxLayout *couche;

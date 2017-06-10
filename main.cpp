@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
     //cout<<fichier.toStdString()<<endl<<fichier2.toStdString()<<endl;
     nm.load();
     rm.load();
+    rm.getRelation(0)->getNbCouples();
     //rm.addRelation(Reference::getRef());
 
    // nm.addArticle("007","titre1",QDate::currentDate(),QDate::currentDate(),"N",actuelle,0,"tester le filename");

@@ -60,10 +60,9 @@ RelationEditeur::RelationEditeur(Relation &re, QWidget *parent,bool newR):
 
     save->setEnabled(false);
     QObject::connect(save,SIGNAL(clicked()),this,SLOT(saveRelation()));
-    QObject::connect(supprimer,SIGNAL(clicked()),this,SLOT(supprimerCouple()));
+   // QObject::connect(supprimer,SIGNAL(clicked()),this,SLOT(supprimerCouple()));
     QObject::connect(ajouter,SIGNAL(clicked()),this,SLOT(ajouterCouple()));
     QObject::connect(orient,SIGNAL(clicked()),this,SLOT(IsOriente()));
-
     QObject::connect(titre,SIGNAL(textEdited(QString)),this,SLOT(activerSave()));
     QObject::connect(desc,SIGNAL(textChanged()),this,SLOT(activerSave()));
 
@@ -82,12 +81,11 @@ void RelationEditeur::saveRelation(){
 
     save->setEnabled(false);
 
-}
+}/*
 void RelationEditeur::supprimerCouple(){
     relation->retirerCouple(couples->currentRow());//label de couple à supprimer
-
 }
-
+*/
 void RelationEditeur::activerSave(QString){
     save->setEnabled(true);
 }
