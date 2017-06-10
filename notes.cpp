@@ -1,5 +1,5 @@
 #include "notes.h"
-#include "relation.h"
+//#include "relation.h"
 #include <QFile>
 NotesManager::Handler NotesManager::handler=Handler();
 
@@ -18,6 +18,9 @@ bool NotesManager::rechercherNote(QString id){
     }
     return false;
 }
+
+
+
 
 /*
 void NotesManager::addCoupleDansReference(const QString& id,QString& s){
@@ -64,7 +67,7 @@ void NotesManager::addOldVersion(const Note* a) {
 }
 
 
-void NotesManager::nouvelleVersion(Note* a) { //si on Ã©dite une nouvelle version d'un article, on la met dans notes[i]
+void NotesManager::nouvelleVersion(Note* a) { //si on ÃƒÂ©dite une nouvelle version d'un article, on la met dans notes[i]
 // et on met l'ancienne version dans oldVersions
 
     for(unsigned int i=0;i<nbNotes;i++) {
@@ -226,8 +229,58 @@ Note& NotesManager::getNote(const QString& id){
         if (notes[i]->getId()==id) return *notes[i];
     }
 
-    throw NotesException("error, Ã©chouÃ© de trouver ce note");
+    throw NotesException("error, ÃƒÂ©chouÃƒÂ© de trouver ce note");
 }
+
+Note* NotesManager::copieOldNote(unsigned int j) {
+
+
+    if (oldVersions[j]==NULL) { throw NotesException("error, impossible de trouver cette note");}
+    switch(oldVersions[j]->type()) {
+          case 2:{
+              Article* tmp=new Article(oldVersions[j]->getId(), oldVersions[j]->getTitle(), oldVersions[j]->getDateCreat(), oldVersions[j]->getDateDernier(),
+                                       oldVersions[j]->getEmp(), oldVersions[j]->getEtat(),oldVersions[j]->getNbVersions(), static_cast<Article*>(oldVersions[j])->getT());
+              return tmp;
+
+          }break;
+          case 1:{
+              Tache* tmp=new Tache(oldVersions[j]->getId(), oldVersions[j]->getTitle(), oldVersions[j]->getDateCreat(), oldVersions[j]->getDateDernier(),
+                                       oldVersions[j]->getEmp(), oldVersions[j]->getEtat(),oldVersions[j]->getNbVersions(), static_cast<Tache*>(oldVersions[j])->getAction(),
+                                   static_cast<Tache*>(oldVersions[j])->getPriority(), static_cast<Tache*>(oldVersions[j])->getExpDate(), static_cast<Tache*>(oldVersions[j])->getStatus());
+              return tmp;
+
+          }break;
+
+          case 3:{
+              Image* tmp=new Image(oldVersions[j]->getId(), oldVersions[j]->getTitle(), oldVersions[j]->getDateCreat(), oldVersions[j]->getDateDernier(),
+                                       oldVersions[j]->getEmp(), oldVersions[j]->getEtat(),oldVersions[j]->getNbVersions(), static_cast<Image*>(oldVersions[j])->getDescpt(),
+                                        static_cast<Image*>(oldVersions[j])->getFicher());
+              return tmp;
+
+          }break;
+
+          case 4:{
+              Audio* tmp=new Audio(oldVersions[j]->getId(), oldVersions[j]->getTitle(), oldVersions[j]->getDateCreat(), oldVersions[j]->getDateDernier(),
+                                       oldVersions[j]->getEmp(), oldVersions[j]->getEtat(),oldVersions[j]->getNbVersions(), static_cast<Audio*>(oldVersions[j])->getDescpt(),
+                                        static_cast<Audio*>(oldVersions[j])->getFicher(),static_cast<Audio*>(oldVersions[j])->getAFile());
+              return tmp;
+
+          }break;
+
+          case 5:{
+              Video* tmp=new Video(oldVersions[j]->getId(), oldVersions[j]->getTitle(), oldVersions[j]->getDateCreat(), oldVersions[j]->getDateDernier(),
+                                       oldVersions[j]->getEmp(), oldVersions[j]->getEtat(),oldVersions[j]->getNbVersions(), static_cast<Video*>(oldVersions[j])->getDescpt(),
+                                        static_cast<Video*>(oldVersions[j])->getFicher(),static_cast<Video*>(oldVersions[j])->getVFile());
+              return tmp;
+
+          }break;
+
+           default: qDebug()<<"default"; break;
+          }
+
+    }
+
+
 
 Note* NotesManager::copieNote(const QString& id){
     // si l'Note existe d, on en renvoie une rrence
@@ -238,7 +291,7 @@ Note* NotesManager::copieNote(const QString& id){
           switch(notes[i]->type()) {
           case 2:{
               Article* tmp=new Article(notes[i]->getId(), notes[i]->getTitle(), notes[i]->getDateCreat(), notes[i]->getDateDernier(),
-                                       notes[i]->getEmp(), notes[i]->getEtat(),notes[i]->getNbVersions(), static_cast<Article*>(notes[i])->getText());
+                                       notes[i]->getEmp(), notes[i]->getEtat(),notes[i]->getNbVersions(), static_cast<Article*>(notes[i])->getT());
               return tmp;
 
           }break;
@@ -279,7 +332,7 @@ Note* NotesManager::copieNote(const QString& id){
 
     }
 }
-    throw NotesException("error, Ã©chouÃ© de trouver ce note");
+    return NULL;
 
 }
 
@@ -289,7 +342,7 @@ Article* art = a;
 art->setEtat(non_traite);
 addNote(art);
 
-//Couple rÃ©fÃ©rence?? Ã  voir !
+//Couple rÃƒÂ©fÃƒÂ©rence?? Ãƒ  voir !
 
 }
 
@@ -321,7 +374,10 @@ Note* NotesManager::getNote(unsigned int i){
     throw NotesException("erreur: didn't find note");
 }
 
-
+Note* NotesManager::getOldVersion(unsigned int j){
+    if(j<nbOldVersions) return oldVersions[j];
+    throw NotesException("erreur: didn't find note");
+}
 NotesManager::NotesManager():notes(NULL),nbNotes(0),nbMaxNotes(0),nbOldVersions(0), nbMaxOldVersions(0), oldVersions(NULL), filename(""){}
 
 NotesManager::~NotesManager(){
@@ -354,19 +410,22 @@ void NotesManager::save() const {
 
                         stream.writeStartElement("Article");
                         stream.writeTextElement("id",static_cast<Article*>(notes[i])->getId());
+                        qDebug()<<"notes["<<i<<"]:"<<notes[i]->getId();
                         stream.writeTextElement("version","1");
                         stream.writeTextElement("title",static_cast<Article*>((notes[i]))->getTitle());
+                        qDebug()<<"notes["<<i<<"]:"<<notes[i]->getTitle();
                         stream.writeTextElement("date_de_creation",static_cast<Article*>((notes[i]))->getDateCreat().toString("dd.MM.yyyy"));
 
                         stream.writeTextElement("date_de_update",static_cast<Article*>((notes[i]))->getDateDernier().toString("dd.MM.yyyy"));
                          stream.writeTextElement("enplacement",static_cast<Article*>(notes[i])->getEmp());
-                        stream.writeTextElement("text",static_cast<Article*>((notes[i]))->getText());
+                        stream.writeTextElement("text",static_cast<Article*>((notes[i]))->getT());
                         stream.writeEndElement();
 
-                       if(notes[i]->getNbVersions() > 0) {
+                    if(notes[i]->getNbVersions() > 0) {
+                            qDebug()<<"notes"<<i<<"nbVersions:"<<notes[i]->getNbVersions();
                             for(unsigned int j=0; j<nbOldVersions; j++){
                                 if(notes[i]->getId() == oldVersions[j]->getId()) {
-
+                                    qDebug()<<"oldversions"<<j<<oldVersions[j]->getId();
                                     stream.writeStartElement("Article");
                                     stream.writeTextElement("id",static_cast<Article*>(oldVersions[j])->getId());
                                     stream.writeTextElement("version","0");
@@ -375,7 +434,7 @@ void NotesManager::save() const {
 
                                     stream.writeTextElement("date_de_update",static_cast<Article*>((oldVersions[j]))->getDateDernier().toString("dd.MM.yyyy"));
                                      stream.writeTextElement("enplacement",static_cast<Article*>(oldVersions[j])->getEmp() );
-                                    stream.writeTextElement("text",static_cast<Article*>((oldVersions[j]))->getText());
+                                    stream.writeTextElement("text",static_cast<Article*>((oldVersions[j]))->getT());
                                     stream.writeEndElement();}
                             }
                         }
@@ -440,7 +499,7 @@ void NotesManager::save() const {
                         if(notes[i]->getNbVersions() > 0) {
                             for(unsigned int j=0; j<nbOldVersions; j++){
                                 if(notes[i]->getId() == oldVersions[j]->getId()) {
-
+                                    qDebug()<<"oldversions"<<j<<oldVersions[j]->getId();
                                     stream.writeStartElement("Image");
                                     stream.writeTextElement("id",static_cast<Image*>(oldVersions[j])->getId());
                                     stream.writeTextElement("version","0");
