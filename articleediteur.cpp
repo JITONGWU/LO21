@@ -3,16 +3,16 @@
 
 ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
 
-    QWidget(parent),article(&art)
+    QDialog(parent),article(&art)
     //apple au constructeur de qwidget en lui donnant en parametre "parent"
     //initialisation de article avec le parametre art
  {
-    //tous les widget créés ont comme parent l'objet de type articleediteur
-
+    //tous les widget crÃ©Ã©s ont comme parent l'objet de type articleediteur
     id=new QLineEdit(this);
     titre=new QLineEdit(this);
     text=new QTextEdit(this);
     save=new QPushButton("sauvegarder",this);
+
 
     id1=new QLabel("identificateur",this);
     titre1=new QLabel("Titre",this);
@@ -42,7 +42,7 @@ ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
 
     id->setText(article->getId());
     titre->setText(article->getTitle());
-    text->setText(article->getText());
+    text->setText(article->getT());
     }
 
     setLayout(couche);
@@ -54,15 +54,31 @@ ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
 
 }
 void ArticleEditeur::saveArticle(){
-    Article* artTemp=new Article(article); // définir un constructeur de recopie s'il n'existe pas déjà
-    artTemp->setTitle(titre->text());
-    artTemp->setText(text->toPlainText());
 
-    NotesManager.getManager().nouvelleVersion(artTemp);
+    QString ident=id->text();
+    qDebug()<<ident;
+    if(NotesManager::getManager().copieNote(ident)!= NULL) {
+        qDebug()<<"entre condition";
+        Note* artTemp= NotesManager::getManager().copieNote(ident); // dÃ©finir un constructeur de recopie s'il n'existe pas dÃ©jÃ 
+        artTemp->setTitle(titre->text()); //Tester référence
+        artTemp->setDateDerModif(QDate::currentDate());
+        static_cast<Article*>(artTemp)->setT(text->toPlainText());
+
+        NotesManager::getManager().nouvelleVersion(artTemp); }
+
+    else {
+        //Tester références avant constructeur?
+        Article *n_article = new Article(id->text(), titre->text(), QDate::currentDate(), QDate::currentDate(), "N", non_traite,0,text->toPlainText());
+        NotesManager::getManager().nouvelleVersion(n_article);}
+
     QMessageBox::information(this,"sauvegarder","bien sauvegarder");
     save->setEnabled(false);
+    NotesManager::getManager().save();
+    NotesManager::getManager().load();
+
 
 }
 void ArticleEditeur::activerSave(QString){
     save->setEnabled(true);
 }
+
