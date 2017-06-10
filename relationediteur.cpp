@@ -8,23 +8,21 @@ RelationEditeur::RelationEditeur(Relation &re, QWidget *parent,bool newR):
 {
 
 
-
     titre=new QLineEdit(this);
     if(!newRelation) titre->setReadOnly(true);
     desc=new QTextEdit(this);
     couples = new QListWidget(this);
     orient = new QRadioButton(this);
-
     titre1=new QLabel("Titre",this);
     desc1=new QLabel("description",this);
     orient1 = new QLabel("orient",this);
     couples1= new QLabel("couples",this);
 
     save=new QPushButton("sauvegarder",this);
-    supprimer=new QPushButton("supprimer",this);
+    supprimerC=new QPushButton("supprimer couple",this);
     ajouter=new QPushButton("ajouter",this);
 
-
+    supprimerR = new QPushButton("supprimer relation",this);
 
 
     ctitre=new QHBoxLayout;
@@ -44,7 +42,7 @@ RelationEditeur::RelationEditeur(Relation &re, QWidget *parent,bool newR):
     ccouples->addWidget(couples);
 
     button = new QHBoxLayout;
-    button->addWidget(supprimer);
+    button->addWidget(supprimerC);
     button->addWidget(ajouter);
 
     couche=new QVBoxLayout;
@@ -55,12 +53,15 @@ RelationEditeur::RelationEditeur(Relation &re, QWidget *parent,bool newR):
     couche->addLayout(ccouples);
     couche->addLayout(button);
     couche->addWidget(save);
+    couche->addWidget(supprimerR);
 
     setLayout(couche);
 
     save->setEnabled(false);
     QObject::connect(save,SIGNAL(clicked()),this,SLOT(saveRelation()));
-   // QObject::connect(supprimer,SIGNAL(clicked()),this,SLOT(supprimerCouple()));
+    QObject::connect(supprimerR,SIGNAL(clicked()),this,SLOT(supprimerRelation()));
+
+   // QObject::connect(supprimerC,SIGNAL(clicked()),this,SLOT(supprimerCouple()));
     QObject::connect(ajouter,SIGNAL(clicked()),this,SLOT(ajouterCouple()));
     QObject::connect(orient,SIGNAL(clicked()),this,SLOT(IsOriente()));
     QObject::connect(titre,SIGNAL(textEdited(QString)),this,SLOT(activerSave()));
@@ -81,7 +82,8 @@ void RelationEditeur::saveRelation(){
 
     save->setEnabled(false);
 
-}/*
+}
+/*
 void RelationEditeur::supprimerCouple(){
     relation->retirerCouple(couples->currentRow());//label de couple à supprimer
 }
@@ -89,19 +91,16 @@ void RelationEditeur::supprimerCouple(){
 void RelationEditeur::activerSave(QString){
     save->setEnabled(true);
 }
-
-
 void RelationEditeur::ajouterCouple(){
-
     CoupleEditeur addCouple(*relation,this,*this);
-
     addCouple.exec();
     qDebug()<<"ajouterCouple réussi\n";
-
 }
-
 void RelationEditeur::IsOriente(){
     relation->setOrient(true);
+}
+void RelationEditeur::supprimerRelation(){
+//彻底删除
 }
 
 CoupleEditeur::CoupleEditeur(Relation& relation,QWidget *parent,RelationEditeur &re):

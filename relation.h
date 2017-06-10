@@ -2,8 +2,6 @@
 #define RELATION_H
 #include<QStringList>
 #include "notes.h"
-
-
 class Couple{
     QString label;
     Note* x;
@@ -34,7 +32,7 @@ protected:
     unsigned int nbCouples;
     unsigned int nbMaxCouples;
 public:
-    Relation(const QString& t, const QString& d,bool o=true,Couple** c=nullptr,unsigned int nbC=0,unsigned int nbm=0):
+    Relation(const QString& t, const QString& d,bool o=false,Couple** c=nullptr,unsigned int nbC=0,unsigned int nbm=0):
         titre(t),desc(d),orient(o),couples(c),nbCouples(nbC),nbMaxCouples(nbm){}
   /* ~Relation(){
         for(unsigned int i=0;i<nbCouples;i++)delete couples[i];
@@ -49,42 +47,12 @@ public:
     bool getOrient()const {return orient;}
     unsigned int getNbCouples()const {return nbCouples;}
     unsigned int getNbMaxCouples()const {return nbMaxCouples;}
-
     void setTitre(const QString& t){titre=t;}
     void setDesc(const QString& d){desc=d;}
     void setOrient(bool o){orient=o;}
     void setNbCouples(unsigned int i){nbCouples=i;nbMaxCouples=i;}
-
-
     Couple* getCouple(const QString& l);//get couple par label*
-
-
     Couple* getCoupleParIndice(unsigned int i);//get couple par la position dans le tableau
-    class Iterator {
-            friend class Relation;
-            Couple** currentN;
-            unsigned int nbRemain;
-            Iterator(Couple** c, unsigned nb):currentN(c),nbRemain(nb){}
-        public:
-            Iterator():currentN(NULL),nbRemain(0){}
-            bool isDone() const { return nbRemain==0; }
-            void next() {
-                if (isDone())
-                    throw NotesException("error, next on an iterator which is done");
-                nbRemain--;
-                currentN++;
-            }
-           Couple& current() const {
-                if (isDone())
-                    throw NotesException("error, indirection on an iterator which is done");
-                return **currentN;
-            }
-        };
-
-        Iterator getIterator() {
-            return Iterator(couples,nbCouples);
-        }
-
 };
 
 class Reference:public Relation{  //singleton
@@ -95,7 +63,7 @@ private:
             ~Handler() { delete reference; }
         };
 public:
-    Reference():Relation("Référence","\ref{idNote}"){}
+    Reference():Relation("reference","\ref{idNote}"){}
     static Handler handler;
     static Reference* getRef();
     static void freeRef();

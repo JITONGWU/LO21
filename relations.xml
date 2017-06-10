@@ -36,30 +36,12 @@
     </Relation>
     <Relation>
         <titre>AZER</titre>
-        <description>AZERqdsfsd</description>
+        <description>AZERqdsfsdkjh</description>
         <oriente>true</oriente>
         <couple>
             <label>ffff</label>
             <idx>0001</idx>
             <idy>0002</idy>
-            <etat></etat>
-        </couple>
-        <couple>
-            <label>ffff</label>
-            <idx>0001</idx>
-            <idy>0002</idy>
-            <etat></etat>
-        </couple>
-        <couple>
-            <label>qsfsdf</label>
-            <idx>id4</idx>
-            <idy>id5</idy>
-            <etat></etat>
-        </couple>
-        <couple>
-            <label>qsdfqzdsfc</label>
-            <idx>0001</idx>
-            <idy>0001</idy>
             <etat></etat>
         </couple>
     </Relation>
@@ -72,6 +54,22 @@
             <idx>id5</idx>
             <idy>id6</idy>
             <etat></etat>
+        </couple>
+    </Relation>
+    <Relation>
+        <titre>reference</titre>
+        <description>ef{idNote}</description>
+        <oriente>true</oriente>
+    </Relation>
+    <Relation>
+        <titre>tester</titre>
+        <description>fqsdfqsdf</description>
+        <oriente>true</oriente>
+        <couple>
+            <label>zefze</label>
+            <idx>0001</idx>
+            <idy>0002</idy>
+            <etat>N</etat>
         </couple>
     </Relation>
 </Relations>

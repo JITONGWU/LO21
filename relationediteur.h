@@ -31,9 +31,7 @@ class RelationEditeur: public QWidget
     QLabel *orient1;
 
     QPushButton *save;
-    QPushButton *ajouter;
-    QPushButton *supprimer;//pour supprimer une couple dans la relation choisi!!! par pour supprimer relation
-
+    QPushButton *supprimerC;//pour supprimer une couple
     QHBoxLayout *ctitre;
     QHBoxLayout *cdesc;
     QHBoxLayout *corient;
@@ -44,11 +42,12 @@ class RelationEditeur: public QWidget
 
 
 public:
-
+    QPushButton *ajouter;//ajouter couple dans une relation
     QLineEdit *titre;
     QTextEdit *desc;
     QListWidget *couples;
     QRadioButton *orient;
+    QPushButton *supprimerR;//pour supprimer une relation
 
     Relation *relation;
     bool newRelation;
@@ -61,10 +60,11 @@ private slots:
     //la valeur par défaut c'est pour pouvoir la connecter avec deux signals
     //l'un avec un parametre qstring et l'autre sans parametre
 public slots:
-     void saveRelation();
+    void saveRelation();
     void ajouterCouple();
-   void IsOriente();
- //  void supprimerCouple();
+    void IsOriente();
+ // void supprimerCouple();
+    void supprimerRelation();
 
 
 };

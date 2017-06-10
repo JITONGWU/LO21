@@ -29,7 +29,7 @@ public:
 
     void addRelation(Relation *re);
 
-    void addRelation(const QString& t, const QString& d, bool o=true, Couple **c=nullptr,unsigned int nbC=0,unsigned int nbM=0);
+    void addRelation(const QString& t, const QString& d, bool o=false, Couple **c=nullptr,unsigned int nbC=0,unsigned int nbM=0);
     QList<QString> getAscendents(const QString& idy);
     QList<QString> getDescendents(const QString& idx);
 

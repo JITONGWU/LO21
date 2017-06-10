@@ -215,11 +215,22 @@ Page2::Page2(QWidget *parent):QMainWindow(parent)
 void Page2::afficherWidget(QListWidgetItem* item){
 
     Relation *choisir=RelationManager::getManager().getRelation(item->text());
+
     re->relation=choisir;
     re->titre->setText(item->text());
     re->desc->setText(choisir->getDesc());
+    //la relation reference ne peut pas être modifiée ni ajouter couples
+    if(choisir->getTitre()=="reference") {
+        re->supprimerR->setEnabled(false);
+        re->titre->setReadOnly(true);
+        re->desc->setReadOnly(true);
+        re->ajouter->setEnabled(false);
+    }
+
     if(choisir->getOrient())
-        re->orient->setChecked(true);
+    re->orient->setChecked(true);
+    re->orient->setEnabled(false);
+
     re->couples->clear();
     for(unsigned int i=0;i<choisir->getNbCouples();i++)
     re->couples->insertItem(i,choisir->getCoupleParIndice(i)->getLabel());
@@ -239,3 +250,26 @@ void Page2::RelationEditeurVide(){
 }
 
 
+/*
+void NotesManager::addCoupleDansReference(const QString& id,QString& s){
+    //std::cout<<"entrer dans la fonction"<<std::endl;
+    // lier tous les attributs de type string
+
+    QStringList lst=s.split("ref{",QString::SkipEmptyParts,Qt::CaseSensitive);  // majuscule  ? minuscule ?
+
+   for(int i=1;i<lst.count();i++)
+    {
+
+        QStringList l=lst.at(i).split("}",QString::SkipEmptyParts, Qt::CaseSensitive);
+        QString idy=l.at(0);
+        std::cout<<rechercherNote(idy)<<std::endl;
+
+        if(rechercherNote(idy)) {//si on trouve les notes avec id= l.at(0)
+
+            Couple *cp=new Couple("ref"+id,&getNote(id),&getNote(idy));
+
+            Reference::getRef().getCouples().append(cp);
+    }
+}
+}
+*/

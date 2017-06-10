@@ -11,21 +11,15 @@ NotesManager::~NotesManager(){
     if (filename!="") save();
     for(unsigned int i=0; i<nbNotes; i++) delete notes[i];
     delete[] notes;
-
     for(unsigned int j=0; j<nbOldVersions; j++) delete oldVersions[j];
     delete[] oldVersions;
-
     qDebug()<<"destructeur de notesManager reussi\n";
-
 }
-
 NotesManager::Handler NotesManager::handler=Handler();
-
 NotesManager& NotesManager::getManager(){
     if (!handler.instance) handler.instance=new NotesManager;
     return *handler.instance;
 }
-
 void NotesManager::freeManager(){
     delete handler.instance;
     handler.instance=NULL;
@@ -37,29 +31,6 @@ bool NotesManager::rechercherNote(QString id){
     return false;
 }
 
-/*
-void NotesManager::addCoupleDansReference(const QString& id,QString& s){
-    //std::cout<<"entrer dans la fonction"<<std::endl;
-    // lier tous les attributs de type string
-
-    QStringList lst=s.split("ref{",QString::SkipEmptyParts,Qt::CaseSensitive);  // majuscule  ? minuscule ?
-
-   for(int i=1;i<lst.count();i++)
-    {
-
-        QStringList l=lst.at(i).split("}",QString::SkipEmptyParts, Qt::CaseSensitive);
-        QString idy=l.at(0);
-        std::cout<<rechercherNote(idy)<<std::endl;
-
-        if(rechercherNote(idy)) {//si on trouve les notes avec id= l.at(0)
-
-            Couple *cp=new Couple("ref"+id,&getNote(id),&getNote(idy));
-
-            Reference::getRef().getCouples().append(cp);
-    }
-}
-}
-*/
 void NotesManager::addOldVersion(const Note* a) {
 
     if (nbOldVersions==nbMaxOldVersions){
@@ -70,18 +41,11 @@ void NotesManager::addOldVersion(const Note* a) {
         nbMaxOldVersions+=5;
         if (oldNotes) delete[] oldNotes;
        }
-
     oldVersions[nbOldVersions++]=const_cast<Note*>(a); //On ajoute tmp dans oldVersions
-
     Note* update_Version = &getNote(a->getId());
     update_Version->setNbVersions(1);
-
     return;
-
-
 }
-
-
 void NotesManager::nouvelleVersion(Note* a) { //si on Ã©dite une nouvelle version d'un article, on la met dans notes[i]
 // et on met l'ancienne version dans oldVersions
 
@@ -114,13 +78,8 @@ void NotesManager::nouvelleVersion(Note* a) { //si on Ã©dite une nouvelle vers
     if(nbOldVersions>2) { qDebug()<<"oldVersions[2]"<<oldVersions[2]->getTitle();}
 
      return;
-
-
-
-
     }
         }
-
     addNote(const_cast<Note*>(a));
 }
 
@@ -514,8 +473,7 @@ void NotesManager::load() {
     QFile fin(filename);
     // If we can't open it, let's show an error message.
     if (!fin.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug()<<"Erreur ouverture fichier notes\n";
-    }
+        qDebug()<<"Erreur ouverture fichier notes\n";}
     // QXmlStreamReader takes any QIODevice.
     QXmlStreamReader xml(&fin);
     //qDebug()<<"debut fichier\n";
@@ -530,41 +488,28 @@ void NotesManager::load() {
             // If it's named taches, we'll go to the next.
             if(xml.name() == "notes") continue;
             // If it's named tache, we'll dig the information from there.
-
-
-
-
-
-
             if(xml.name()== "Article") {
 
                 QString identificateur;
                 QString titre;
-                QString version; Etat et;
+                QString version;
+                Etat et;
                 QString text;
                 QDate creat;
-                QDate der_modif;QString enpl;
-            //    QXmlStreamAttributes attributes = xml.attributes();
+                QDate der_modif;
+                QString enpl;
                 xml.readNext();
-                //We're going to loop over the things because the order might change.
-                //We'll continue the loop until we hit an EndElement named article.
                 while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Article")) {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
                         if(xml.name() == "id") {
                             xml.readNext(); identificateur=xml.text().toString();
-                            qDebug()<<"id="<<identificateur<<"\n";
-
                         }
-
                         if(xml.name() == "version") {
                             xml.readNext();version=xml.text().toString();
-                            qDebug()<<"version="<<version<<"\n";
                             if (version=="0") {et=ancienne;}
                             else{et=actuelle;}
                         }
-
-                        // We've found titre.
                         if(xml.name() == "title") {
                             xml.readNext(); titre=xml.text().toString();
                         }
@@ -584,11 +529,9 @@ void NotesManager::load() {
                     }
                     xml.readNext();
                 }
-
                 addArticle(identificateur,titre,creat,der_modif,enpl,et,0,text);
             }
             if(xml.name()== "Tache"){
-
                 QString identificateur;
                 QString titre;
                 QString version; Etat et;
@@ -598,25 +541,17 @@ void NotesManager::load() {
                 QString priorite;
                 QDate echeance;
                 QString status;QString enpl;
-            //    QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
-                //We're going to loop over the things because the order might change.
-                //We'll continue the loop until we hit an EndElement named article.
                 while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Tache")) {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
-                        // We've found identificteur.
                         if(xml.name() == "id") {
                             xml.readNext(); identificateur=xml.text().toString();
                         }
-
                         if(xml.name() == "version") {
                             xml.readNext();version=xml.text().toString();
-                            qDebug()<<"version="<<version<<"\n";
                             if (version=="0") {et=ancienne;}
                             else{et=actuelle;}
                         }
-
-                        // We've found titre.
                         if(xml.name() == "title") {
                             xml.readNext(); titre=xml.text().toString();
                         }
@@ -629,11 +564,11 @@ void NotesManager::load() {
                         if(xml.name() == "emplacement") {
                             xml.readNext(); enpl=xml.text().toString();
                         }
-                      if(xml.name() == "action") {
+                        if(xml.name() == "action") {
                             xml.readNext();
                             action=xml.text().toString();
                         }
-                      if(xml.name() == "priorite") {
+                        if(xml.name() == "priorite") {
                             xml.readNext();
                             priorite=xml.text().toString();
                         }
@@ -648,11 +583,9 @@ void NotesManager::load() {
                     }
                     xml.readNext();
                 }
-
                 addTache(identificateur,titre,creat,der_modif,enpl,et,0,action,priorite,echeance,status);
             }
             if(xml.name()== "Image" ){
-
                 QString identificateur;
                 QString titre;
                 QString version; Etat et;
@@ -660,25 +593,19 @@ void NotesManager::load() {
                 QDate der_modif;
                 QString desc;
                 QString file;QString enpl;
-            //    QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
-                //We're going to loop over the things because the order might change.
-                //We'll continue the loop until we hit an EndElement named article.
                 while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Image")) {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
                         if(xml.name() == "id") {
                             xml.readNext(); identificateur=xml.text().toString();
                         }
-
                         if(xml.name() == "version") {
                             xml.readNext();version=xml.text().toString();
                             qDebug()<<"version="<<version<<"\n";
                             if (version=="0") {et=ancienne;}
                             else{et=actuelle;}
                         }
-
-                        // We've found titre.
                         if(xml.name() == "title") {
                             xml.readNext(); titre=xml.text().toString();
                         }
@@ -702,11 +629,9 @@ void NotesManager::load() {
                     }
                     xml.readNext();
                 }
-
                 addImage(identificateur,titre,creat,der_modif,enpl,et,0,desc,file);
             }
            if(xml.name()==  "Audio" ){
-
                 QString identificateur;
                 QString titre;
                 QString version; Etat et;
@@ -715,25 +640,19 @@ void NotesManager::load() {
                 QString desc;
                 QString file;
                 QString afile;QString enpl;
-               // QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
-                //We're going to loop over the things because the order might change.
-                //We'll continue the loop until we hit an EndElement named article.
                 while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Audio")) {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
                         if(xml.name() == "id") {
                             xml.readNext(); identificateur=xml.text().toString();
                         }
-
                         if(xml.name() == "version") {
                             xml.readNext();version=xml.text().toString();
                             qDebug()<<"version="<<version<<"\n";
                             if (version=="0") {et=ancienne;}
                             else{et=actuelle;}
                         }
-
-                        // We've found titre.
                         if(xml.name() == "title") {
                             xml.readNext(); titre=xml.text().toString();
                         }
@@ -761,12 +680,9 @@ void NotesManager::load() {
                     }
                     xml.readNext();
                 }
-
                 addAudio(identificateur,titre,creat,der_modif, enpl,et,0,desc,file,afile);
             }
-
             if(xml.name()=="Video" ){
-
                 QString identificateur;
                 QString titre;
                 QString version; Etat et;
@@ -776,25 +692,19 @@ void NotesManager::load() {
                 QString file;
                 QString vfile;
                 QString enpl;
-               // QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
-                //We're going to loop over the things because the order might change.
-                //We'll continue the loop until we hit an EndElement named article.
                 while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Video")) {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
                         if(xml.name() == "id") {
                             xml.readNext(); identificateur=xml.text().toString();
                         }
-
                         if(xml.name() == "version") {
                             xml.readNext();version=xml.text().toString();
                             //qDebug()<<"version="<<version<<"\n";
                             if (version=="0") {et=ancienne;}
                             else{et=actuelle;}
                         }
-
-                        // We've found titre.
                         if(xml.name() == "title") {
                             xml.readNext(); titre=xml.text().toString();
                         }
@@ -825,12 +735,8 @@ void NotesManager::load() {
 
                 addVideo(identificateur,titre,creat,der_modif,enpl,et,0,desc,file,vfile);
             }
-
-
-
             }
         }
-
     // Error handling.
     if(xml.hasError()) {
         throw NotesException("Erreur lecteur fichier notes, parser xml");
@@ -838,5 +744,4 @@ void NotesManager::load() {
     // Removes any device() or data from the reader * and resets its internal state to the initial state.
   xml.clear();
   qDebug()<<"fin load\n";
-
 }
