@@ -1,6 +1,7 @@
 #ifndef ARTICLEEDITEUR
 #define ARTICLEEDITEUR
 #include <QApplication>
+#include <QObject>
 #include <QWidget>
 #include <QLabel>
 #include <QLineEdit>
@@ -9,9 +10,8 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFileDialog>
-#include <QObject>
 #include "notes.h"
-class ArticleEditeur: public QWidget
+class ArticleEditeur: public QDialog
 {
     Q_OBJECT     //macro pour pouvoir utiliser les signals et les slots
 
@@ -24,21 +24,22 @@ class ArticleEditeur: public QWidget
     QLabel *text1;
 
     QPushButton *save;
+
     QHBoxLayout *cid;
     QHBoxLayout *ctitre;
     QHBoxLayout *ctext;
     QVBoxLayout *couche;
 
-    Article *article; //pointeur vers l'article à afficher par la fenetre
+    Article *article; //pointeur vers l'article Ã  afficher par la fenetre
 
 public:
-    explicit ArticleEditeur (Article& article,QWidget *parent=0);
-    //explicit pour empêcher la conversion implicite de article vers Article
+    explicit ArticleEditeur (Article& article,QWidget *parent=0,bool n=false);
+    //explicit pour empÃªcher la conversion implicite de article vers Article
 
 signals:
 private slots:
     void activerSave(QString ="");
-    //la valeur par défaut c'est pour pouvoir la connecter avec deux signals
+    //la valeur par dÃ©faut c'est pour pouvoir la connecter avec deux signals
     //l'un avec un parametre qstring et l'autre sans parametre
 public slots:
     void saveArticle();
