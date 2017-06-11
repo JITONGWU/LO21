@@ -30,9 +30,11 @@ class ArticleEditeur: public QWidget
     QHBoxLayout *ct;
     QVBoxLayout *couche;
 
-    Article *article; //pointeur vers l'article à afficher par la fenetre
+     //pointeur vers l'article à afficher par la fenetre
 
 public:
+    bool newA;
+    Article *article;
     QLineEdit *id;
     QLineEdit *titre;
     QTextEdit *t;
@@ -40,6 +42,7 @@ public:
     //explicit pour empêcher la conversion implicite de article vers Article
 
 signals:
+    void SendToPage1(QString);
 private slots:
     void activerSave(QString ="");
     //la valeur par défaut c'est pour pouvoir la connecter avec deux signals

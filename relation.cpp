@@ -13,7 +13,10 @@ void Reference::freeRef(){
     handler.reference=nullptr;
 }
 void Relation::addCouple(const Couple* c){
-    qDebug()<<"addcouple réussi!\n";
+    for(unsigned int i=0;i<nbCouples;i++)
+    {
+        if (couples[i]->getLabel()==c->getLabel()) return;
+    }
 
     if (nbCouples==nbMaxCouples){
         qDebug()<<"addcouple réussi!\n";

@@ -3,7 +3,7 @@
 
 ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
 
-    QWidget(parent),article(&art)
+    QWidget(parent),article(&art),newA(n)
     //apple au constructeur de qwidget en lui donnant en parametre "parent"
     //initialisation de article avec le parametre art
  {
@@ -61,11 +61,38 @@ ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
 
 }
 void ArticleEditeur::saveArticle(){
-   article->setTitle(titre->text());
-   article->setT(t->toPlainText());
-    QMessageBox::information(this,"sauvegarder","bien sauvegarder");
-    save->setEnabled(false);
+  /* QString ident=id->text();
+    qDebug()<<ident;
+  if(NotesManager::getManager().copieNote(ident)!= NULL) {
+        qDebug()<<"entre condition";
+            Note* artTemp= NotesManager::getManager().copieNote(ident); // dÃ©finir un constructeur de recopie s'il n'existe pas dÃ©jÃ
+            artTemp->setTitle(titre->text());
+            NotesManager::addCoupleDansReference(ident,titre->text()+t->toPlainText());
+            //Tester référence
+            artTemp->setDateDerModif(QDateTime::currentDateTime());
+            static_cast<Article*>(artTemp)->setT(t->toPlainText());
 
+            NotesManager::getManager().nouvelleVersion(artTemp); }
+
+        else {
+            //Tester références avant constructeur?
+            Article *n_article = new Article(id->text(), titre->text(), QDateTime::currentDateTime(), QDateTime::currentDateTime(), "N", non_traite,0,t->toPlainText());
+            NotesManager::getManager().nouvelleVersion(n_article);}
+*/
+    if(newA==false) {
+        article->setDateDerModif(QDateTime::currentDateTime());
+        article->setTitle(titre->text());
+        article->setT(t->toPlainText());
+       }
+    else {
+        article->setId(id->text());
+        article->setTitle(titre->text());
+        article->setT(t->toPlainText());
+        NotesManager::getManager().addNote(article);
+        emit SendToPage1(id->text());
+    }
+         QMessageBox::information(this,"sauvegarder","bien sauvegarder");
+         save->setEnabled(false);
 }
 void ArticleEditeur::activerSave(QString){
     save->setEnabled(true);

@@ -70,16 +70,10 @@ public:
     void addAudio(const QString& i,const QString& t, QDateTime c, QDateTime d,QString em,Etat et,int nb,const QString& des, const QString& f,const QString& aud);
     void addVideo(const QString& i,const QString& t, QDateTime c, QDateTime d,QString em,Etat et,int nb,const QString& des, const QString& f,const QString& vid);
 
-/*
-    void addTache(Tache* t);
-    void addArticle(Article* a);
-    void addImage(Image* i);
-    void addAudio(Audio* ad);
-    void addVideo(Video* v); */
-
     void restaurerVersionNote(Note* note, int j);
 
     Note* copieNote(const QString& id);
+    Note* copieOldNote(unsigned int j);
     Note& getNote(const QString& id); // return the article with identificator id
     Note* getNote(unsigned int i);
 
@@ -88,10 +82,11 @@ public:
     void setFilename(QString f) { filename=f; }
     void load(); // load notes from file filename
     void save() const; // save notes in file filename
-    void addCoupleDansReference(const QString& id,QString& s);
+    static void addCoupleDansReference(const QString& id,QString& s);
     static NotesManager& getManager();
     static void freeManager(); // free the memory used by the NotesManager; it can be rebuild later
 
+    Note* getOldVersion(unsigned int j);
     void addOldVersion(const Note* a);
     void nouvelleVersion(Note* a);
     int getNbOldVersions()const{return nbOldVersions;}
@@ -142,5 +137,28 @@ public:
         ConstIterator getIterator() const {
             return ConstIterator(notes,nbNotes);
         }
+        class OldIterator {
+                    friend class NotesManager;
+                   Note** currentNC;
+                    unsigned int nbRemain;
+                    OldIterator(Note** a, unsigned nb):currentNC(a),nbRemain(nb){}
+
+                public:
+                    OldIterator():nbRemain(0),currentNC(0){}
+                    bool isDone() const { return nbRemain==0; }
+                    void next() {
+                        if (isDone())
+                            throw NotesException("error, next on an iterator which is done");
+                        nbRemain--;
+                        currentNC++;
+                    }
+                    const Note& current() const {
+                       if (isDone())
+                           throw NotesException("error, indirection on an iterator which is done");
+                       return **currentNC;
+                   }
+               };
+                OldIterator getOldIterator() const {
+                    return OldIterator(oldVersions,nbOldVersions);}
 };
 #endif // NOTEMANAGER_H

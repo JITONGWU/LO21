@@ -41,9 +41,10 @@ public:
     const QString & getTitle()const {return title; }
     QDateTime getDateCreat() const {return creat;}
     QDateTime getDateDernier() const {return der_modif;}
+    void setId(const QString& i){id=i;}
     void setTitle(const QString& t){title=t;}
     void setDateCreat();//ajouter
-    void setDateDerModif();//modifier
+    void setDateDerModif(const QDateTime d) {der_modif=d;}
 
 
     unsigned int getNbVersions() const {return nbVersions;}
@@ -92,7 +93,7 @@ public:
     Article(const QString & i,const QString & t, QDateTime c, QDateTime d,QString em, Etat et, unsigned int n, const QString& te):
         Note(i,t,c,d,em,et,n),text(te){}
     const QString & getT() const { return text; }
-    void setT(const QString& t){text=t;}
+    void setT(const QString& te){qDebug()<<"article\n";text=te;}
     int type()const {return 2;}
 };
 

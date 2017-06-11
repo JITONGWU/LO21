@@ -33,6 +33,21 @@ void NotesManager::freeManager(){
     delete handler.instance;
     handler.instance=NULL;
 }
+void NotesManager::addCoupleDansReference(const QString& id,QString& s){
+    NotesManager &nm = NotesManager::getManager();
+    // lier tous les attributs de type string
+    QStringList lst=s.split("ref{",QString::SkipEmptyParts,Qt::CaseSensitive);  // majuscule  ? minuscule ?
+   for(int i=1;i<lst.count();i++)
+    {
+        QStringList l=lst.at(i).split("}",QString::SkipEmptyParts, Qt::CaseSensitive);
+        QString idy=l.at(0);
+        //std::cout<<rechercherNote(idy)<<std::endl;
+        if(nm.rechercherNote(idy)) {//si on trouve les notes avec id= l.at(0)
+            Couple *cp=new Couple("ref"+id,&(nm.getNote(id)),&(nm.getNote(idy)));
+            Reference::getRef()->addCouple(cp);
+    }
+}
+}
 bool NotesManager::rechercherNote(QString id){
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) return true;
@@ -138,8 +153,6 @@ void NotesManager::supprimertousNotes(QString id){
 }
 
 
-
-
 void NotesManager::addOldVersion(const Note* a) {
 
     if (nbOldVersions==nbMaxOldVersions){
@@ -162,7 +175,7 @@ void NotesManager::addOldVersion(const Note* a) {
 }
 
 
-void NotesManager::nouvelleVersion(Note* a) { //si on Ã©dite une nouvelle version d'un article, on la met dans notes[i]
+void NotesManager::nouvelleVersion(Note* a) { //si on ÃƒÂ©dite une nouvelle version d'un article, on la met dans notes[i]
 // et on met l'ancienne version dans oldVersions
 
     for(unsigned int i=0;i<nbNotes;i++) {
@@ -203,7 +216,6 @@ void NotesManager::nouvelleVersion(Note* a) { //si on Ã©dite une nouvelle vers
 
     addNote(const_cast<Note*>(a));
 }
-
 void NotesManager::restaurerVersionNote(Note* n, int j) { //n est une note de oldversions[j] accessible par l'interface
     for(unsigned int i=0; i<nbNotes; i++) {
         if(notes[i]->getId()==n->getId()) {
@@ -373,14 +385,68 @@ Note* NotesManager::copieNote(const QString& id){
 
     }
 }
-    throw NotesException("error,echoue de trouver ce note");
-
+    return NULL;
 }
+
+
+Note* NotesManager::copieOldNote(unsigned int j) {
+
+
+     if (oldVersions[j]==NULL) { throw NotesException("error, impossible de trouver cette note");}
+     switch(oldVersions[j]->type()) {
+           case 2:{
+               Article* tmp=new Article(oldVersions[j]->getId(), oldVersions[j]->getTitle(), oldVersions[j]->getDateCreat(), oldVersions[j]->getDateDernier(),
+                                        oldVersions[j]->getEmp(), oldVersions[j]->getEtat(),oldVersions[j]->getNbVersions(), static_cast<Article*>(oldVersions[j])->getT());
+               return tmp;
+
+           }break;
+           case 1:{
+               Tache* tmp=new Tache(oldVersions[j]->getId(), oldVersions[j]->getTitle(), oldVersions[j]->getDateCreat(), oldVersions[j]->getDateDernier(),
+                                        oldVersions[j]->getEmp(), oldVersions[j]->getEtat(),oldVersions[j]->getNbVersions(), static_cast<Tache*>(oldVersions[j])->getAction(),
+                                    static_cast<Tache*>(oldVersions[j])->getPriority(), static_cast<Tache*>(oldVersions[j])->getExpDate(), static_cast<Tache*>(oldVersions[j])->getStatus());
+               return tmp;
+
+           }break;
+
+           case 3:{
+               Image* tmp=new Image(oldVersions[j]->getId(), oldVersions[j]->getTitle(), oldVersions[j]->getDateCreat(), oldVersions[j]->getDateDernier(),
+                                        oldVersions[j]->getEmp(), oldVersions[j]->getEtat(),oldVersions[j]->getNbVersions(), static_cast<Image*>(oldVersions[j])->getDescpt(),
+                                         static_cast<Image*>(oldVersions[j])->getFicher());
+               return tmp;
+
+           }break;
+
+           case 4:{
+               Audio* tmp=new Audio(oldVersions[j]->getId(), oldVersions[j]->getTitle(), oldVersions[j]->getDateCreat(), oldVersions[j]->getDateDernier(),
+                                        oldVersions[j]->getEmp(), oldVersions[j]->getEtat(),oldVersions[j]->getNbVersions(), static_cast<Audio*>(oldVersions[j])->getDescpt(),
+                                         static_cast<Audio*>(oldVersions[j])->getFicher(),static_cast<Audio*>(oldVersions[j])->getAFile());
+               return tmp;
+
+           }break;
+
+           case 5:{
+               Video* tmp=new Video(oldVersions[j]->getId(), oldVersions[j]->getTitle(), oldVersions[j]->getDateCreat(), oldVersions[j]->getDateDernier(),
+                                        oldVersions[j]->getEmp(), oldVersions[j]->getEtat(),oldVersions[j]->getNbVersions(), static_cast<Video*>(oldVersions[j])->getDescpt(),
+                                         static_cast<Video*>(oldVersions[j])->getFicher(),static_cast<Video*>(oldVersions[j])->getVFile());
+               return tmp;
+
+           }break;
+
+            default: qDebug()<<"default"; break;
+           }
+
+     }
+
+
+
 Note* NotesManager::getNote(unsigned int i){
     if(i<nbNotes) return notes[i];
     throw NotesException("erreur: didn't find note!!");
 }
-
+Note* NotesManager::getOldVersion(unsigned int j){
+    if(j<nbOldVersions) return oldVersions[j];
+    throw NotesException("erreur: didn't find note");
+}
 
 void NotesManager::save() const {
     qDebug()<<"entre\n";

@@ -120,8 +120,8 @@ Page1::Page1(QWidget *parent):QMainWindow(parent){
     couche->addLayout(buttons);
     couche->addLayout(layout);
     Article *avide = new Article("this is id","this is title",QDateTime::currentDateTime(),QDateTime::currentDateTime(),"N",actuelle,0,"this is text");
-
     Image *ivide = new Image("","",QDateTime::currentDateTime(),QDateTime::currentDateTime(),"N",actuelle,0,"","");
+    Tach
     av = new ArticleEditeur(*avide,this,true);
     iv = new ImageEditeur(*ivide,this,true);
     ae = new ArticleEditeur(*avide,this,false);
@@ -179,8 +179,6 @@ void Page1::afficherWidget(QListWidgetItem* item){
             ae->id->setText(item->text());
             ae->titre->setText(choisir.getTitle());
             ae->t->setText(choisir.getT());
-            qDebug()<<choisir.getT()<<"getT reussi\n";
-
             ae->setVisible(true);
         break;
    // case 3:

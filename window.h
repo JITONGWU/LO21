@@ -51,6 +51,22 @@ class ListeRelation : public QListWidget {
     private:
 
 };
+class ListeOldNotes : public QListWidget {
+
+     Q_OBJECT
+public:
+     ListeOldNotes();
+     friend class Page1;
+private:
+
+   //  ArticleEditeur *ae;
+    // ImageEditeur *ie;
+     public slots:
+     void afficherOldNotes(QListWidgetItem *item);
+    // void restaurerVersion(int j);
+
+
+ };
 class Page3 : public QMainWindow {
     friend class NotesManager;
     friend class RelationManager;
@@ -91,10 +107,9 @@ class Page1 : public QMainWindow {
     QWidget *vide;
 
 
-    ArticleEditeur *av;
 
-    ImageEditeur *iv;
     QListWidget *listWidget;
+    ListeOldNotes *listWidget2;
     QListWidget *NotesArchieve;
     QListWidget *Taches;
     QVBoxLayout *List;
@@ -102,15 +117,20 @@ class Page1 : public QMainWindow {
     QHBoxLayout *buttons;
     QVBoxLayout *couche;
 public:
-
+    ArticleEditeur *av;
+    ImageEditeur *iv;
+    ArticleEditeur *ae;
+    ImageEditeur *ie;
     Page1(QWidget *parent);
 public slots:
     void afficherWidget(QListWidgetItem* item);
     void ArticleEditeurVide();
     void ImageEditeurVide();
     void afficherArbo(QListWidgetItem*);
-
-
+   // void ajouterArticle();
+   // void ajouterImage();
+private slots:
+    void receive(QString id);
 
 };
 
