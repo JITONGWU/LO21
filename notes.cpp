@@ -2,7 +2,7 @@
 #include "relation.h"
 #include <QFile>
 NotesManager::NotesManager():
-    notes(nullptr),nbNotes(0),nbMaxNotes(0),filename(""),
+    notes(nullptr),nbNotes(0),nbMaxNotes(0),Corbeille(nullptr),nbCorbeille(0),nbMaxCorbeille(0),filename(""),
     oldVersions(nullptr),nbOldVersions(0),nbMaxOldVersions(0){
     qDebug()<<"constructeur de notesManager reussi\n";
 
@@ -11,15 +11,24 @@ NotesManager::~NotesManager(){
     if (filename!="") save();
     for(unsigned int i=0; i<nbNotes; i++) delete notes[i];
     delete[] notes;
+
     for(unsigned int j=0; j<nbOldVersions; j++) delete oldVersions[j];
     delete[] oldVersions;
+    for(unsigned int j=0; j<nbCorbeille; j++) delete Corbeille[j];
+    delete[] Corbeille;
+
+
     qDebug()<<"destructeur de notesManager reussi\n";
+
 }
+
 NotesManager::Handler NotesManager::handler=Handler();
+
 NotesManager& NotesManager::getManager(){
     if (!handler.instance) handler.instance=new NotesManager;
     return *handler.instance;
 }
+
 void NotesManager::freeManager(){
     delete handler.instance;
     handler.instance=NULL;
@@ -31,6 +40,106 @@ bool NotesManager::rechercherNote(QString id){
     return false;
 }
 
+
+bool NotesManager::IdUniqueDansNotes(QString id){
+   for(unsigned int i=0;i<nbNotes;i++)
+       if(notes[i]->getId()==id)return false;
+   return true;
+}
+
+
+void NotesManager::restaurerDeCorbeille(QString id)
+{
+    for(unsigned int i=0;i<nbCorbeille;i++)
+        if(Corbeille[i]->getId()==id){
+            if(Corbeille[i]->getEtat()==actuelle){
+                if(IdUniqueDansNotes(id)){
+                if (nbNotes==nbMaxNotes){
+                    Note** newNotes= new Note*[nbMaxNotes+5];
+                    for(unsigned int i=0; i<nbNotes; i++) newNotes[i]=notes[i];
+                    Note** oldNotes=notes;
+                    notes=newNotes;
+                    nbMaxNotes+=5;
+                    if (oldNotes) delete[] oldNotes;
+                   }
+
+                notes[nbNotes++]=const_cast<Note*>(Corbeille[i]);}
+                else{std::cout<<"error :id ne sera pas unique\n" ;}
+        }
+            if(Corbeille[i]->getEtat()==ancienne){
+                if (nbOldVersions==nbMaxOldVersions){
+                    Note** newNotes= new Note*[nbMaxOldVersions+5];
+                    for(unsigned int i=0; i<nbOldVersions; i++) newNotes[i]=oldVersions[i];
+                    Note** oldNotes=oldVersions;
+                    oldVersions=newNotes;
+                    nbMaxOldVersions+=5;
+                    if (oldNotes) delete[] oldNotes;
+                   }
+
+                oldVersions[nbOldVersions++]=const_cast<Note*>(Corbeille[i]); //On ajoute tmp dans oldVersions
+            }
+
+}
+}
+
+
+
+void NotesManager::archiverNoteX(QString id)
+{for(unsigned int i=0;i<nbNotes;i++)
+        if(notes[i]->getId()==id)
+            notes[i]->emplacement="A";
+
+}
+void NotesManager::addCorbeille(const Note* a){
+    if (nbCorbeille==nbMaxCorbeille){
+        Note** newNotes= new Note*[nbMaxCorbeille+5];
+        for(unsigned int i=0; i<nbCorbeille; i++) newNotes[i]=Corbeille[i];
+        Note** oldNotes=Corbeille;
+        Corbeille=newNotes;
+        nbMaxCorbeille+=5;
+        if (oldNotes) delete[] oldNotes;
+       }
+
+    Corbeille[nbCorbeille++]=const_cast<Note*>(a);
+     qDebug()<<"addCorbeille reussi\n";
+}
+
+
+void NotesManager::supprimerNote(QString id)
+{
+    for(unsigned int i=0;i<nbNotes;i++)
+    {
+        if(notes[i]->getId()==id){
+            Note * mid;
+            mid=notes[i];
+            addCorbeille(mid);
+            for(unsigned int j=i;j<nbNotes-1;j++){
+                notes[j]=notes[j+1];
+                }
+             nbNotes=nbNotes-1;
+        }
+    }
+}
+
+void NotesManager::supprimertousNotes(QString id){
+   supprimerNote(id);
+   for(unsigned int i=0;i<nbOldVersions;i++)
+   {
+       if(oldVersions[i]->getId()==id){
+           Note * mid;
+           mid=oldVersions[i];
+           addCorbeille(mid);
+           for(unsigned int j=i;j<nbOldVersions-1;j++){
+               oldVersions[j]=oldVersions[j+1];
+           }
+           nbOldVersions=nbOldVersions-1;
+       }
+   }
+}
+
+
+
+
 void NotesManager::addOldVersion(const Note* a) {
 
     if (nbOldVersions==nbMaxOldVersions){
@@ -41,11 +150,18 @@ void NotesManager::addOldVersion(const Note* a) {
         nbMaxOldVersions+=5;
         if (oldNotes) delete[] oldNotes;
        }
+
     oldVersions[nbOldVersions++]=const_cast<Note*>(a); //On ajoute tmp dans oldVersions
+
     Note* update_Version = &getNote(a->getId());
     update_Version->setNbVersions(1);
+
     return;
+
+
 }
+
+
 void NotesManager::nouvelleVersion(Note* a) { //si on Ã©dite une nouvelle version d'un article, on la met dans notes[i]
 // et on met l'ancienne version dans oldVersions
 
@@ -78,8 +194,13 @@ void NotesManager::nouvelleVersion(Note* a) { //si on Ã©dite une nouvelle vers
     if(nbOldVersions>2) { qDebug()<<"oldVersions[2]"<<oldVersions[2]->getTitle();}
 
      return;
+
+
+
+
     }
         }
+
     addNote(const_cast<Note*>(a));
 }
 
@@ -127,8 +248,8 @@ void NotesManager::addNote(const Note* a){
 
 
 //utiliser template pour simplifier???
-void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate d,QString em,Etat et, int nb, const QString& a,
-                            const QString& p, QDate e,const QString& s="en_attente")
+void NotesManager::addTache(const QString & id,const QString & t, QDateTime c, QDateTime d,QString em,Etat et, int nb, const QString& a,
+                            const QString& p, QDateTime e,const QString& s="en_attente")
 {
    /* for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
@@ -142,7 +263,7 @@ void NotesManager::addTache(const QString & id,const QString & t, QDate c, QDate
 
 
 
-void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDate d,QString em,Etat et,int nb,const QString& te)
+void NotesManager::addArticle(const QString & id,const QString & t, QDateTime c, QDateTime d,QString em,Etat et,int nb,const QString& te)
 {
    /* for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
@@ -155,7 +276,7 @@ void NotesManager::addArticle(const QString & id,const QString & t, QDate c, QDa
 }
 
 
-void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f)
+void NotesManager::addImage(const QString& id,const QString& t, QDateTime c, QDateTime d,QString em,Etat et,int nb,const QString& des, const QString& f)
 {
   /*  for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
@@ -169,7 +290,7 @@ void NotesManager::addImage(const QString& id,const QString& t, QDate c, QDate d
 
 
 
-void NotesManager::addAudio(const QString& id,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f,const QString& aud)
+void NotesManager::addAudio(const QString& id,const QString& t, QDateTime c, QDateTime d,QString em,Etat et,int nb,const QString& des, const QString& f,const QString& aud)
 {
    /* for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
@@ -182,7 +303,7 @@ void NotesManager::addAudio(const QString& id,const QString& t, QDate c, QDate d
 }
 
 
-void NotesManager::addVideo(const QString& id,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f,const QString& vid)
+void NotesManager::addVideo(const QString& id,const QString& t, QDateTime c, QDateTime d,QString em,Etat et,int nb,const QString& des, const QString& f,const QString& vid)
 {
     /* for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) throw NotesException("error, creation of an already existent note");
@@ -193,11 +314,10 @@ void NotesManager::addVideo(const QString& id,const QString& t, QDate c, QDate d
     if(et==actuelle) {addNote(video);}
   }
 
-Note& NotesManager::getNote(const QString& id){
+Note &NotesManager::getNote(const QString& id){
     // si l'Note existe d, on en renvoie une rrence
     for(unsigned int i=0; i<nbNotes; i++){
-        if (notes[i]->getId()==id) {return *notes[i];    }
-
+        if (notes[i]->getId()==id) return *notes[i];
     }
 
     throw NotesException("error, Ã©chouÃ© de trouver ce note");
@@ -272,6 +392,7 @@ void NotesManager::save() const {
     QXmlStreamWriter stream(&newfile);
     stream.setAutoFormatting(true);
     stream.writeStartDocument();
+
     stream.writeStartElement("notes");
 
        for(unsigned int i=0; i<nbNotes; i++){
@@ -280,6 +401,7 @@ void NotesManager::save() const {
        switch(type){
            case 2:      {
                         stream.writeStartElement("Article");
+                        stream.writeTextElement("corbeille","0");
                         stream.writeTextElement("id",static_cast<Article*>(notes[i])->getId());
                         stream.writeTextElement("version","1");
                         stream.writeTextElement("title",static_cast<Article*>((notes[i]))->getTitle());
@@ -295,6 +417,7 @@ void NotesManager::save() const {
                                 if(notes[i]->getId() == oldVersions[j]->getId()) {
 
                                     stream.writeStartElement("Article");
+                                     stream.writeTextElement("corbeille","0");
                                     stream.writeTextElement("id",static_cast<Article*>(oldVersions[j])->getId());
                                     stream.writeTextElement("version","0");
                                     stream.writeTextElement("title",static_cast<Article*>((oldVersions[j]))->getTitle());
@@ -306,12 +429,16 @@ void NotesManager::save() const {
                                     stream.writeEndElement();}
                             }
                         }
+
+                       qDebug()<<"save ok\n";
+
                         } break;
 
 
            case 1:     {
 
                         stream.writeStartElement("Tache");
+                         stream.writeTextElement("corbeille","0");
                         stream.writeTextElement("id",static_cast<Tache*>(notes[i])->getId());
                         stream.writeTextElement("version","1");
                         stream.writeTextElement("title",static_cast<Tache*>(notes[i])->getTitle());
@@ -329,6 +456,7 @@ void NotesManager::save() const {
                                 if(notes[i]->getId() == oldVersions[j]->getId()) {
 
                                     stream.writeStartElement("Tache");
+                                     stream.writeTextElement("corbeille","0");
                                     stream.writeTextElement("id",static_cast<Tache*>(oldVersions[j])->getId());
                                     stream.writeTextElement("version","0");
                                     stream.writeTextElement("title",static_cast<Tache*>(oldVersions[j])->getTitle());
@@ -351,6 +479,7 @@ void NotesManager::save() const {
 
 
            case 3:     {stream.writeStartElement("Image");
+            stream.writeTextElement("corbeille","0");
                         stream.writeTextElement("id",static_cast<Image*>(notes[i])->getId());
                         stream.writeTextElement("version","1");
                         stream.writeTextElement("title",static_cast<Image*>(notes[i])->getTitle());
@@ -367,6 +496,7 @@ void NotesManager::save() const {
                                 if(notes[i]->getId() == oldVersions[j]->getId()) {
 
                                     stream.writeStartElement("Image");
+                                     stream.writeTextElement("corbeille","0");
                                     stream.writeTextElement("id",static_cast<Image*>(oldVersions[j])->getId());
                                     stream.writeTextElement("version","0");
                                     stream.writeTextElement("title",static_cast<Image*>(oldVersions[j])->getTitle());
@@ -387,6 +517,7 @@ void NotesManager::save() const {
        }break;
 
            case 4:     { stream.writeStartElement("Audio");
+            stream.writeTextElement("corbeille","0");
                         stream.writeTextElement("id",static_cast<Audio*>(notes[i])->getId());
                         stream.writeTextElement("version","1");
                         stream.writeTextElement("title",static_cast<Audio*>(notes[i])->getTitle());
@@ -403,6 +534,7 @@ void NotesManager::save() const {
                                 if(notes[i]->getId() == oldVersions[j]->getId()) {
 
                                     stream.writeStartElement("Audio");
+                                     stream.writeTextElement("corbeille","0");
                                     stream.writeTextElement("id",static_cast<Audio*>(oldVersions[j])->getId());
                                     stream.writeTextElement("version","0");
                                     stream.writeTextElement("title",static_cast<Audio*>(oldVersions[j])->getTitle());
@@ -424,6 +556,7 @@ void NotesManager::save() const {
 
 
            case 5:     {stream.writeStartElement("Video");
+            stream.writeTextElement("corbeille","0");
                         stream.writeTextElement("id",static_cast<Video*>(notes[i])->getId());
                         stream.writeTextElement("version","1");
                         stream.writeTextElement("title",static_cast<Video*>(notes[i])->getTitle());
@@ -441,6 +574,7 @@ void NotesManager::save() const {
                                 if(notes[i]->getId() == oldVersions[j]->getId()) {
 
                                     stream.writeStartElement("Video");
+                                     stream.writeTextElement("corbeille","0");
                                     stream.writeTextElement("id",static_cast<Video*>(oldVersions[j])->getId());
                                     stream.writeTextElement("version","0");
                                     stream.writeTextElement("title",static_cast<Video*>(oldVersions[j])->getTitle());
@@ -463,17 +597,143 @@ void NotesManager::save() const {
 
 
        }}
+
+
+
+
+    for(unsigned int i=0; i<nbCorbeille; i++){
+    int type=(Corbeille[i])->type();
+qDebug()<<"corbeille2\n";
+    switch(type){
+        case 2:      {
+                     stream.writeStartElement("Article");
+                      stream.writeTextElement("corbeille","1");
+                     qDebug()<<"corbeille4\n";
+                     stream.writeTextElement("id",static_cast<Article*>(Corbeille[i])->getId());
+                     qDebug()<<"corbeille5\n";
+                     stream.writeTextElement("version","0");
+                      qDebug()<<"corbeille6\n";
+                     stream.writeTextElement("title",static_cast<Article*>((Corbeille[i]))->getTitle());
+                     stream.writeTextElement("date_de_creation",static_cast<Article*>((Corbeille[i]))->getDateCreat().toString("dd.MM.yyyy"));
+
+                     stream.writeTextElement("date_de_update",static_cast<Article*>((Corbeille[i]))->getDateDernier().toString("dd.MM.yyyy"));
+                     stream.writeTextElement("enplacement",static_cast<Article*>(Corbeille[i])->getEmp());
+                     stream.writeTextElement("text",static_cast<Article*>((Corbeille[i]))->getT());
+                     stream.writeEndElement();
+
+
+
+                    qDebug()<<"save ok corbeille\n";
+
+                     } break;
+
+
+        case 1:     {
+
+                     stream.writeStartElement("Tache");
+                      stream.writeTextElement("corbeille","1");
+                     stream.writeTextElement("id",static_cast<Tache*>(Corbeille[i])->getId());
+                     stream.writeTextElement("version",static_cast<Tache*>(Corbeille[i])->getVersion());
+                     stream.writeTextElement("title",static_cast<Tache*>(Corbeille[i])->getTitle());
+                     stream.writeTextElement("date_de_creation",static_cast<Tache*>(Corbeille[i])->getDateCreat().toString("dd.MM.yyyy"));
+                     stream.writeTextElement("date_de_update",static_cast<Tache*>(Corbeille[i])->getDateDernier().toString("dd.MM.yyyy"));
+                      stream.writeTextElement("enplacement",static_cast<Tache*>(Corbeille[i])->getEmp());
+                     stream.writeTextElement("action",static_cast<Tache*>(Corbeille[i])->getAction());
+                     stream.writeTextElement("status",static_cast<Tache*>(Corbeille[i])->getStatus());
+                     stream.writeTextElement("priority",static_cast<Tache*>(Corbeille[i])->getPriority());
+                     stream.writeTextElement("echeance",static_cast<Tache*>(Corbeille[i])->getExpDate().toString("dd.MM.yyyy"));
+                     stream.writeEndElement();
+
+
+
+             }break;
+
+
+
+        case 3:     {stream.writeStartElement("Image");
+                     stream.writeTextElement("corbeille","1");
+                     stream.writeTextElement("id",static_cast<Image*>(Corbeille[i])->getId());
+                     stream.writeTextElement("version",static_cast<Image*>(Corbeille[i])->getVersion());
+                     stream.writeTextElement("title",static_cast<Image*>(Corbeille[i])->getTitle());
+                     stream.writeTextElement("date_de_creation",static_cast<Image*>(Corbeille[i])->getDateCreat().toString("dd.MM.yyyy"));
+                     stream.writeTextElement("date_de_update",static_cast<Image*>(Corbeille[i])->getDateDernier().toString("dd.MM.yyyy"));
+                     stream.writeTextElement("enplacement",static_cast<Image*>(Corbeille[i])->getEmp());
+                     stream.writeTextElement("descp",static_cast<Image*>(Corbeille[i])->getDescpt());
+                     stream.writeTextElement("ficher",static_cast<Image*>(Corbeille[i])->getFicher());
+                     stream.writeEndElement();
+
+
+
+
+
+
+
+    }break;
+
+        case 4:     { stream.writeStartElement("Audio");
+                      stream.writeTextElement("corbeille","1");
+                     stream.writeTextElement("id",static_cast<Audio*>(Corbeille[i])->getId());
+                     stream.writeTextElement("version",static_cast<Audio*>(Corbeille[i])->getVersion());
+                     stream.writeTextElement("title",static_cast<Audio*>(Corbeille[i])->getTitle());
+                     stream.writeTextElement("date_de_creation",static_cast<Audio*>(Corbeille[i])->getDateCreat().toString("dd.MM.yyyy"));
+                     stream.writeTextElement("date_de_update",static_cast<Audio*>(Corbeille[i])->getDateDernier().toString("dd.MM.yyyy"));
+                     stream.writeTextElement("descp",static_cast<Audio*>(Corbeille[i])->getDescpt());
+                      stream.writeTextElement("enplacement",static_cast<Video*>(Corbeille[i])->getEmp());
+                     stream.writeTextElement("ficher",static_cast<Audio*>(Corbeille[i])->getFicher());
+                     stream.writeTextElement("A_ficher",static_cast<Audio*>(Corbeille[i])->getAFile());
+                     stream.writeEndElement();
+
+
+
+
+ }
+        break;
+
+
+        case 5:     {stream.writeStartElement("Video");
+                     stream.writeTextElement("corbeille","1");
+                     stream.writeTextElement("id",static_cast<Video*>(Corbeille[i])->getId());
+                     stream.writeTextElement("version",static_cast<Video*>(Corbeille[i])->getVersion());
+                     stream.writeTextElement("title",static_cast<Video*>(Corbeille[i])->getTitle());
+                     stream.writeTextElement("date_de_creation",static_cast<Video*>(Corbeille[i])->getDateCreat().toString("dd.MM.yyyy"));
+                     stream.writeTextElement("date_de_update",static_cast<Video*>(Corbeille[i])->getDateDernier().toString("dd.MM.yyyy"));
+                     stream.writeTextElement("enplacement",static_cast<Video*>(Corbeille[i])->getEmp());
+                     stream.writeTextElement("descp",static_cast<Video*>(Corbeille[i])->getDescpt());
+                     stream.writeTextElement("ficher",static_cast<Video*>(Corbeille[i])->getFicher());
+                     stream.writeTextElement("V_ficher",static_cast<Video*>(Corbeille[i])->getVFile());
+                     stream.writeEndElement();
+
+
+
+
+    }break;
+
+
+
+
+    }}
     stream.writeEndElement();
+
+
+
     stream.writeEndDocument();
+
     qDebug()<<"save\n";
     newfile.close();
 }
+
+
+
+
+
+
 
 void NotesManager::load() {
     QFile fin(filename);
     // If we can't open it, let's show an error message.
     if (!fin.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug()<<"Erreur ouverture fichier notes\n";}
+        qDebug()<<"Erreur ouverture fichier notes\n";
+    }
     // QXmlStreamReader takes any QIODevice.
     QXmlStreamReader xml(&fin);
     //qDebug()<<"debut fichier\n";
@@ -488,28 +748,44 @@ void NotesManager::load() {
             // If it's named taches, we'll go to the next.
             if(xml.name() == "notes") continue;
             // If it's named tache, we'll dig the information from there.
-            if(xml.name()== "Article") {
 
+
+
+
+
+
+            if(xml.name()== "Article") {
+ QString corb;
                 QString identificateur;
                 QString titre;
-                QString version;
-                Etat et;
+                QString version; Etat et;
                 QString text;
-                QDate creat;
-                QDate der_modif;
-                QString enpl;
+                QDateTime creat;
+                QDateTime der_modif;QString enpl;
+            //    QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
+                //We're going to loop over the things because the order might change.
+                //We'll continue the loop until we hit an EndElement named article.
                 while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Article")) {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
+                        if(xml.name() == "corbeille") {
+                            xml.readNext(); corb=xml.text().toString();
+                        }
                         if(xml.name() == "id") {
                             xml.readNext(); identificateur=xml.text().toString();
+                            qDebug()<<"id="<<identificateur<<"\n";
+
                         }
+
                         if(xml.name() == "version") {
                             xml.readNext();version=xml.text().toString();
+                            qDebug()<<"version="<<version<<"\n";
                             if (version=="0") {et=ancienne;}
                             else{et=actuelle;}
                         }
+
+                        // We've found titre.
                         if(xml.name() == "title") {
                             xml.readNext(); titre=xml.text().toString();
                         }
@@ -529,29 +805,48 @@ void NotesManager::load() {
                     }
                     xml.readNext();
                 }
+                if(corb=="0")
+
                 addArticle(identificateur,titre,creat,der_modif,enpl,et,0,text);
+                if(corb=="1")
+                {
+                    Article * a=new Article(identificateur,titre,creat,der_modif,enpl,et,0,text);
+                    addCorbeille(a);
+                }
             }
             if(xml.name()== "Tache"){
+ QString corb;
                 QString identificateur;
                 QString titre;
                 QString version; Etat et;
-                QDate creat;
-                QDate der_modif;
+                QDateTime creat;
+                QDateTime der_modif;
                 QString action;
                 QString priorite;
-                QDate echeance;
+                QDateTime echeance;
                 QString status;QString enpl;
+            //    QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
+                //We're going to loop over the things because the order might change.
+                //We'll continue the loop until we hit an EndElement named article.
                 while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Tache")) {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
+                        // We've found identificteur.
+                        if(xml.name() == "corbeille") {
+                            xml.readNext(); corb=xml.text().toString();
+                        }
                         if(xml.name() == "id") {
                             xml.readNext(); identificateur=xml.text().toString();
                         }
+
                         if(xml.name() == "version") {
                             xml.readNext();version=xml.text().toString();
+                            qDebug()<<"version="<<version<<"\n";
                             if (version=="0") {et=ancienne;}
                             else{et=actuelle;}
                         }
+
+                        // We've found titre.
                         if(xml.name() == "title") {
                             xml.readNext(); titre=xml.text().toString();
                         }
@@ -564,11 +859,11 @@ void NotesManager::load() {
                         if(xml.name() == "emplacement") {
                             xml.readNext(); enpl=xml.text().toString();
                         }
-                        if(xml.name() == "action") {
+                      if(xml.name() == "action") {
                             xml.readNext();
                             action=xml.text().toString();
                         }
-                        if(xml.name() == "priorite") {
+                      if(xml.name() == "priorite") {
                             xml.readNext();
                             priorite=xml.text().toString();
                         }
@@ -583,29 +878,41 @@ void NotesManager::load() {
                     }
                     xml.readNext();
                 }
+if(corb=="0")
                 addTache(identificateur,titre,creat,der_modif,enpl,et,0,action,priorite,echeance,status);
+if(corb=="1"){Tache * t=new Tache(identificateur,titre,creat,der_modif,enpl,et,0,action,priorite,echeance,status);addCorbeille(t);}
             }
             if(xml.name()== "Image" ){
+ QString corb;
                 QString identificateur;
                 QString titre;
                 QString version; Etat et;
-                QDate creat;
-                QDate der_modif;
+                QDateTime creat;
+                QDateTime der_modif;
                 QString desc;
                 QString file;QString enpl;
+            //    QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
+                //We're going to loop over the things because the order might change.
+                //We'll continue the loop until we hit an EndElement named article.
                 while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Image")) {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
+                        if(xml.name() == "corbeille") {
+                            xml.readNext(); corb=xml.text().toString();
+                        }
                         if(xml.name() == "id") {
                             xml.readNext(); identificateur=xml.text().toString();
                         }
+
                         if(xml.name() == "version") {
                             xml.readNext();version=xml.text().toString();
                             qDebug()<<"version="<<version<<"\n";
                             if (version=="0") {et=ancienne;}
                             else{et=actuelle;}
                         }
+
+                        // We've found titre.
                         if(xml.name() == "title") {
                             xml.readNext(); titre=xml.text().toString();
                         }
@@ -629,30 +936,42 @@ void NotesManager::load() {
                     }
                     xml.readNext();
                 }
+ if(corb=="0")
                 addImage(identificateur,titre,creat,der_modif,enpl,et,0,desc,file);
+ if(corb=="1"){Image *i=new Image(identificateur,titre,creat,der_modif,enpl,et,0,desc,file); addCorbeille(i); }
             }
            if(xml.name()==  "Audio" ){
+ QString corb;
                 QString identificateur;
                 QString titre;
                 QString version; Etat et;
-                QDate creat;
-                QDate der_modif;
+                QDateTime creat;
+                QDateTime der_modif;
                 QString desc;
                 QString file;
                 QString afile;QString enpl;
+               // QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
+                //We're going to loop over the things because the order might change.
+                //We'll continue the loop until we hit an EndElement named article.
                 while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Audio")) {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
+                        if(xml.name() == "corbeille") {
+                            xml.readNext(); corb=xml.text().toString();
+                        }
                         if(xml.name() == "id") {
                             xml.readNext(); identificateur=xml.text().toString();
                         }
+
                         if(xml.name() == "version") {
                             xml.readNext();version=xml.text().toString();
                             qDebug()<<"version="<<version<<"\n";
                             if (version=="0") {et=ancienne;}
                             else{et=actuelle;}
                         }
+
+                        // We've found titre.
                         if(xml.name() == "title") {
                             xml.readNext(); titre=xml.text().toString();
                         }
@@ -680,31 +999,45 @@ void NotesManager::load() {
                     }
                     xml.readNext();
                 }
+if(corb=="0")
                 addAudio(identificateur,titre,creat,der_modif, enpl,et,0,desc,file,afile);
+if(corb=="1"){Audio * a=new Audio(identificateur,titre,creat,der_modif, enpl,et,0,desc,file,afile);
+             addCorbeille(a);    }
             }
+
             if(xml.name()=="Video" ){
+ QString corb;
                 QString identificateur;
                 QString titre;
                 QString version; Etat et;
-                QDate creat;
-                QDate der_modif;
+                QDateTime creat;
+                QDateTime der_modif;
                 QString desc;
                 QString file;
                 QString vfile;
                 QString enpl;
+               // QXmlStreamAttributes attributes = xml.attributes();
                 xml.readNext();
+                //We're going to loop over the things because the order might change.
+                //We'll continue the loop until we hit an EndElement named article.
                 while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Video")) {
                     if(xml.tokenType() == QXmlStreamReader::StartElement) {
                         // We've found identificteur.
+                        if(xml.name() == "corbeille") {
+                            xml.readNext(); corb=xml.text().toString();
+                        }
                         if(xml.name() == "id") {
                             xml.readNext(); identificateur=xml.text().toString();
                         }
+
                         if(xml.name() == "version") {
                             xml.readNext();version=xml.text().toString();
                             //qDebug()<<"version="<<version<<"\n";
                             if (version=="0") {et=ancienne;}
                             else{et=actuelle;}
                         }
+
+                        // We've found titre.
                         if(xml.name() == "title") {
                             xml.readNext(); titre=xml.text().toString();
                         }
@@ -732,11 +1065,21 @@ void NotesManager::load() {
                     }
                     xml.readNext();
                 }
-
+                if(corb=="0")
                 addVideo(identificateur,titre,creat,der_modif,enpl,et,0,desc,file,vfile);
+                if(corb=="1")
+                {
+                    Video*v=new Video(identificateur,titre,creat,der_modif,enpl,et,0,desc,file,vfile);
+                    addCorbeille(v);
+                }
+
             }
+
+
+
             }
         }
+
     // Error handling.
     if(xml.hasError()) {
         throw NotesException("Erreur lecteur fichier notes, parser xml");
@@ -744,4 +1087,5 @@ void NotesManager::load() {
     // Removes any device() or data from the reader * and resets its internal state to the initial state.
   xml.clear();
   qDebug()<<"fin load\n";
+
 }

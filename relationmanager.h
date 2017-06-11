@@ -1,6 +1,10 @@
 #ifndef RELATIONMANAGER_H
 #define RELATIONMANAGER_H
-#include "relation.h"
+#include "notemanager.h"
+
+class Couple;
+class Relation;
+
 class RelationManager{
     //friend class Relation;
 
@@ -26,10 +30,14 @@ class RelationManager{
 
 
 public:
+    void restaurerLesCoupleContenantNoteX(QString id);
+    void supprimerLesCoupleContenantNoteX(QString id);
+    void archiverLesCoupleContenantNoteX(QString id);
 
     void addRelation(Relation *re);
-
     void addRelation(const QString& t, const QString& d, bool o=false, Couple **c=nullptr,unsigned int nbC=0,unsigned int nbM=0);
+    void supprimerRelation(unsigned int i);
+
     QList<QString> getAscendents(const QString& idy);
     QList<QString> getDescendents(const QString& idx);
 
@@ -44,6 +52,7 @@ public:
 
     static RelationManager& getManager();
     static void freeManager();
+
     class Iterator {
             friend class RelationManager;
             Relation** currentN;
@@ -74,3 +83,18 @@ public:
 
 
 #endif // RELATIONMANAGER_H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

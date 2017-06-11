@@ -2,12 +2,17 @@
 #define RELATION_H
 #include<QStringList>
 #include "notes.h"
+#include "relationmanager.h"
+
 class Couple{
     QString label;
     Note* x;
     Note* y;
     QString etat;
 public:
+    friend void  RelationManager::restaurerLesCoupleContenantNoteX(QString id);
+    friend void  RelationManager::archiverLesCoupleContenantNoteX(QString id);
+    friend void  RelationManager::supprimerLesCoupleContenantNoteX(QString id);
     Couple(const QString& l, Note* a,Note* b,const QString& e="N"):label(l),x(a),y(b),etat(e){}
   /*  ~Couple(){
     qDebug()<<"destructeur de couple\n";
@@ -32,6 +37,9 @@ protected:
     unsigned int nbCouples;
     unsigned int nbMaxCouples;
 public:
+    friend void  RelationManager::restaurerLesCoupleContenantNoteX(QString id);
+    friend void  RelationManager::archiverLesCoupleContenantNoteX(QString id);
+    friend void  RelationManager::supprimerLesCoupleContenantNoteX(QString id);
     Relation(const QString& t, const QString& d,bool o=false,Couple** c=nullptr,unsigned int nbC=0,unsigned int nbm=0):
         titre(t),desc(d),orient(o),couples(c),nbCouples(nbC),nbMaxCouples(nbm){}
   /* ~Relation(){
@@ -74,3 +82,25 @@ public:
 //choisir une note existant --- modifier / supprimer ce note --- sauvegarder ( si on trouve \ref, addCouple()dans reference)
 //création d'une relation --- remplir le titre , description etc...
 //choisir une relation existant --- supprimer/ ajouter les couples
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

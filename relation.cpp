@@ -53,24 +53,15 @@ void Relation::addCouple(const QString& lab, Note *x, Note *y, const QString &e)
     }
 
 }
-/*
+
 void Relation::retirerCouple(unsigned int i){
-    qDebug()<<"retirer couple réussi\n";
-
-    if(i<nbCouples) {
-        Couple * supprimer=couples[i];
-        delete supprimer;
-    else throw NotesException("didn't find couple\n");
     nbCouples--;
-
-
     while(i<nbCouples){
         couples[i]=couples[i+1];
         i++;
     }
-
 }
-*/
+
 Couple* Relation::getCouple(const QString &l){
     for(unsigned int i=0;i<nbCouples;i++)
         {
@@ -92,4 +83,3 @@ QString Couple::AfficherCouple(){
     QString s="("+this->getX()->getId()+","+this->getY()->getId()+")";
     return s;
 }
-

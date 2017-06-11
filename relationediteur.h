@@ -16,15 +16,13 @@
 #include <QDialog>
 #include "relation.h"
 #include "relationmanager.h"
-
+#include "window.h"
 class CoupleEditeur;
 
 class RelationEditeur: public QWidget
 {
+    friend class Page2;
     Q_OBJECT     //macro pour pouvoir utiliser les signals et les slots
-
-
-
     QLabel *titre1;
     QLabel *desc1;
     QLabel *couples1;
@@ -38,35 +36,24 @@ class RelationEditeur: public QWidget
     QHBoxLayout *ccouples;
     QHBoxLayout *button;
     QVBoxLayout *couche;
-
-
-
 public:
     QPushButton *ajouter;//ajouter couple dans une relation
     QLineEdit *titre;
     QTextEdit *desc;
     QListWidget *couples;
     QRadioButton *orient;
-    QPushButton *supprimerR;//pour supprimer une relation
-
     Relation *relation;
     bool newRelation;
     explicit RelationEditeur (Relation& re, QWidget *parent=0, bool newR=true);
-    //explicit pour empêcher la conversion implicite de article vers Article
-
 signals:
+    void SendToPage2(QString);  //envoyer le signal à page2 pour ajouter item dans listwidget
 private slots:
     void activerSave(QString ="");
-    //la valeur par défaut c'est pour pouvoir la connecter avec deux signals
-    //l'un avec un parametre qstring et l'autre sans parametre
 public slots:
     void saveRelation();
     void ajouterCouple();
     void IsOriente();
- // void supprimerCouple();
-    void supprimerRelation();
-
-
+    void supprimerCouple();
 };
 
 
@@ -109,4 +96,3 @@ public slots:
 
 
 #endif // RELATIONEDITEUR
-

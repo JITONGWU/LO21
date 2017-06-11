@@ -7,7 +7,7 @@
 #include <QtXml>
 #include <QAction>
 #include <QHBoxLayout>
-#include <QDate>
+#include <QDateTime>
 FenPrincipale::FenPrincipale() {
     QTabWidget *onglet = new QTabWidget;
     onglet->addTab(new Page1(this), tr("Notes"));
@@ -41,8 +41,17 @@ Page1::Page1(QWidget *parent):QMainWindow(parent){
     QObject::connect(AjoutArticle,SIGNAL(clicked()),this,SLOT(ArticleEditeurVide()));
     QObject::connect(AjoutImage,SIGNAL(clicked()),this,SLOT(ImageEditeurVide()));
 
-
-
+    ascend = new QLabel;
+    ascend->setText("Ascendentes");
+    descend = new QLabel;
+    descend->setText("Descendentes");
+    arbo = new QVBoxLayout;
+    listAscend = new QListWidget;
+    listDescend = new QListWidget;
+    arbo->addWidget(ascend);
+    arbo->addWidget(listAscend);
+    arbo->addWidget(descend);
+    arbo->addWidget(listDescend);
     QMenu *fichiersRecents = menuNotes->addMenu("Fichiers &récents");
     fichiersRecents->addAction("Fichier_test.txt");
 
@@ -58,6 +67,8 @@ Page1::Page1(QWidget *parent):QMainWindow(parent){
     menuEdition->addAction(actionRetablir);
     actionAnnuler->setShortcut(QKeySequence("Ctrl+Z"));
     actionRetablir->setShortcut(QKeySequence("Ctrl+Y"));
+  //  QObject::connect(actionAnnuler,SIGNAL(clicked()),this,SLOT());
+  //  QObject::connect(actionRetablir,SIGNAL(clicked()),this,SLOT(ArticleEditeurVide()));
 
 
     /*** DOCKS ?  ***/
@@ -65,18 +76,15 @@ Page1::Page1(QWidget *parent):QMainWindow(parent){
 
     // https://qt.developpez.com/doc/4.7/mainwindow/
 
-  /*   QDockWidget *contentsWindow = new QDockWidget(tr("Visionneuse de notes"), this);
+     QDockWidget *contentsWindow = new QDockWidget(tr("Visionneuse de notes"), this);
      contentsWindow->setAllowedAreas(Qt::LeftDockWidgetArea);
-
      addDockWidget(Qt::LeftDockWidgetArea, contentsWindow);
-
      QListWidget *headingList = new QListWidget(contentsWindow);
      contentsWindow->setWidget(headingList);
      setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
      setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
      setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
 
-     */
 
 
 
@@ -87,7 +95,7 @@ Page1::Page1(QWidget *parent):QMainWindow(parent){
     vide = new QWidget;
 
 
-    scrollNote = new QScrollArea;
+
     listWidget = new QListWidget;
     NotesArchieve = new QListWidget;
     Taches = new QListWidget;
@@ -109,10 +117,9 @@ Page1::Page1(QWidget *parent):QMainWindow(parent){
     couche = new QVBoxLayout;
     couche->addLayout(buttons);
     couche->addLayout(layout);
-    scrollNote->setWidgetResizable(true);
-    Article avide("","",QDate::currentDate(),QDate::currentDate(),"N",actuelle,0,"");
+    Article avide("","",QDateTime::currentDateTime(),QDateTime::currentDateTime(),"N",actuelle,0,"");
 
-    Image ivide("","",QDate::currentDate(),QDate::currentDate(),"N",actuelle,0,"","");
+    Image ivide("","",QDateTime::currentDateTime(),QDateTime::currentDateTime(),"N",actuelle,0,"","");
     av = new ArticleEditeur(avide,this,true);
     iv = new ImageEditeur(ivide,this,true);
 
@@ -121,7 +128,7 @@ Page1::Page1(QWidget *parent):QMainWindow(parent){
     layout->addWidget(av,1,0);
     layout->addWidget(iv,1,0);
     layout->addWidget(vide,1,0);
-    layout->addWidget(scrollNote,1,0);
+    layout->addLayout(arbo);
 
    // ie->setVisible(false);
     iv->setVisible(false);
@@ -133,8 +140,18 @@ Page1::Page1(QWidget *parent):QMainWindow(parent){
     zoneCentrale->setLayout(couche);
     setCentralWidget(zoneCentrale);
     QObject::connect(listWidget,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(afficherWidget(QListWidgetItem*)));
+    QObject::connect(listWidget,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(afficherArbo(QListWidgetItem*)));
+
 
 }
+void Page1::afficherArbo(QListWidgetItem* item){
+    listAscend->clear();
+    listDescend->clear();
+    RelationManager &rm= RelationManager::getManager();
+    listAscend->addItems(rm.getAscendents(item->text()));
+    listDescend->addItems(rm.getDescendents(item->text()));
+}
+
 void Page1::afficherWidget(QListWidgetItem* item){
     NotesManager &nm = NotesManager::getManager();
 
@@ -167,109 +184,21 @@ void Page1::ImageEditeurVide(){
     iv->setVisible(true);
 }
 
-Page2::Page2(QWidget *parent):QMainWindow(parent)
-{
-    zoneCentrale = new QWidget;
 
 
-    AjoutRelation = new QPushButton("ajouter une relation",this);
-    QObject::connect(AjoutRelation,SIGNAL(clicked()),this,SLOT(RelationEditeurVide()));
-
-
-
-    listR = new QListWidget;
-    for(RelationManager::Iterator it = RelationManager::getManager().getIterator();!it.isDone();it.next())
-        listR->addItem(it.current().getTitre());
-    vide = new QWidget;
-
-    Relation* rvide = new Relation("","");
-    re = new RelationEditeur(*rvide,this,false);
-    rv = new RelationEditeur(*rvide,this);
-    scrollRelation = new QScrollArea;
-
-    layout =new QHBoxLayout;
-    couche = new QVBoxLayout;
-    layout->addWidget(listR,1,0);
-    layout->addWidget(re,1,0);
-    layout->addWidget(rv,1,0);
-    layout->addWidget(vide,1,0);
-    re->setVisible(false);
-    rv->setVisible(false);
-    vide->setVisible(true);
-    couche->addWidget(AjoutRelation);
-    couche->addLayout(layout);
-
-    zoneCentrale->setLayout(couche);
-    setCentralWidget(zoneCentrale);
-
-
-
-    QObject::connect(listR,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(afficherWidget(QListWidgetItem*)));
-
-
-
-
-}
-
-
-void Page2::afficherWidget(QListWidgetItem* item){
-
-    Relation *choisir=RelationManager::getManager().getRelation(item->text());
-
-    re->relation=choisir;
-    re->titre->setText(item->text());
-    re->desc->setText(choisir->getDesc());
-    //la relation reference ne peut pas être modifiée ni ajouter couples
-    if(choisir->getTitre()=="reference") {
-        re->supprimerR->setEnabled(false);
-        re->titre->setReadOnly(true);
-        re->desc->setReadOnly(true);
-        re->ajouter->setEnabled(false);
-    }
-
-    if(choisir->getOrient())
-    re->orient->setChecked(true);
-    re->orient->setEnabled(false);
-
-    re->couples->clear();
-    for(unsigned int i=0;i<choisir->getNbCouples();i++)
-    re->couples->insertItem(i,choisir->getCoupleParIndice(i)->getLabel());
-
-    rv->setVisible(false);
-    vide->setVisible(false);
-    re->setVisible(true);
-
-
-}
-void Page2::RelationEditeurVide(){
-    vide->setVisible(false);
-    re->setVisible(false);
-    rv->setVisible(true);
-
-
-}
-
-
-/*
-void NotesManager::addCoupleDansReference(const QString& id,QString& s){
-    //std::cout<<"entrer dans la fonction"<<std::endl;
+void addCoupleDansReference(const QString& id,QString& s){
+    NotesManager &nm = NotesManager::getManager();
     // lier tous les attributs de type string
-
     QStringList lst=s.split("ref{",QString::SkipEmptyParts,Qt::CaseSensitive);  // majuscule  ? minuscule ?
-
    for(int i=1;i<lst.count();i++)
     {
-
         QStringList l=lst.at(i).split("}",QString::SkipEmptyParts, Qt::CaseSensitive);
         QString idy=l.at(0);
-        std::cout<<rechercherNote(idy)<<std::endl;
-
-        if(rechercherNote(idy)) {//si on trouve les notes avec id= l.at(0)
-
-            Couple *cp=new Couple("ref"+id,&getNote(id),&getNote(idy));
-
-            Reference::getRef().getCouples().append(cp);
+        //std::cout<<rechercherNote(idy)<<std::endl;
+        if(nm.rechercherNote(idy)) {//si on trouve les notes avec id= l.at(0)
+            Couple *cp=new Couple("ref"+id,&(nm.getNote(id)),&(nm.getNote(idy)));
+            Reference::getRef()->addCouple(cp);
     }
 }
 }
-*/
+

@@ -13,12 +13,13 @@ int main(int argc, char *argv[])
     NotesManager &nm = NotesManager::getManager();
     RelationManager &rm = RelationManager::getManager();
     //QString fichier = QFileDialog::getOpenFileName();
-     nm.setFilename(QString::fromStdString("C:/Users/TINKPAD/Documents/lo21projet/notes.xml"));
-      //  QString fichier2 = QFileDialog::getOpenFileName();
-    rm.setFilename(QString::fromStdString("C:/Users/TINKPAD/Documents/lo21projet/relations.xml"));
-    //cout<<fichier.toStdString()<<endl<<fichier2.toStdString()<<endl;
-    nm.load();
-    rm.load();
+    //QString fichier2 = QFileDialog::getOpenFileName();
+    //nm.setFilename(fichier);
+    //rm.setFilename(fichier2);
+    //nm.setFilename(QString::fromStdString("C:/Users/TINKPAD/Downloads/LO21-wangweis1997-patch-1/LO21-wangweis1997-patch-1/notes.xml"));
+    //rm.setFilename(QString::fromStdString("C:/Users/TINKPAD/Downloads/LO21-wangweis1997-patch-1/LO21-wangweis1997-patch-1/relations.xml"));
+    //nm.load();
+    //rm.load();
 
     //ajouter ref à la premiere lancement
     bool refExiste=false;
@@ -26,8 +27,8 @@ int main(int argc, char *argv[])
         if(it.current().getTitre()=="reference") refExiste=true;
     if(!refExiste) rm.addRelation(Reference::getRef());
 
-  /*  QDate d1(2017, 5, 17);
-    QDate d2(2017, 5, 20);
+    QDateTime d1=QDateTime::currentDateTime();
+    QDateTime d2=QDateTime::currentDateTime();
     nm.addArticle("0001","titre1",d1,d2,"N",actuelle,0,"this is text");
     nm.addArticle("0002","titre2",d1,d2,"N",actuelle,0,"this is text");
     nm.addArticle("0003","titre3",d1,d2,"N",actuelle,0,"this is text");
@@ -46,12 +47,17 @@ int main(int argc, char *argv[])
     r2->addCouple(cp4);
     rm.addRelation(r1);
     rm.addRelation(r2);
-*/
+
 
     }
     catch(NotesException& e){
             std::cout<<e.getInfo().toStdString()<<"\n";
         }
+
+
+
+  //  for(NotesManager::Iterator it= nm.getIteratro();!it.isDone();it.next())
+
     FenPrincipale w;
      w.show();
 

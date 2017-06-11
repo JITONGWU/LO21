@@ -1,7 +1,40 @@
-#include "relationmanager.h"
+
 #include "relation.h"
 // relationManager singleton
 
+void RelationManager::restaurerLesCoupleContenantNoteX(QString id){
+    for(unsigned int i=0;i<nbRelations;i++){
+        for(unsigned int j=0;j<relations[i]->getNbCouples();j++)
+        {
+            if(relations[i]->couples[j]->getX()->getId()==id||relations[i]->couples[j]->getY()->getId()==id)
+                relations[i]->couples[j]->setEtat("N");
+        }
+    }
+
+
+}
+
+void RelationManager::supprimerLesCoupleContenantNoteX(QString id){
+    for(unsigned int i=0;i<nbRelations;i++){
+        for(unsigned int j=0;j<relations[i]->getNbCouples();j++)
+        {
+            if(relations[i]->couples[j]->getX()->getId()==id||relations[i]->couples[j]->getY()->getId()==id)
+                relations[i]->couples[j]->setEtat("C");
+        }
+    }
+
+
+}
+
+void RelationManager::archiverLesCoupleContenantNoteX(QString id){
+    for(unsigned int i=0;i<nbRelations;i++){
+        for(unsigned int j=0;j<relations[i]->getNbCouples();j++)
+        {
+            if(relations[i]->couples[j]->getX()->getId()==id||relations[i]->couples[j]->getY()->getId()==id)
+                relations[i]->couples[j]->setEtat("A");
+        }
+    }
+}
 
 RelationManager::Handler RelationManager::handlerR=Handler();
 
@@ -42,6 +75,14 @@ void RelationManager::addRelation(const QString& t, const QString& d, bool o, Co
 
 }
 
+void RelationManager::supprimerRelation(unsigned int i){
+    nbRelations--;
+    while(i<nbRelations)
+    {
+       relations[i]=relations[i+1];
+       i++;
+    }
+}
 
 
 RelationManager::~RelationManager(){
@@ -231,3 +272,4 @@ void RelationManager::load() {
     xml.clear();
     qDebug()<<"fin load relation\n";
 }
+

@@ -10,7 +10,7 @@ QMAKE = /FS
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 QT += xml
 
-QMAKE_CXXFLAGS = /FS
+
 QMAKE_LFLAGS = -std=c++11
 
 TARGET = LO21
@@ -37,7 +37,8 @@ SOURCES += main.cpp\
     articleediteur.cpp \
     imageediteur.cpp \
     relationediteur.cpp \
-    page1.cpp
+    page3.cpp \
+    page2.cpp
 
 HEADERS  += mainwindow.h \
     relation.h \
@@ -46,7 +47,8 @@ HEADERS  += mainwindow.h \
     articleediteur.h \
     notes.h \
     imageediteur.h \
-    relationediteur.h
+    relationediteur.h \
+    notemanager.h
 
 FORMS    += mainwindow.ui
 

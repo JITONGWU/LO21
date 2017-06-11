@@ -23,6 +23,7 @@
 #include <QComboBox>
 #include <QMdiArea>
 #include <QScrollArea>
+#include <QMessageBox>
 #include "relationmanager.h"
 #include "articleediteur.h"
 #include "imageediteur.h"
@@ -37,6 +38,15 @@ class ListeNotes : public QListWidget {
     public:
 
     ListeNotes();
+
+    private:
+
+};
+class ListeRelation : public QListWidget {
+
+    public:
+
+    ListeRelation();
 
     private:
 
@@ -72,16 +82,18 @@ class Page1 : public QMainWindow {
     QPushButton *AjoutAudio;
     QPushButton *AjoutVideo;
 
+    QLabel * ascend;
+    QLabel *descend;
+    QVBoxLayout *arbo;
+    QListWidget *listAscend;
+    QListWidget *listDescend;
 
     QWidget *vide;
 
- //   ArticleEditeur *ae;
+
     ArticleEditeur *av;
 
-  //  ImageEditeur *ie;
     ImageEditeur *iv;
-
-    QScrollArea *scrollNote;
     QListWidget *listWidget;
     QListWidget *NotesArchieve;
     QListWidget *Taches;
@@ -96,10 +108,11 @@ public slots:
     void afficherWidget(QListWidgetItem* item);
     void ArticleEditeurVide();
     void ImageEditeurVide();
+    void afficherArbo(QListWidgetItem*);
+
 
 
 };
-
 
 class RelationEditeur;
 class Page2 : public QMainWindow
@@ -110,25 +123,25 @@ class Page2 : public QMainWindow
     Q_OBJECT
 
     QWidget *zoneCentrale;
-
     QPushButton *AjoutRelation;
+    QPushButton *supprimerR;//pour supprimer une relation
     QWidget *vide;
     RelationEditeur *re;
     RelationEditeur *rv;
     QScrollArea *scrollRelation;
+    QHBoxLayout *buttons;
     QHBoxLayout *layout;
     QVBoxLayout *couche;
 
-
 public:
-    QListWidget *listR;
-
+    ListeRelation *listR;
     Page2(QWidget *parent);
-
+private slots:
+    void receive(QString titre);//recevoir le signal de relation editeur
 public slots:
     void afficherWidget(QListWidgetItem* item);
     void RelationEditeurVide();
-
+    void supprimerRelation();
 };
 
 

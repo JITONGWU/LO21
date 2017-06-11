@@ -6,8 +6,6 @@ RelationEditeur::RelationEditeur(Relation &re, QWidget *parent,bool newR):
     QWidget(parent),relation(&re),newRelation(newR)
 
 {
-
-
     titre=new QLineEdit(this);
     if(!newRelation) titre->setReadOnly(true);
     desc=new QTextEdit(this);
@@ -21,9 +19,6 @@ RelationEditeur::RelationEditeur(Relation &re, QWidget *parent,bool newR):
     save=new QPushButton("sauvegarder",this);
     supprimerC=new QPushButton("supprimer couple",this);
     ajouter=new QPushButton("ajouter",this);
-
-    supprimerR = new QPushButton("supprimer relation",this);
-
 
     ctitre=new QHBoxLayout;
     ctitre->addWidget(titre1);
@@ -53,15 +48,12 @@ RelationEditeur::RelationEditeur(Relation &re, QWidget *parent,bool newR):
     couche->addLayout(ccouples);
     couche->addLayout(button);
     couche->addWidget(save);
-    couche->addWidget(supprimerR);
 
     setLayout(couche);
-
     save->setEnabled(false);
-    QObject::connect(save,SIGNAL(clicked()),this,SLOT(saveRelation()));
-    QObject::connect(supprimerR,SIGNAL(clicked()),this,SLOT(supprimerRelation()));
 
-   // QObject::connect(supprimerC,SIGNAL(clicked()),this,SLOT(supprimerCouple()));
+    QObject::connect(save,SIGNAL(clicked()),this,SLOT(saveRelation()));
+    QObject::connect(supprimerC,SIGNAL(clicked()),this,SLOT(supprimerCouple()));
     QObject::connect(ajouter,SIGNAL(clicked()),this,SLOT(ajouterCouple()));
     QObject::connect(orient,SIGNAL(clicked()),this,SLOT(IsOriente()));
     QObject::connect(titre,SIGNAL(textEdited(QString)),this,SLOT(activerSave()));
@@ -73,21 +65,20 @@ void RelationEditeur::saveRelation(){
     relation->setTitre(titre->text());
     relation->setDesc(desc->toPlainText());
 
-    if(newRelation){
-       RelationManager &rm = RelationManager::getManager();
-       rm.addRelation(relation);
-    }
+    if(newRelation)   RelationManager::getManager().addRelation(relation);
     QMessageBox::information(this,"sauvegarder","bien sauvegarder");
     qDebug()<<"saveRelation réussi\n";
-
     save->setEnabled(false);
 
+    emit SendToPage2(titre->text());//
+
 }
-/*
+
 void RelationEditeur::supprimerCouple(){
     relation->retirerCouple(couples->currentRow());//label de couple à supprimer
+     QMessageBox::information(this,"supprimer","bien supprimer une couple");
 }
-*/
+
 void RelationEditeur::activerSave(QString){
     save->setEnabled(true);
 }
@@ -98,9 +89,6 @@ void RelationEditeur::ajouterCouple(){
 }
 void RelationEditeur::IsOriente(){
     relation->setOrient(true);
-}
-void RelationEditeur::supprimerRelation(){
-//彻底删除
 }
 
 CoupleEditeur::CoupleEditeur(Relation& relation,QWidget *parent,RelationEditeur &re):
@@ -146,6 +134,7 @@ CoupleEditeur::CoupleEditeur(Relation& relation,QWidget *parent,RelationEditeur 
     couche->addWidget(save);
     setLayout(couche);
 
+    save->setEnabled(false);
 
     QObject::connect(notes,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(afficherId(QListWidgetItem*)));
     QObject::connect(save,SIGNAL(clicked()),this,SLOT(saveCouple()));
@@ -154,9 +143,9 @@ CoupleEditeur::CoupleEditeur(Relation& relation,QWidget *parent,RelationEditeur 
 }
 void CoupleEditeur::afficherId(QListWidgetItem *item){
     if(idx->text()==nullptr)    idx->setText(item->text());
-
     else    idy->setText(item->text());
     if(idx->text()!=nullptr && idy ->text()!=nullptr) save->setEnabled(true);
+
 }
 void CoupleEditeur::saveCouple(){
     relationediteur->couples->addItem(label->text());
@@ -167,6 +156,4 @@ void CoupleEditeur::saveCouple(){
     QMessageBox::information(this,"sauvegarder","bien sauvegarder");
     save->setEnabled(false);
     this->close();
-    //for(unsigned int i=0; i<relationediteur->couples->count();i++)
-    //relationediteur->relation->addCouple(relationediteur->relation->getCouple(relationediteur->couples->item(i)->text()));
 }
