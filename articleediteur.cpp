@@ -58,9 +58,14 @@ ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
     QObject::connect(save,SIGNAL(clicked()),this,SLOT(saveArticle()));
     QObject::connect(titre,SIGNAL(textEdited(QString)),this,SLOT(activerSave()));
     QObject::connect(t,SIGNAL(textChanged()),this,SLOT(activerSave()));
+    QObject::connect(supprimer,SIGNAL(clicked()),this,SLOT(supprimerArticle()));
+
 
 }
 void ArticleEditeur::saveArticle(){
+    QString avant=titre->text()+t->toPlainText();
+    NotesManager::getManager().supprimerCoupleDansReference(id->text(),avant);
+
   /* QString ident=id->text();
     qDebug()<<ident;
   if(NotesManager::getManager().copieNote(ident)!= NULL) {
@@ -90,7 +95,10 @@ void ArticleEditeur::saveArticle(){
         article->setT(t->toPlainText());
         NotesManager::getManager().addNote(article);
         emit SendToPage1(id->text());
+        article= new Article("this is id","this is title",QDateTime::currentDateTime(),QDateTime::currentDateTime(),"N",actuelle,0,"this is text");
     }
+    QString apres= titre->text()+t->toPlainText();
+    NotesManager::getManager().addCoupleDansReference(id->text(),apres);
          QMessageBox::information(this,"sauvegarder","bien sauvegarder");
          save->setEnabled(false);
 }

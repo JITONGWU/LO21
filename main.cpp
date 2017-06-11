@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
     QDateTime d1=QDateTime::currentDateTime();
     QDateTime d2=QDateTime::currentDateTime();
-    nm.addArticle("0001","titre1",d1,d2,"N",actuelle,0,"this is text");
+    nm.addArticle("0001","titre1",d1,d2,"N",actuelle,0,"this is text ref{0002}");
     nm.addArticle("0002","titre2",d1,d2,"N",actuelle,0,"this is text");
     nm.addArticle("0003","titre3",d1,d2,"N",actuelle,0,"this is text");
     nm.addArticle("id4","titre4",d1,d2,"N",actuelle,0,"this is text");
@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
     r2->addCouple(cp4);
     rm.addRelation(r1);
     rm.addRelation(r2);
+    Reference::getRef()->addCouple(cp1);
 
 
     }
@@ -59,7 +60,6 @@ int main(int argc, char *argv[])
   //  for(NotesManager::Iterator it= nm.getIteratro();!it.isDone();it.next())
 
     FenPrincipale w;
-     w.show();
-
+     w.showMaximized();
     return a.exec();
 }

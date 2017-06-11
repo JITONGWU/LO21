@@ -70,32 +70,11 @@ Page1::Page1(QWidget *parent):QMainWindow(parent){
   //  QObject::connect(actionAnnuler,SIGNAL(clicked()),this,SLOT());
   //  QObject::connect(actionRetablir,SIGNAL(clicked()),this,SLOT(ArticleEditeurVide()));
 
-
-    /*** DOCKS ?  ***/
-
-
-    // https://qt.developpez.com/doc/4.7/mainwindow/
-
-     QDockWidget *contentsWindow = new QDockWidget(tr("Visionneuse de notes"), this);
-     contentsWindow->setAllowedAreas(Qt::LeftDockWidgetArea);
-     addDockWidget(Qt::LeftDockWidgetArea, contentsWindow);
-     QListWidget *headingList = new QListWidget(contentsWindow);
-     contentsWindow->setWidget(headingList);
-     setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
-     setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
-     setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
-
-
-
-
     /*** ZONE CENTRALE ***/
 
 
     zoneCentrale = new QWidget;
     vide = new QWidget;
-
-
-
     listWidget = new QListWidget;
     listWidget2 = new ListeOldNotes;
     listWidget2->setVisible(false);
@@ -120,12 +99,19 @@ Page1::Page1(QWidget *parent):QMainWindow(parent){
     couche->addLayout(buttons);
     couche->addLayout(layout);
     Article *avide = new Article("this is id","this is title",QDateTime::currentDateTime(),QDateTime::currentDateTime(),"N",actuelle,0,"this is text");
-
     Image *ivide = new Image("","",QDateTime::currentDateTime(),QDateTime::currentDateTime(),"N",actuelle,0,"","");
+    //Tache *tvide= new Tache();
+    //Audio * avide = new Audio();
+    //Video * vvide = new Video();
+
     av = new ArticleEditeur(*avide,this,true);
     iv = new ImageEditeur(*ivide,this,true);
+    //tv = new TacheEditeur(*tvide,this,true);
+    //auv = new AudioEditeur(*auvide,this,ture);
     ae = new ArticleEditeur(*avide,this,false);
     ie = new ImageEditeur(*ivide,this,false);
+    //te = new TacheEditeur(*tvide,this,flase);
+
 
     layout->addLayout(List);
 
@@ -179,9 +165,8 @@ void Page1::afficherWidget(QListWidgetItem* item){
             ae->id->setText(item->text());
             ae->titre->setText(choisir.getTitle());
             ae->t->setText(choisir.getT());
-            qDebug()<<choisir.getT()<<"getT reussi\n";
-
             ae->setVisible(true);
+
         break;
    // case 3:
    //     break;
@@ -193,7 +178,9 @@ void Page1::afficherWidget(QListWidgetItem* item){
 
 }
 void Page1::ArticleEditeurVide(){
-    qDebug()<<av->article->getT()<<"lalaaall\n";
+    av->id->clear();
+    av->titre->clear();
+    av->t->clear();
     ie->setVisible(false);
     iv->setVisible(false);
     ae->setVisible(false);
@@ -272,19 +259,4 @@ void ListeOldNotes::restaurerVersion(int j) {
           }
     }
 */
-static void addCoupleDansReference(const QString& id,QString& s){
-    NotesManager &nm = NotesManager::getManager();
-    // lier tous les attributs de type string
-    QStringList lst=s.split("ref{",QString::SkipEmptyParts,Qt::CaseSensitive);  // majuscule  ? minuscule ?
-   for(int i=1;i<lst.count();i++)
-    {
-        QStringList l=lst.at(i).split("}",QString::SkipEmptyParts, Qt::CaseSensitive);
-        QString idy=l.at(0);
-        //std::cout<<rechercherNote(idy)<<std::endl;
-        if(nm.rechercherNote(idy)) {//si on trouve les notes avec id= l.at(0)
-            Couple *cp=new Couple("ref"+id,&(nm.getNote(id)),&(nm.getNote(idy)));
-            Reference::getRef()->addCouple(cp);
-    }
-}
-}
 

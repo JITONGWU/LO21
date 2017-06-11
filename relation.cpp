@@ -64,6 +64,10 @@ void Relation::retirerCouple(unsigned int i){
         i++;
     }
 }
+void Relation::retirerCouple(const Couple *c){
+    for(unsigned int i=0;i<nbCouples;i++)
+        if (couples[i]->getLabel()==c->getLabel()) retirerCouple(i);
+}
 
 Couple* Relation::getCouple(const QString &l){
     for(unsigned int i=0;i<nbCouples;i++)

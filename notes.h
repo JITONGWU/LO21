@@ -14,12 +14,6 @@
 using namespace std;
 
 class NotesManager;
-
-
-
-
-
-
 class Note {
     QString id;
     QString title;
@@ -58,9 +52,6 @@ public:
 
 };
 
-
-
-
 class Tache : public Note {
     QString action;
     QString priorite;
@@ -83,8 +74,6 @@ public :
 
 
 };
-
-
 
 class Article : public Note{
 

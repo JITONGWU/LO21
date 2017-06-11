@@ -64,28 +64,8 @@ private:
      public slots:
      void afficherOldNotes(QListWidgetItem *item);
     // void restaurerVersion(int j);
-
-
  };
-class Page3 : public QMainWindow {
-    friend class NotesManager;
-    friend class RelationManager;
-    Q_OBJECT
-    QWidget *zoneCentrale;
 
-    QPushButton *restaurer;
-    QPushButton *supprimer;
-    QListWidget *corbeille;
-    QHBoxLayout *buttons;
-    QVBoxLayout *couche;
-public:
-
-    Page3(QWidget *parent);
-public slots:
-    void Restaurer();
-    void Supprimer();
-
-};
 class Page1 : public QMainWindow {
     friend class NotesManager;
     friend class RelationManager;
@@ -97,6 +77,7 @@ class Page1 : public QMainWindow {
     QPushButton *AjoutImage;
     QPushButton *AjoutAudio;
     QPushButton *AjoutVideo;
+
 
     QLabel * ascend;
     QLabel *descend;
@@ -163,7 +144,27 @@ public slots:
     void RelationEditeurVide();
     void supprimerRelation();
 };
+class Page3 : public QMainWindow {
+    friend class NotesManager;
+    friend class RelationManager;
+    Q_OBJECT
+    QWidget *zoneCentrale;
 
+    QPushButton *restaurer;
+    QPushButton *supprimer;
+    QListWidget *corbeille;
+    QHBoxLayout *buttons;
+    QVBoxLayout *couche;
+public:
+
+    Page3(QWidget *parent);
+public slots:
+    void Restaurer();
+    void Supprimer();
+private slots:
+   // void receive(QString id);
+
+};
 
 
 #endif

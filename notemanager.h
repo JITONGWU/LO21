@@ -25,12 +25,12 @@ private:
 typedef enum { actuelle, ancienne, non_traite } Etat;
 class NotesManager {
 private:
+    mutable QString filename;
 
     Note** notes;  //QList<Note*> notes;
     unsigned int nbNotes;
     unsigned int nbMaxNotes;
 
-    mutable QString filename;
 
     Note** oldVersions;
     unsigned int nbOldVersions;
@@ -47,13 +47,10 @@ private:
         ~Handler() { delete instance; }
     };
     static Handler handler;
-
     NotesManager();
     ~NotesManager();
     NotesManager(const NotesManager& m);
     NotesManager& operator=(const NotesManager& m);
-
-
 public:
     bool IdUniqueDansNotes(QString id);
     void restaurerDeCorbeille(QString id);
@@ -83,6 +80,7 @@ public:
     void load(); // load notes from file filename
     void save() const; // save notes in file filename
     static void addCoupleDansReference(const QString& id,QString& s);
+    static void supprimerCoupleDansReference(const QString& id, QString& s);
     static NotesManager& getManager();
     static void freeManager(); // free the memory used by the NotesManager; it can be rebuild later
 

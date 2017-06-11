@@ -33,6 +33,16 @@ Page3::Page3(QWidget *parent):QMainWindow(parent)
 
     zoneCentrale->setLayout(couche);
     setCentralWidget(zoneCentrale);
+    //QObject::connect(Page1::av,SIGNAL(SendToPage1(QString)),this,SLOT(receive(QString));
+    //QObject::connect(Page1::av,SIGNAL(SendToPage1(QString)),this,SLOT(receive(QString));
+    //QObject::connect(Page1::av,SIGNAL(SendToPage1(QString)),this,SLOT(receive(QString));
+    //QObject::connect(Page1::av,SIGNAL(SendToPage1(QString)),this,SLOT(receive(QString));
+    Page1::a
+
 }
 void Page3::Restaurer(){}
 void Page3::Supprimer(){}
+/*void Page3::receive(QString id){
+    //corbeille->takeItem(id);
+}
+*/

@@ -50,6 +50,8 @@ public:
     void addCouple(const Couple *c);
     void addCouple(const QString& lab, Note *x, Note *y, const QString& e="N");// seulement pour les notes de dernière version!
     void retirerCouple(unsigned int i);
+    void retirerCouple(const Couple *c);
+
     QString getTitre()const {return titre;}
     QString getDesc()const{return desc;}
     bool getOrient()const {return orient;}

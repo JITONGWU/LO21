@@ -43,11 +43,27 @@ void NotesManager::addCoupleDansReference(const QString& id,QString& s){
         QString idy=l.at(0);
         //std::cout<<rechercherNote(idy)<<std::endl;
         if(nm.rechercherNote(idy)) {//si on trouve les notes avec id= l.at(0)
-            Couple *cp=new Couple("ref"+id,&(nm.getNote(id)),&(nm.getNote(idy)));
+            Couple *cp=new Couple("ref_"+id+"_"+idy,&nm.getNote(id),&nm.getNote(idy));
             Reference::getRef()->addCouple(cp);
     }
 }
 }
+void NotesManager::supprimerCoupleDansReference(const QString& id,QString& s){
+    NotesManager &nm = NotesManager::getManager();
+    // lier tous les attributs de type string
+    QStringList lst=s.split("ref{",QString::SkipEmptyParts,Qt::CaseSensitive);  // majuscule  ? minuscule ?
+   for(int i=1;i<lst.count();i++)
+    {
+        QStringList l=lst.at(i).split("}",QString::SkipEmptyParts, Qt::CaseSensitive);
+        QString idy=l.at(0);
+        //std::cout<<rechercherNote(idy)<<std::endl;
+        if(nm.rechercherNote(idy)) {//si on trouve les notes avec id= l.at(0)
+            Couple *cp=new Couple("ref_"+id+"_"+idy,&nm.getNote(id),&nm.getNote(idy));
+            Reference::getRef()->retirerCouple(cp);
+    }
+}
+}
+
 bool NotesManager::rechercherNote(QString id){
     for(unsigned int i=0; i<nbNotes; i++){
         if (notes[i]->getId()==id) return true;
