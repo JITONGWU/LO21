@@ -73,8 +73,7 @@ void ArticleEditeur::saveArticle(){
 
     QMessageBox::information(this,"sauvegarder","bien sauvegarder");
     save->setEnabled(false);
-    NotesManager::getManager().save();
-    NotesManager::getManager().load();
+
 
 
 }
