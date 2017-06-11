@@ -1,22 +1,23 @@
 #include "articleediteur.h"
 #include <QMessageBox>
 
-ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
+ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n, int r):
 
-    QDialog(parent),article(&art)
+    QWidget(parent),article(&art),newA(n), restaurer(r)
     //apple au constructeur de qwidget en lui donnant en parametre "parent"
     //initialisation de article avec le parametre art
  {
-    //tous les widget crÃ©Ã©s ont comme parent l'objet de type articleediteur
+    //tous les widget créés ont comme parent l'objet de type articleediteur
+
+    qDebug()<<"restaurer:"<<restaurer;
+
     id=new QLineEdit(this);
     titre=new QLineEdit(this);
-    text=new QTextEdit(this);
-    save=new QPushButton("sauvegarder",this);
-
+    t=new QTextEdit(this);
 
     id1=new QLabel("identificateur",this);
     titre1=new QLabel("Titre",this);
-    text1=new QLabel("Texte",this);
+    t1=new QLabel("Texte",this);
 
     cid=new QHBoxLayout;
     cid->addWidget(id1);
@@ -27,55 +28,97 @@ ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
     ctitre->addWidget(titre1);
     ctitre->addWidget(titre);
 
-    ctext=new QHBoxLayout ;
-    ctext->addWidget(text1);
-    ctext->addWidget(text);
+    ct=new QHBoxLayout ;
+    ct->addWidget(t1);
+    ct->addWidget(t);
+
+    save=new QPushButton("sauvegarder",this);
+    archieve=new QPushButton("archiever",this);
+    supprimer =new QPushButton("supprimer",this);
+     rest=new QPushButton("restaurer",this);
+
+    buttons = new QHBoxLayout;
+    buttons->addWidget(archieve);
+    buttons->addWidget(save);
+    buttons->addWidget(supprimer);
+    buttons->addWidget(rest);
 
     couche=new QVBoxLayout;
     couche->addLayout(cid);
     couche->addLayout(ctitre);
-    couche->addLayout(ctext);
-    couche->addWidget(save);
+    couche->addLayout(ct);
+    couche->addLayout(buttons);
 
-     if(n==false){
-    id->setReadOnly(true);
+    if(n=false) {
+    id->setReadOnly(true);}
+
+if(restaurer<0) { rest->setVisible(false);}
+ else {save->setVisible(false); supprimer->setVisible(false); archieve->setVisible(false);}
+
 
     id->setText(article->getId());
     titre->setText(article->getTitle());
-    text->setText(article->getT());
-    }
+    t->setText(article->getT());
+
 
     setLayout(couche);
 
     save->setEnabled(false);
+     QObject::connect(rest,SIGNAL(clicked()),this,SLOT(saveArticle()));
     QObject::connect(save,SIGNAL(clicked()),this,SLOT(saveArticle()));
     QObject::connect(titre,SIGNAL(textEdited(QString)),this,SLOT(activerSave()));
-    QObject::connect(text,SIGNAL(textChanged()),this,SLOT(activerSave()));
+    QObject::connect(t,SIGNAL(textChanged()),this,SLOT(activerSave()));
 
 }
 void ArticleEditeur::saveArticle(){
 
-    QString ident=id->text();
+
+  /* QString ident=id->text();
     qDebug()<<ident;
-    if(NotesManager::getManager().copieNote(ident)!= NULL) {
+  if(NotesManager::getManager().copieNote(ident)!= NULL) {
         qDebug()<<"entre condition";
-        Note* artTemp= NotesManager::getManager().copieNote(ident); // dÃ©finir un constructeur de recopie s'il n'existe pas dÃ©jÃ 
-        artTemp->setTitle(titre->text()); //Tester référence
-        artTemp->setDateDerModif(QDate::currentDate());
-        static_cast<Article*>(artTemp)->setT(text->toPlainText());
+            Note* artTemp= NotesManager::getManager().copieNote(ident); // dÃ©finir un constructeur de recopie s'il n'existe pas dÃ©jÃ
+            artTemp->setTitle(titre->text());
+            NotesManager::addCoupleDansReference(ident,titre->text()+t->toPlainText());
+            //Tester référence
+            artTemp->setDateDerModif(QDateTime::currentDateTime());
+            static_cast<Article*>(artTemp)->setT(t->toPlainText());
 
-        NotesManager::getManager().nouvelleVersion(artTemp); }
+            NotesManager::getManager().nouvelleVersion(artTemp); }
 
+        else {
+            //Tester références avant constructeur?
+            Article *n_article = new Article(id->text(), titre->text(), QDateTime::currentDateTime(), QDateTime::currentDateTime(), "N", non_traite,0,t->toPlainText());
+            NotesManager::getManager().nouvelleVersion(n_article);}
+*/
+
+
+if(restaurer >=0) {
+      qDebug()<<"restaurer??";
+        NotesManager::getManager().restaurerVersionNote(article,restaurer);
+        QMessageBox::information(this,"restauration","bien restaurer");
+        setVisible(false);
+}
     else {
-        //Tester références avant constructeur?
-        Article *n_article = new Article(id->text(), titre->text(), QDate::currentDate(), QDate::currentDate(), "N", non_traite,0,text->toPlainText());
-        NotesManager::getManager().nouvelleVersion(n_article);}
+    if(newA==false) {
+            Note* artTemp= NotesManager::getManager().copieNote(id->text()); // dÃ©finir un constructeur de recopie s'il n'existe pas dÃ©jÃ
+            artTemp->setTitle(titre->text());
+          //  NotesManager::addCoupleDansReference(id->text(),titre->text()+t->toPlainText());
+            //Tester référence
+            artTemp->setDateDerModif(QDateTime::currentDateTime());
+            static_cast<Article*>(artTemp)->setT(t->toPlainText());
 
-    QMessageBox::information(this,"sauvegarder","bien sauvegarder");
-    save->setEnabled(false);
-
-
-
+            NotesManager::getManager().nouvelleVersion(artTemp);
+       }
+    else {
+        article->setId(id->text());
+        article->setTitle(titre->text());
+        article->setT(t->toPlainText());
+        NotesManager::getManager().addNote(article);
+        emit SendToPage1(id->text());
+    }
+         QMessageBox::information(this,"sauvegarder","bien sauvegarder");
+         save->setEnabled(false);}
 }
 void ArticleEditeur::activerSave(QString){
     save->setEnabled(true);

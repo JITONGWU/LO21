@@ -1,9 +1,9 @@
 #include "tacheediteur.h"
 #include <QMessageBox>
 
-TacheEditeur::TacheEditeur(Image &ta, QWidget *parent):
+TacheEditeur::TacheEditeur(Tache &ta, QWidget *parent, bool n, int j):
 
-    QWidget(parent),tache(&ta)
+    QWidget(parent),tache(&ta), newT(n), restaurer(j)
     //apple au constructeur de qwidget en lui donnant en parametre "parent"
     //initialisation de image avec le parametre im
 {
@@ -12,15 +12,27 @@ TacheEditeur::TacheEditeur(Image &ta, QWidget *parent):
     id=new QLineEdit(this);
     titre=new QLineEdit(this);
     action=new QTextEdit(this);
-    echeance=new QDateEdit(this);
-    priorite=new QComboBox(this);
+    echeance=new QDateTimeEdit(this);
+   // priorite=new QComboBox(this);
+
     save=new QPushButton("sauvegarder",this);
+    archieve=new QPushButton("archiever",this);
+    supprimer =new QPushButton("supprimer",this);
+    rest =new QPushButton("Restaurer",this);
+
+    buttons = new QHBoxLayout;
+
+    buttons->addWidget(archieve);
+    buttons->addWidget(save);
+    buttons->addWidget(supprimer);
+    buttons->addWidget(rest);
+
 
     id1=new QLabel("identificateur",this);
     titre1=new QLabel("Titre",this);
-    action=new QLabel("Action",this);
+    action1=new QLabel("Action",this);
     echeance1= new QLabel("Echeance",this);
-    priorite1=new QLabel("Priorite",this);
+ //   priorite1=new QLabel("Priorite",this);
 
     cid=new QHBoxLayout;
     cid->addWidget(id1);
@@ -40,13 +52,13 @@ TacheEditeur::TacheEditeur(Image &ta, QWidget *parent):
     cecheance->addWidget(echeance);
 
 
-    cpriorite=new QHBoxLayout ;
+    /*cpriorite=new QHBoxLayout ;
 
     priorite->addItem("Forte");
     priorite->addItem("Normale");
     priorite->addItem("Faible");
     cpriorite->addWidget(priorite1);
-    cpriorite->addWidget(priorite);
+    cpriorite->addWidget(priorite);*/
 
 
     couche=new QVBoxLayout;
@@ -54,25 +66,34 @@ TacheEditeur::TacheEditeur(Image &ta, QWidget *parent):
     couche->addLayout(ctitre);
     couche->addLayout(caction);
     couche->addLayout(cecheance);
-    couche->addWidget(cpriorite);
+  //  couche->addWidget(cpriorite);
+    couche->addLayout(buttons);
 
-    id->setReadOnly(true);
+    if(n=false) {
+    id->setReadOnly(true);}
+
+
+    save->setEnabled(false);
 
     id->setText(tache->getId());
     titre->setText(tache->getTitle());
     action->setText(tache->getAction());
-    echeance->setDate(tache->getExpDate());
-    priorite->setText(tache->getPriority());
+    echeance->setDateTime(tache->getExpDate());
+  //  priorite->setText(tache->getPriority());
+
+if(restaurer<0) { rest->setVisible(false);}
+ else {save->setVisible(false); supprimer->setVisible(false); archieve->setVisible(false);}
+
 
 
     setLayout(couche);
 
-    save->setEnabled(false);
     QObject::connect(save,SIGNAL(clicked()),this,SLOT(saveTache()));
+    QObject::connect(rest,SIGNAL(clicked()),this,SLOT(saveTache()));
     QObject::connect(titre,SIGNAL(textEdited(QString)),this,SLOT(activerSave()));
     QObject::connect(action,SIGNAL(textChanged()),this,SLOT(activerSave()));
     QObject::connect(echeance,SIGNAL(dateChanged()),this,SLOT(activerSave()));
-    QObject::connect(priorite,SIGNAL(currentIndexChanged()),this,SLOT(activerSave()));
+    //QObject::connect(priorite,SIGNAL(currentIndexChanged()),this,SLOT(activerSave()));
 
 
 }
@@ -83,16 +104,43 @@ void TacheEditeur::saveTache(){
     //image->setDesc(desc->toPlainText());
 
 
-    Tache tTemp = *tache;
+ /*  Tache tTemp = *tache;
     tTemp.setTitle(titre->text());
     tTemp.setAction(action->toPlainText());
     tTemp.setExpDate(echeance->toString("dd.MM.yyyy"));
-    tTemp.setPriority(priorite->SelectedItem.toString());
+  //  tTemp.setPriority(priorite->SelectedItem.toString());
 
-    NotesManager::getManager().addTache(tTemp);
+    NotesManager::getManager().addTache(tTemp); */
+    if(restaurer >=0) {
+        NotesManager::getManager().restaurerVersionNote(tache,restaurer);
+        QMessageBox::information(this,"restauration","bien restaurer");
+}
+    else {
+
+
+            if(newT==false) {
+            Note* tTemp = NotesManager::getManager().copieNote(id->text());
+            tTemp->setTitle(titre->text());
+
+            tTemp->setDateDerModif(QDateTime::currentDateTime());
+            static_cast<Tache*>(tTemp)->setAction(action->toPlainText());
+            static_cast<Tache*>(tTemp)->setExpDate(echeance->dateTime());
+
+            NotesManager::getManager().nouvelleVersion(tTemp);
+
+       }
+    else {
+        tache->setId(id->text());
+        tache->setTitle(titre->text());
+        tache->setAction(action->toPlainText());
+        tache->setExpDate(echeance->dateTime());
+        NotesManager::getManager().addNote(tache);
+        emit SendToPage1(id->text());
+    }
+
 
     QMessageBox::information(this,"sauvegarder","bien sauvegarder");
-    save->setEnabled(false);
+    save->setEnabled(false); }
 
 }
 void TacheEditeur::activerSave(QString){
