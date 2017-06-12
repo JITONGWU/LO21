@@ -10,15 +10,12 @@
 #include <QVBoxLayout>
 #include <QFileDialog>
 #include <QObject>
+#include <QMovie>
 #include "notes.h"
 class ImageEditeur: public QWidget
 {
     Q_OBJECT     //macro pour pouvoir utiliser les signals et les slots
 
-    QLineEdit *id;
-    QLineEdit *titre;
-    QTextEdit *desc;
-    QLineEdit *file;
 
     QLabel *id1;
     QLabel *titre1;
@@ -32,19 +29,32 @@ class ImageEditeur: public QWidget
     QHBoxLayout *cfile;
     QVBoxLayout *couche;
 
-    Image *image; //pointeur vers l'article à afficher par la fenetre
+    bool newI;
+
 
 public:
+
+    QLineEdit *id;
+    QLineEdit *titre;
+    QLineEdit *desc;
+    QLineEdit *file;
+    QMovie *movie;////////////////////////////
+    QLabel *position;///////////////////////////
+    Image *image; //pointeur vers l'article à afficher par la fenetre
+
     explicit ImageEditeur (Image& im,QWidget *parent=0,bool n=false);
     //explicit pour empêcher la conversion implicite de article vers Article
 
 signals:
+    void SendToPage1(QString);
+
 private slots:
     void activerSave(QString ="");
     //la valeur par défaut c'est pour pouvoir la connecter avec deux signals
     //l'un avec un parametre qstring et l'autre sans parametre
 public slots:
     void saveImage();
+    void getFile();///////////////////////
 
 
 };

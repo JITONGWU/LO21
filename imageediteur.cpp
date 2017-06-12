@@ -3,7 +3,7 @@
 
 ImageEditeur::ImageEditeur(Image &im, QWidget *parent,bool n):
 
-    QWidget(parent),image(&im)
+    QWidget(parent),image(&im),newI(n)
     //apple au constructeur de qwidget en lui donnant en parametre "parent"
     //initialisation de image avec le parametre im
 {
@@ -11,7 +11,7 @@ ImageEditeur::ImageEditeur(Image &im, QWidget *parent,bool n):
 
     id=new QLineEdit(this);
     titre=new QLineEdit(this);
-    desc=new QTextEdit(this);
+    desc=new QLineEdit(this);
     file=new QLineEdit(this);
     save=new QPushButton("sauvegarder",this);
 
@@ -24,6 +24,8 @@ ImageEditeur::ImageEditeur(Image &im, QWidget *parent,bool n):
     cid->addWidget(id1);
     cid->addWidget(id);
 
+    movie = new QMovie;///////////////
+    position = new QLabel;/////////////////////
 
     ctitre=new QHBoxLayout;
     ctitre->addWidget(titre1);
@@ -37,11 +39,13 @@ ImageEditeur::ImageEditeur(Image &im, QWidget *parent,bool n):
     cfile->addWidget(file1);
     cfile->addWidget(file);
 
+
     couche=new QVBoxLayout;
     couche->addLayout(cid);
     couche->addLayout(ctitre);
     couche->addLayout(cdesc);
     couche->addLayout(cfile);
+    couche->addWidget(position);//////////////////
     couche->addWidget(save);
     if(n==false){
     id->setReadOnly(true);
@@ -57,18 +61,37 @@ ImageEditeur::ImageEditeur(Image &im, QWidget *parent,bool n):
     save->setEnabled(false);
     QObject::connect(save,SIGNAL(clicked()),this,SLOT(saveImage()));
     QObject::connect(titre,SIGNAL(textEdited(QString)),this,SLOT(activerSave()));
-    QObject::connect(desc,SIGNAL(textChanged()),this,SLOT(activerSave()));
+    QObject::connect(desc,SIGNAL(textEdited(QString)),this,SLOT(activerSave()));
+    QObject::connect(file,SIGNAL(textEdited(QString)),this,SLOT(getFile()));/////////////////
 
 }
 void ImageEditeur::saveImage(){
- //   image->setTitle(titre->text());
-  //
-    //image->setDesc(desc->toPlainText());
-    QMessageBox::information(this,"sauvegarder","bien sauvegarder");
-    save->setEnabled(false);
+    if(newI==false) { //modification
+        image->setDateDerModif(QDateTime::currentDateTime());
+        image->setTitle(titre->text());
+        image->setDesc(desc->text());
+
+       }
+    else { //new image
+        image->setId(id->text());
+        image->setTitle(titre->text());
+        image->setDesc(desc->text());
+        image->setFile(file->text());
+        NotesManager::getManager().addNote(image);
+         emit SendToPage1(id->text());
+
+
+    }
+
+         QMessageBox::information(this,"sauvegarder","bien sauvegarder");
+         save->setEnabled(false);
 
 }
 void ImageEditeur::activerSave(QString){
     save->setEnabled(true);
 }
 
+void ImageEditeur::getFile(){/////////////////////
+    QString filename = QFileDialog::getOpenFileName(this,tr("Open Image"), "/home/new photo", tr("Image Files (*.png *.jpg *.bmp *.gif)"));
+    file->setText(filename);
+}
