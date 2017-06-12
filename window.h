@@ -1,6 +1,8 @@
 #ifndef HEADER_FENPRINCIPALE
 #define HEADER_FENPRINCIPALE
-
+#include "audioediteur.h"
+#include "videoediteur.h"
+#include "tacheediteur.h"
 #include <QApplication>
 #include <QWidget>
 #include <QLabel>
@@ -24,13 +26,10 @@
 #include <QMdiArea>
 #include <QScrollArea>
 #include <QMessageBox>
-//#include "relationmanager.h"
-#include "videoediteur.h"
+#include "relationmanager.h"
 #include "articleediteur.h"
 #include "imageediteur.h"
-#include "tacheediteur.h"
-#include "audioediteur.h"
-//#include "relationediteur.h"
+#include "relationediteur.h"
 class FenPrincipale : public QMainWindow {
   public:
     FenPrincipale();
@@ -75,9 +74,10 @@ class Page3 : public QMainWindow {
     friend class RelationManager;
     Q_OBJECT
     QWidget *zoneCentrale;
-
+    QString choix;
     QPushButton *restaurer;
     QPushButton *supprimer;
+    QPushButton *update;
     QListWidget *corbeille;
     QHBoxLayout *buttons;
     QVBoxLayout *couche;
@@ -85,16 +85,18 @@ public:
 
     Page3(QWidget *parent);
 public slots:
+    void Activer(QListWidgetItem*);
     void Restaurer();
     void Supprimer();
-
+    void Update();
+ private slots:
 };
 class Page1 : public QMainWindow {
     friend class NotesManager;
     friend class RelationManager;
     Q_OBJECT
     QWidget *zoneCentrale;
-
+ QPushButton *update;
     QPushButton *AjoutArticle;
     QPushButton *AjoutTache;
     QPushButton *AjoutImage;
@@ -121,37 +123,47 @@ class Page1 : public QMainWindow {
     QVBoxLayout *couche;
 public:
     ArticleEditeur *av;
-    ImageEditeur *iv;
-    TacheEditeur *tv;
-    AudioEditeur *adv;
-    VideoEditeur *vv;
+       ImageEditeur *iv;
+       TacheEditeur *tv;
+       AudioEditeur *adv;
+       VideoEditeur *vv;
 
-    ArticleEditeur *ae;
-    ImageEditeur *ie;
-    TacheEditeur *te;
-    AudioEditeur *ade;
-    VideoEditeur *ve;
+       ArticleEditeur *ae;
+       ImageEditeur *ie;
+       TacheEditeur *te;
+       AudioEditeur *ade;
+       VideoEditeur *ve;
 
-    ArticleEditeur *ar;
-    ImageEditeur *ir;
-    TacheEditeur *tar;
-    AudioEditeur *adr;
-    VideoEditeur *vr;
+       ArticleEditeur *ar;
+       ImageEditeur *ir;
+       TacheEditeur *tar;
+       AudioEditeur *adr;
+       VideoEditeur *vr;
+
+       ArticleEditeur *aa;
+       ImageEditeur *ia;
+       TacheEditeur *ta;
+       AudioEditeur *ada;
+       VideoEditeur *va;
+
 
     Page1(QWidget *parent);
 public slots:
     void afficherWidget(QListWidgetItem* item);
     void ArticleEditeurVide();
     void ImageEditeurVide();
+    void afficherArbo(QListWidgetItem*);
     void TacheEditeurVide();
     void AudioEditeurVide();
     void VideoEditeurVide();
     void restaurerVersion(QListWidgetItem* item);
-  //  void afficherArbo(QListWidgetItem*);
-   // void ajouterArticle();
-   // void ajouterImage();
+    void afficherNotesArch(QListWidgetItem*);
+
+
+    void Update();
 private slots:
-   // void receive(QString id);
+    void receive(QString id);
+
 
 };
 
@@ -166,23 +178,25 @@ class Page2 : public QMainWindow
     QWidget *zoneCentrale;
     QPushButton *AjoutRelation;
     QPushButton *supprimerR;//pour supprimer une relation
-/*    QWidget *vide;
+    QPushButton *update;
+    QWidget *vide;
     RelationEditeur *re;
     RelationEditeur *rv;
-    QScrollArea *scrollRelation; */
+    QScrollArea *scrollRelation;
     QHBoxLayout *buttons;
     QHBoxLayout *layout;
     QVBoxLayout *couche;
 
 public:
-//    ListeRelation *listR;
+    ListeRelation *listR;
     Page2(QWidget *parent);
 private slots:
-  // void receive(QString titre);//recevoir le signal de relation editeur
+    void receive(QString titre);//recevoir le signal de relation editeur
 public slots:
-  //  void afficherWidget(QListWidgetItem* item);
-   // void RelationEditeurVide();
-  //  void supprimerRelation();
+    void afficherWidget(QListWidgetItem* item);
+    void RelationEditeurVide();
+    void supprimerRelation();
+    void Update();
 };
 
 

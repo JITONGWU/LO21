@@ -29,6 +29,7 @@ class TacheEditeur: public QWidget
 
     QPushButton *save;
     QPushButton *archieve;
+    QPushButton *desarchieve;
     QPushButton *supprimer;
     QPushButton *rest;
 
@@ -43,6 +44,7 @@ class TacheEditeur: public QWidget
 
     int restaurer;
 public:
+    bool arc;
     Tache *tache; //pointeur vers l'article Ã  afficher par la fenetre
     bool newT;
     QLineEdit *id;
@@ -52,7 +54,7 @@ public:
     QDateTimeEdit *echeance;
 
     //QComboBox *priorite;
-    explicit TacheEditeur (Tache& ta,QWidget *parent=0, bool n=false, int r=(-1));
+    explicit TacheEditeur (Tache& ta,QWidget *parent=0, bool n=false, int r=(-1),bool a=false);
     //explicit pour empÃªcher la conversion implicite de article vers Article
 
 signals:
@@ -63,6 +65,9 @@ private slots:
     //l'un avec un parametre qstring et l'autre sans parametre
 public slots:
     void saveTache();
+
+    void archiverTache();
+    void SupprimertousTache();
 
 
 };

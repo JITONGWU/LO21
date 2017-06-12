@@ -42,9 +42,10 @@ public:
     QDateTime getDateCreat() const {return creat;}
     QDateTime getDateDernier() const {return der_modif;}
     void setId(const QString& i){id=i;}
+     void setEmplacement(const QString& i){emplacement=i;}
     void setTitle(const QString& t){title=t;}
     void setDateCreat();//ajouter
-    void setDateDerModif(const QDateTime d) {der_modif=d;}
+    void setDateDerModif(const QDateTime d) {der_modif= d;}
 
 
     unsigned int getNbVersions() const {return nbVersions;}

@@ -1,7 +1,9 @@
 #include "tacheediteur.h"
 #include <QMessageBox>
+#include "relationmanager.h"
+#include "relation.h"
 
-TacheEditeur::TacheEditeur(Tache &ta, QWidget *parent, bool n, int j):
+TacheEditeur::TacheEditeur(Tache &ta, QWidget *parent, bool n, int j, bool a):
 
     QWidget(parent),tache(&ta), newT(n), restaurer(j)
     //apple au constructeur de qwidget en lui donnant en parametre "parent"
@@ -17,6 +19,8 @@ TacheEditeur::TacheEditeur(Tache &ta, QWidget *parent, bool n, int j):
 
     save=new QPushButton("sauvegarder",this);
     archieve=new QPushButton("archiever",this);
+    desarchieve=new QPushButton("archiever",this);
+
     supprimer =new QPushButton("supprimer",this);
     rest =new QPushButton("Restaurer",this);
 
@@ -69,6 +73,29 @@ TacheEditeur::TacheEditeur(Tache &ta, QWidget *parent, bool n, int j):
   //  couche->addWidget(cpriorite);
     couche->addLayout(buttons);
 
+    if(arc==true){
+
+   titre->setReadOnly(true);
+   titre->setReadOnly(true);
+   action->setReadOnly(true);
+   echeance->setReadOnly(true);
+
+   save->setVisible(false);
+   supprimer->setVisible(false);
+   archieve->setVisible(false);
+
+
+   desarchieve->setEnabled(true);
+
+    } else{
+
+
+
+        save->setEnabled(true);
+        supprimer->setEnabled(true);
+        archieve->setEnabled(true);
+        desarchieve->setVisible(false);}
+
     if(n=false) {
     id->setReadOnly(true);}
 
@@ -94,6 +121,10 @@ if(restaurer<0) { rest->setVisible(false);}
     QObject::connect(action,SIGNAL(textChanged()),this,SLOT(activerSave()));
     QObject::connect(echeance,SIGNAL(dateChanged()),this,SLOT(activerSave()));
     //QObject::connect(priorite,SIGNAL(currentIndexChanged()),this,SLOT(activerSave()));
+    QObject::connect(archieve,SIGNAL(clicked()),this,SLOT(archiverTache()));
+    QObject::connect(supprimer,SIGNAL(clicked()),this,SLOT(SupprimertousTache()));
+
+
 
 
 }
@@ -148,5 +179,29 @@ void TacheEditeur::activerSave(QString){
 }
 
 
+void TacheEditeur::archiverTache(){
+
+    NotesManager::getManager().archiverNoteX(tache->getId());
+
+    RelationManager::getManager().archiverLesCoupleContenantNoteX (tache->getId());
+
+    QMessageBox::information(this,"archiver","bien archiver");
+}
+
+void TacheEditeur::SupprimertousTache(){
+    if(Reference::getRef()->supprimeroupas(tache->getId())){
+
+   NotesManager::getManager().supprimertousNotes(tache->getId());
+     RelationManager::getManager().supprimerLesCoupleContenantNoteX(tache->getId());
+    QMessageBox::information(this,"supprimer","bien supprimer");}
+    else{
+        NotesManager::getManager().archiverNoteX(tache->getId());
+         RelationManager::getManager().archiverLesCoupleContenantNoteX(tache->getId());
+
+        QMessageBox::information(this,"archiver","bien archiver");
+    }
+
+
+}
 
 

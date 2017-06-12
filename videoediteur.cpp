@@ -1,9 +1,11 @@
 #include "videoediteur.h"
 #include <QMessageBox>
+#include "relationmanager.h"
+#include "relation.h"
 
-VideoEditeur::VideoEditeur(Video &vid, QWidget *parent, bool n, int r):
+VideoEditeur::VideoEditeur(Video &vid, QWidget *parent, bool n, int r, bool a):
 
-    QWidget(parent),video(&vid), newVid(n), restaurer(r)
+    QWidget(parent),video(&vid), newVid(n), restaurer(r),arc(a)
     //apple au constructeur de qwidget en lui donnant en parametre "parent"
     //initialisation de image avec le parametre im
 {
@@ -16,6 +18,7 @@ VideoEditeur::VideoEditeur(Video &vid, QWidget *parent, bool n, int r):
     vfile=new QLineEdit(this);
     save=new QPushButton("sauvegarder",this);
     archieve=new QPushButton("archiever",this);
+    desarchieve=new QPushButton("desarchiver",this);
     supprimer =new QPushButton("supprimer",this);
     rest =new QPushButton("restaurer",this);
 
@@ -61,6 +64,30 @@ VideoEditeur::VideoEditeur(Video &vid, QWidget *parent, bool n, int r):
     couche->addLayout(cvfile);
     couche->addLayout(buttons);
 
+    if(arc==true){
+
+   titre->setReadOnly(true);
+   desc->setReadOnly(true);
+   file->setReadOnly(true);
+   vfile->setReadOnly(true);
+
+
+   save->setVisible(false);
+   supprimer->setVisible(false);
+   archieve->setVisible(false);
+
+
+   desarchieve->setEnabled(true);
+
+    } else{
+
+
+
+        save->setEnabled(true);
+        supprimer->setEnabled(true);
+        archieve->setEnabled(true);
+        desarchieve->setVisible(false);}
+
     if(n=false) {
     id->setReadOnly(true);}
 
@@ -81,6 +108,9 @@ VideoEditeur::VideoEditeur(Video &vid, QWidget *parent, bool n, int r):
     QObject::connect(titre,SIGNAL(textEdited(QString)),this,SLOT(activerSave()));
     QObject::connect(desc,SIGNAL(textChanged()),this,SLOT(activerSave()));
     QObject::connect(vfile,SIGNAL(textChanged()),this,SLOT(activerSave()));
+    QObject::connect(archieve,SIGNAL(clicked()),this,SLOT(archiverVideo()));
+    QObject::connect(supprimer,SIGNAL(clicked()),this,SLOT(SupprimertousVideo()));
+
 
 
 }
@@ -131,5 +161,29 @@ void VideoEditeur::activerSave(QString){
     save->setEnabled(true);
 }
 
+void VideoEditeur::archiverVideo(){
+
+    NotesManager::getManager().archiverNoteX(video->getId());
+
+    RelationManager::getManager().archiverLesCoupleContenantNoteX (video->getId());
+
+    QMessageBox::information(this,"archiver","bien archiver");
+}
+
+void VideoEditeur::SupprimertousVideo(){
+    if(Reference::getRef()->supprimeroupas(video->getId())){
+
+   NotesManager::getManager().supprimertousNotes(video->getId());
+     RelationManager::getManager().supprimerLesCoupleContenantNoteX(video->getId());
+    QMessageBox::information(this,"supprimer","bien supprimer");}
+    else{
+        NotesManager::getManager().archiverNoteX(video->getId());
+         RelationManager::getManager().archiverLesCoupleContenantNoteX(video->getId());
+
+        QMessageBox::information(this,"archiver","bien archiver");
+    }
+
+
+}
 
 

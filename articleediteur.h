@@ -15,7 +15,7 @@ class ArticleEditeur: public QWidget
 {
     Q_OBJECT     //macro pour pouvoir utiliser les signals et les slots
 
-
+  bool ad;
 
     QLabel *id1;
     QLabel *titre1;
@@ -23,29 +23,32 @@ class ArticleEditeur: public QWidget
 
     QPushButton *save;
     QPushButton *archieve;
-    QPushButton *supprimer;
-        QPushButton *rest;
-
+    QPushButton *desarchieve;
+    QPushButton *supprimertous;
     QHBoxLayout *buttons;
     QHBoxLayout *cid;
     QHBoxLayout *ctitre;
     QHBoxLayout *ct;
     QVBoxLayout *couche;
-    int restaurer;
-     //pointeur vers l'article �  afficher par la fenetre
+    QPushButton *rest;
+ int restaurer;
+     //pointeur vers l'article à afficher par la fenetre
 
 public:
+
+  bool arc;
     bool newA;
     void setRest(int i) {restaurer =i;}
     Article *article;
     QLineEdit *id;
     QLineEdit *titre;
     QTextEdit *t;
-    explicit ArticleEditeur (Article& article,QWidget *parent=0,bool n=false, int r=(-1));
+    explicit ArticleEditeur (Article& article,QWidget *parent=0,bool n=true, int r=(-1), bool a=false);
     //explicit pour empêcher la conversion implicite de article vers Article
 
 signals:
     void SendToPage1(QString);
+
 private slots:
     void activerSave(QString ="");
     //la valeur par défaut c'est pour pouvoir la connecter avec deux signals
@@ -53,6 +56,8 @@ private slots:
 public slots:
     void saveArticle();
 
+    void ArchiverArticle();
+    void SupprimertousArticle();
 
 };
 

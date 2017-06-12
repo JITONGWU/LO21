@@ -1,9 +1,11 @@
 #include "audioediteur.h"
 #include <QMessageBox>
+#include "relationmanager.h"
+#include "relation.h"
 
-AudioEditeur::AudioEditeur(Audio &aud, QWidget *parent, bool n, int r):
+AudioEditeur::AudioEditeur(Audio &aud, QWidget *parent, bool n, int r,bool a):
 
-    QWidget(parent),audio(&aud), newAud(n), restaurer(r)
+    QWidget(parent),audio(&aud), newAud(n), restaurer(r),arc(a)
     //apple au constructeur de qwidget en lui donnant en parametre "parent"
     //initialisation de image avec le parametre im
 {
@@ -16,6 +18,7 @@ AudioEditeur::AudioEditeur(Audio &aud, QWidget *parent, bool n, int r):
     afile=new QLineEdit(this);
     save=new QPushButton("sauvegarder",this);
     archieve=new QPushButton("archiever",this);
+    desarchieve=new QPushButton("archiever",this);
     supprimer =new QPushButton("supprimer",this);
     rest=new QPushButton("restaurer",this);
 
@@ -60,6 +63,30 @@ AudioEditeur::AudioEditeur(Audio &aud, QWidget *parent, bool n, int r):
     couche->addLayout(cafile);
     couche->addLayout(buttons);
 
+    if(arc==true){
+
+   titre->setReadOnly(true);
+   desc->setReadOnly(true);
+   file->setReadOnly(true);
+   afile->setReadOnly(true);
+
+
+   save->setVisible(false);
+   supprimer->setVisible(false);
+   archieve->setVisible(false);
+
+
+   desarchieve->setEnabled(true);
+
+    } else{
+
+
+
+        save->setEnabled(true);
+        supprimer->setEnabled(true);
+        archieve->setEnabled(true);
+        desarchieve->setVisible(false);}
+
     if(n=false) {
     id->setReadOnly(true);}
 
@@ -82,6 +109,8 @@ AudioEditeur::AudioEditeur(Audio &aud, QWidget *parent, bool n, int r):
     QObject::connect(titre,SIGNAL(textEdited(QString)),this,SLOT(activerSave()));
     QObject::connect(desc,SIGNAL(textChanged()),this,SLOT(activerSave()));
     QObject::connect(afile,SIGNAL(textChanged()),this,SLOT(activerSave()));
+    QObject::connect(archieve,SIGNAL(clicked()),this,SLOT(archiverAudio()));
+    QObject::connect(supprimer,SIGNAL(clicked()),this,SLOT(SupprimertousAudio()));
 
 
 }
@@ -109,7 +138,7 @@ if(restaurer >=0) {
 
     if(newAud==false) {
         Note* audTemp= NotesManager::getManager().copieNote(id->text());
-        audTemp->setDateDerModif(QDateTime::currentDateTime());
+          audTemp->setDateDerModif(QDateTime::currentDateTime());
         audTemp->setTitle(titre->text());
         static_cast<Audio*>(audTemp)->setDesc(desc->toPlainText());
         static_cast<Audio*>(audTemp)->setAFile(afile->text());
@@ -134,5 +163,29 @@ void AudioEditeur::activerSave(QString){
     save->setEnabled(true);
 }
 
+void AudioEditeur::archiverAudio(){
+
+    NotesManager::getManager().archiverNoteX(audio->getId());
+
+    RelationManager::getManager().archiverLesCoupleContenantNoteX (audio->getId());
+
+    QMessageBox::information(this,"archiver","bien archiver");
+}
+
+void AudioEditeur::SupprimertousAudio(){
+    if(Reference::getRef()->supprimeroupas(audio->getId())){
+
+   NotesManager::getManager().supprimertousNotes(audio->getId());
+     RelationManager::getManager().supprimerLesCoupleContenantNoteX(audio->getId());
+    QMessageBox::information(this,"supprimer","bien supprimer");}
+    else{
+        NotesManager::getManager().archiverNoteX(audio->getId());
+         RelationManager::getManager().archiverLesCoupleContenantNoteX (audio->getId());
+
+        QMessageBox::information(this,"archiver","bien archiver");
+    }
+
+
+}
 
 

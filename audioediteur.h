@@ -27,6 +27,7 @@ class AudioEditeur: public QWidget
 
     QPushButton *save;
     QPushButton *archieve;
+    QPushButton *desarchieve;
     QPushButton *supprimer;
         QPushButton *rest;
 
@@ -41,6 +42,7 @@ class AudioEditeur: public QWidget
 
 
 public:
+    bool arc;
     Audio *audio;
     QLineEdit *id;
     QLineEdit *titre;
@@ -51,7 +53,7 @@ public:
 
 
     bool newAud;
-    explicit AudioEditeur (Audio& aud,QWidget *parent=0, bool n=false, int r=(-1));
+    explicit AudioEditeur (Audio& aud,QWidget *parent=0, bool n=false, int r=(-1), bool a=false);
     //explicit pour empêcher la conversion implicite de article vers Article
 
 signals:
@@ -63,6 +65,9 @@ private slots:
     //l'un avec un parametre qstring et l'autre sans parametre
 public slots:
     void saveAudio();
+
+    void archiverAudio();
+    void SupprimertousAudio();
 
 
 };

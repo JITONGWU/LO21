@@ -24,6 +24,7 @@ class ImageEditeur: public QWidget
 
     QPushButton *save;
     QPushButton *archieve;
+    QPushButton *desarchieve;
     QPushButton *supprimer;
     QPushButton *rest;
 
@@ -36,25 +37,28 @@ class ImageEditeur: public QWidget
     int restaurer;
 
 public:
-    Image *image; //pointeur vers l'article �  afficher par la fenetre
+    bool arc;
+    Image *image; //pointeur vers l'article Ã  afficher par la fenetre
     QLineEdit *id;
     QLineEdit *titre;
     QTextEdit *desc;
     QLineEdit *file;
     bool newI;
     void setRest(int i){restaurer=i;}
-    explicit ImageEditeur (Image& im,QWidget *parent=0,bool n=false, int r=(-1));
-    //explicit pour empêcher la conversion implicite de article vers Article
+    explicit ImageEditeur (Image& im,QWidget *parent=0,bool n=false, int r=(-1),bool a=false);
+    //explicit pour empÃªcher la conversion implicite de article vers Article
 
 signals:
         void SendToPage1(QString);
 private slots:
     void activerSave(QString ="");
-    //la valeur par défaut c'est pour pouvoir la connecter avec deux signals
+    //la valeur par dÃ©faut c'est pour pouvoir la connecter avec deux signals
     //l'un avec un parametre qstring et l'autre sans parametre
 public slots:
     void saveImage();
-
+   // void supprimerImage();
+    void suppriemrtousImage();
+    void archiverImage();
 
 };
 #endif // IMAGEEDITEUR_H

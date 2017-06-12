@@ -27,6 +27,7 @@ class VideoEditeur: public QWidget
 
     QPushButton *save;
    QPushButton *archieve;
+   QPushButton *desarchieve;
     QPushButton *supprimer;
     QPushButton *rest;
     QHBoxLayout *buttons;
@@ -39,6 +40,7 @@ class VideoEditeur: public QWidget
     int restaurer;
 
 public:
+    bool arc;
     Video *video;
     QLineEdit *id;
     QLineEdit *titre;
@@ -48,7 +50,7 @@ public:
     void setRest(int i){restaurer=i;}
 
     bool newVid;
-    explicit VideoEditeur (Video& vid,QWidget *parent=0, bool n=false, int r=(-1));
+    explicit VideoEditeur (Video& vid,QWidget *parent=0, bool n=false, int r=(-1), bool a=false);
     //explicit pour empêcher la conversion implicite de article vers Article
 
 signals:
@@ -61,6 +63,8 @@ private slots:
 public slots:
     void saveVideo();
 
+    void archiverVideo();
+    void SupprimertousVideo();
 
 };
 
