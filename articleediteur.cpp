@@ -1,5 +1,7 @@
 #include "articleediteur.h"
 #include <QMessageBox>
+#include <relationmanager.h>
+#include "relation.h"
 
 ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
 
@@ -33,11 +35,12 @@ ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
     save=new QPushButton("sauvegarder",this);
     archieve=new QPushButton("archiever",this);
     supprimer =new QPushButton("supprimer",this);
+    supprimertous =new QPushButton("supprimer toutes version",this);
     buttons = new QHBoxLayout;
     buttons->addWidget(archieve);
     buttons->addWidget(save);
     buttons->addWidget(supprimer);
-
+    buttons->addWidget(supprimertous);
     couche=new QVBoxLayout;
     couche->addLayout(cid);
     couche->addLayout(ctitre);
@@ -58,7 +61,9 @@ ArticleEditeur::ArticleEditeur(Article &art, QWidget *parent, bool n):
     QObject::connect(save,SIGNAL(clicked()),this,SLOT(saveArticle()));
     QObject::connect(titre,SIGNAL(textEdited(QString)),this,SLOT(activerSave()));
     QObject::connect(t,SIGNAL(textChanged()),this,SLOT(activerSave()));
-    QObject::connect(supprimer,SIGNAL(clicked()),this,SLOT(supprimerArticle()));
+    QObject::connect(supprimer,SIGNAL(clicked()),this,SLOT(SupprimerArticle()));
+     QObject::connect(archieve,SIGNAL(clicked()),this,SLOT(ArchiverArticle()));
+     QObject::connect(supprimertous,SIGNAL(clicked()),this,SLOT(SupprimertousArticle()));
 
 
 }
@@ -76,9 +81,7 @@ void ArticleEditeur::saveArticle(){
             //Tester référence
             artTemp->setDateDerModif(QDateTime::currentDateTime());
             static_cast<Article*>(artTemp)->setT(t->toPlainText());
-
             NotesManager::getManager().nouvelleVersion(artTemp); }
-
         else {
             //Tester références avant constructeur?
             Article *n_article = new Article(id->text(), titre->text(), QDateTime::currentDateTime(), QDateTime::currentDateTime(), "N", non_traite,0,t->toPlainText());
@@ -95,7 +98,6 @@ void ArticleEditeur::saveArticle(){
         article->setT(t->toPlainText());
         NotesManager::getManager().addNote(article);
         emit SendToPage1(id->text());
-        article= new Article("this is id","this is title",QDateTime::currentDateTime(),QDateTime::currentDateTime(),"N",actuelle,0,"this is text");
     }
     QString apres= titre->text()+t->toPlainText();
     NotesManager::getManager().addCoupleDansReference(id->text(),apres);
@@ -106,3 +108,42 @@ void ArticleEditeur::activerSave(QString){
     save->setEnabled(true);
 }
 
+void ArticleEditeur::SupprimerArticle(){
+    if(Reference::getRef()->supprimeroupas(article->getId())){
+
+    NotesManager::getManager().supprimerNote(article->getId());
+     RelationManager::getManager().supprimerLesCoupleContenantNoteX(article->getId());
+    QMessageBox::information(this,"supprimer","bien supprimer");
+    emit SendToPage1(article->getId());
+
+    }
+    else{
+        NotesManager::getManager().archiverNoteX(article->getId());
+         RelationManager::getManager().archiverLesCoupleContenantNoteX (article->getId());
+
+        QMessageBox::information(this,"archiver","bien archiver");
+    }
+}
+
+void ArticleEditeur::ArchiverArticle(){
+
+    NotesManager::getManager().archiverNoteX(article->getId());
+     RelationManager::getManager().archiverLesCoupleContenantNoteX (article->getId());
+
+    QMessageBox::information(this,"archiver","bien archiver");
+}
+void ArticleEditeur::SupprimertousArticle(){
+    if(Reference::getRef()->supprimeroupas(article->getId())){
+
+   NotesManager::getManager().supprimertousNotes(article->getId());
+     RelationManager::getManager().supprimerLesCoupleContenantNoteX(article->getId());
+    QMessageBox::information(this,"supprimer","bien supprimer");}
+    else{
+        NotesManager::getManager().archiverNoteX(article->getId());
+         RelationManager::getManager().archiverLesCoupleContenantNoteX (article->getId());
+
+        QMessageBox::information(this,"archiver","bien archiver");
+    }
+
+
+}
