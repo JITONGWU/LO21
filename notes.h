@@ -1,7 +1,7 @@
 #if !defined(_NOTES_H)
 #define _NOTES_H
 #include <QString>
-#include <QDate>
+#include <QDateTime>
 #include <iostream>
 #include <QList>
 #include <QXmlStreamWriter>
@@ -9,44 +9,43 @@
 #include <QtXml>
 #include <QDebug>
 #include <string>
-
+#include "notemanager.h"
 
 using namespace std;
 
+class NotesManager;
 
 
-class NotesException{
-public:
-    NotesException(const QString& message):info(message){}
-    const QString & getInfo() const { return info; }
-private:
-    QString info;
-};
 
 
-typedef enum { actuelle, ancienne, non_traite } Etat;
+
 
 class Note {
     QString id;
     QString title;
-    QDate creat;
-    QDate der_modif;
+    QDateTime creat;
+    QDateTime der_modif;
     QString emplacement;
     Etat etat;
     unsigned int nbVersions;
     friend class Suppression;
 
 public:
-    Note(const QString & i,const QString & t, QDate c, QDate d,QString e, Etat et=non_traite, unsigned int n=0):
+    const QString & getVersion()const{if(etat==actuelle) return QString::fromStdString("1");
+                                      if(etat==ancienne) return QString::fromStdString("0");}
+    friend void NotesManager::archiverNoteX(QString id);
+    Note(const QString & i,const QString & t, QDateTime c, QDateTime d,QString e, Etat et=non_traite, unsigned int n=0):
         id(i),title(t),creat(c),der_modif(d),emplacement(e), etat(et), nbVersions(n){}
     const QString & getEmp()const{return emplacement;}
     const QString & getId() const{return id ;}
     const QString & getTitle()const {return title; }
-    QDate getDateCreat() const {return creat;}
-    QDate getDateDernier() const {return der_modif;}
+    QDateTime getDateCreat() const {return creat;}
+    QDateTime getDateDernier() const {return der_modif;}
+    void setId(const QString& i){id=i;}
+     void setEmplacement(const QString& i){emplacement=i;}
     void setTitle(const QString& t){title=t;}
     void setDateCreat();//ajouter
-    void setDateDerModif(const QDate d) {der_modif=d;}//modifier
+    void setDateDerModif(const QDateTime d) {der_modif= d;}
 
 
     unsigned int getNbVersions() const {return nbVersions;}
@@ -66,21 +65,21 @@ public:
 class Tache : public Note {
     QString action;
     QString priorite;
-    QDate echeance;
+    QDateTime echeance;
     QString status;
 public :
 
-    Tache(const QString & i,const QString & t, QDate c, QDate d,QString em, Etat et, unsigned int n, const QString& a,
-          const QString& p, QDate e,const QString& s):
+    Tache(const QString & i,const QString & t, QDateTime c, QDateTime d,QString em, Etat et, unsigned int n, const QString& a,
+          const QString& p, QDateTime e,const QString& s):
         Note(i,t,c,d,em,et,n),action(a),priorite(p),echeance(e),status(s){}
     const QString & getAction()const {return action;}
     const QString & getStatus()const {return status;}
     const QString & getPriority()const {return priorite;}
-    QDate getExpDate()const{return echeance;}
+    QDateTime getExpDate()const{return echeance;}
     void setAction(const QString& a){action=a;}
     void setStatus(const QString& s){status=s;}
     void setPriority(const QString& p){priorite=p;}
-    void setExpDate(const QDate e){echeance=e;}
+    void setExpDate(const QDateTime e){echeance=e;}
     int type()const {return 1;}
 
 
@@ -92,10 +91,10 @@ class Article : public Note{
 
     QString text;
 public:
-    Article(const QString & i,const QString & t, QDate c, QDate d,QString em, Etat et, unsigned int n, const QString& te):
+    Article(const QString & i,const QString & t, QDateTime c, QDateTime d,QString em, Etat et, unsigned int n, const QString& te):
         Note(i,t,c,d,em,et,n),text(te){}
     const QString & getT() const { return text; }
-    void setT(const QString& t){text=t;}
+    void setT(const QString& te){qDebug()<<"article\n";text=te;}
     int type()const {return 2;}
 };
 
@@ -104,7 +103,7 @@ class Image : public Note {
     QString desc;
     QString file;
    public:
-    Image(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et, unsigned int n,const QString& des, const QString& f):
+    Image(const QString& i,const QString& t, QDateTime c, QDateTime d,QString em,Etat et, unsigned int n,const QString& des, const QString& f):
         Note(i,t,c,d,em,et,n),desc(des),file(f){}
     const QString & getDescpt() const {return desc;}
     const QString & getFicher() const {return file;} // la valeur de retour est de type QString ou de type Image?
@@ -119,7 +118,7 @@ class Image : public Note {
 
      QString aud_file;
     public:
-     Audio(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et, unsigned int n,const QString& des, const QString& f,const QString& aud):
+     Audio(const QString& i,const QString& t, QDateTime c, QDateTime d,QString em,Etat et, unsigned int n,const QString& des, const QString& f,const QString& aud):
          Image(i,t,c,d,em,et,n,des,f),aud_file(aud){}
      const QString & getAFile() const {return aud_file;}
      void setAFile(const QString& af){aud_file=af;}
@@ -128,7 +127,7 @@ class Image : public Note {
  class Video : public Image{
       QString vid_file;
      public:
-      Video(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et, unsigned int n,const QString& des,const QString& f,const QString& vid):
+      Video(const QString& i,const QString& t, QDateTime c, QDateTime d,QString em,Etat et, unsigned int n,const QString& des,const QString& f,const QString& vid):
          Image(i,t,c,d,em,et,n,des,f),vid_file(vid){}
       const QString & getVFile() const {return vid_file;}
       void setVFile(const QString& vf){vid_file=vf;}
@@ -137,145 +136,4 @@ class Image : public Note {
 
  };
 
-
-
-
-
-class NotesManager {
-private:
-    Note** notes;  //QList<Note*> notes;
-    unsigned int nbNotes;
-    unsigned int nbMaxNotes;
-
-    mutable QString filename;
-
-    Note** oldVersions;
-    unsigned int nbOldVersions;
-    unsigned int nbMaxOldVersions;
-
-
-    struct Handler {
-        NotesManager* instance; // pointeur sur l'unique instance
-        Handler():instance(NULL){}
-        ~Handler() { delete instance; }
-    };
-    static Handler handler;
-
-    NotesManager();
-    ~NotesManager();
-    NotesManager(const NotesManager& m);
-    NotesManager& operator=(const NotesManager& m);
-
-
-public:
-
-
-    void addNote(const Note* n);
-    void addTache(const QString & id, const QString & t, QDate c, QDate d, QString em, Etat et, int nb, const QString& a,
-                  const QString& p, QDate e, const QString& s);
-    void addArticle(const QString & i,const QString & t, QDate c, QDate d,QString em, Etat et, int nb,const QString& te);
-    void addImage(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f);
-    void addAudio(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f,const QString& aud);
-    void addVideo(const QString& i,const QString& t, QDate c, QDate d,QString em,Etat et,int nb,const QString& des, const QString& f,const QString& vid);
-
-/*
-    void addTache(Tache* t);
-    void addArticle(Article* a);
-    void addImage(Image* i);
-    void addAudio(Audio* ad);
-    void addVideo(Video* v); */
-
-    void restaurerVersionNote(Note* note, int j);
-
-    Note* copieNote(const QString& id);
-    Note* copieOldNote(unsigned int j);
-
-    Note& getNote(const QString& id); // return the article with identificator id
-    Note* getNote(unsigned int i);
-    Note* getOldVersion(unsigned int j);
-
-    int getNb()const {return nbNotes;}
-    bool rechercherNote(QString id);
-    void setFilename(QString f) { filename=f; }
-    void load(); // load notes from file filename
-    void save() const; // save notes in file filename
-    void addCoupleDansReference(const QString& id,QString& s);
-    static NotesManager& getManager();
-    static void freeManager(); // free the memory used by the NotesManager; it can be rebuild later
-
-    void addOldVersion(const Note* a);
-    void nouvelleVersion(Note* a);
-    int getNbOldVersions()const{return nbOldVersions;}
-    class Iterator {
-            friend class NotesManager;
-            Note** currentN;
-            unsigned int nbRemain;
-            Iterator(Note** a, unsigned nb):currentN(a),nbRemain(nb){}
-        public:
-            Iterator():currentN(NULL),nbRemain(0){}
-            bool isDone() const { return nbRemain==0; }
-            void next() {
-                if (isDone())
-                    throw NotesException("error, next on an iterator which is done");
-                nbRemain--;
-                currentN++;
-            }
-           Note& current() const {
-                if (isDone())
-                    throw NotesException("error, indirection on an iterator which is done");
-                return **currentN;
-            }
-        };
-        Iterator getIterator() {
-            return Iterator(notes,nbNotes);
-        }
-
-        class ConstIterator {   //non modifiable
-            friend class NotesManager;
-           Note** currentNC;
-            unsigned int nbRemain;
-            ConstIterator(Note** a, unsigned nb):currentNC(a),nbRemain(nb){}
-        public:
-            ConstIterator():nbRemain(0),currentNC(0){}
-            bool isDone() const { return nbRemain==0; }
-            void next() {
-                if (isDone())
-                    throw NotesException("error, next on an iterator which is done");
-                nbRemain--;
-                currentNC++;
-            }
-            const Note& current() const {
-                if (isDone())
-                    throw NotesException("error, indirection on an iterator which is done");
-                return **currentNC;
-            }
-        };
-        ConstIterator getIterator() const {
-            return ConstIterator(notes,nbNotes);
-        }
-
-          class OldIterator {
-            friend class NotesManager;
-           Note** currentNC;
-            unsigned int nbRemain;
-            OldIterator(Note** a, unsigned nb):currentNC(a),nbRemain(nb){}
-
-        public:
-            OldIterator():nbRemain(0),currentNC(0){}
-            bool isDone() const { return nbRemain==0; }
-            void next() {
-                if (isDone())
-                    throw NotesException("error, next on an iterator which is done");
-                nbRemain--;
-                currentNC++;
-            }
-            const Note& current() const {
-                if (isDone())
-                    throw NotesException("error, indirection on an iterator which is done");
-                return **currentNC;
-            }
-        };
-        OldIterator getOldIterator() const {
-            return OldIterator(oldVersions,nbOldVersions);}
-};
 #endif

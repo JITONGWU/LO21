@@ -1,9 +1,11 @@
 #include "videoediteur.h"
 #include <QMessageBox>
+#include "relationmanager.h"
+#include "relation.h"
 
-VideoEditeur::VideoEditeur(Video &vid, QWidget *parent):
+VideoEditeur::VideoEditeur(Video &vid, QWidget *parent, bool n, int r, bool a):
 
-    QWidget(parent),video(&vid)
+    QWidget(parent),video(&vid), newVid(n), restaurer(r),arc(a)
     //apple au constructeur de qwidget en lui donnant en parametre "parent"
     //initialisation de image avec le parametre im
 {
@@ -15,6 +17,17 @@ VideoEditeur::VideoEditeur(Video &vid, QWidget *parent):
     file=new QLineEdit(this);
     vfile=new QLineEdit(this);
     save=new QPushButton("sauvegarder",this);
+    archieve=new QPushButton("archiever",this);
+    desarchieve=new QPushButton("desarchiver",this);
+    supprimer =new QPushButton("supprimer",this);
+    rest =new QPushButton("restaurer",this);
+
+    buttons = new QHBoxLayout;
+    buttons->addWidget(archieve);
+    buttons->addWidget(save);
+    buttons->addWidget(supprimer);
+    buttons->addWidget(rest);
+
 
     id1=new QLabel("identificateur",this);
     titre1=new QLabel("Titre",this);
@@ -49,9 +62,37 @@ VideoEditeur::VideoEditeur(Video &vid, QWidget *parent):
     couche->addLayout(cdesc);
     couche->addLayout(cfile);
     couche->addLayout(cvfile);
-    couche->addWidget(save);
+    couche->addLayout(buttons);
 
-    id->setReadOnly(true);
+    if(arc==true){
+
+   titre->setReadOnly(true);
+   desc->setReadOnly(true);
+   file->setReadOnly(true);
+   vfile->setReadOnly(true);
+
+
+   save->setVisible(false);
+   supprimer->setVisible(false);
+   archieve->setVisible(false);
+
+
+   desarchieve->setEnabled(true);
+
+    } else{
+
+
+
+        save->setEnabled(true);
+        supprimer->setEnabled(true);
+        archieve->setEnabled(true);
+        desarchieve->setVisible(false);}
+
+    if(n=false) {
+    id->setReadOnly(true);}
+
+    if(restaurer<0) { rest->setVisible(false);}
+ else {save->setVisible(false); supprimer->setVisible(false); archieve->setVisible(false);}
 
     id->setText(video->getId());
     titre->setText(video->getTitle());
@@ -62,10 +103,14 @@ VideoEditeur::VideoEditeur(Video &vid, QWidget *parent):
     setLayout(couche);
 
     save->setEnabled(false);
-    QObject::connect(save,SIGNAL(clicked()),this,SLOT(saveImage()));
+    QObject::connect(rest,SIGNAL(clicked()),this,SLOT(saveVideo()));
+    QObject::connect(save,SIGNAL(clicked()),this,SLOT(saveVideo()));
     QObject::connect(titre,SIGNAL(textEdited(QString)),this,SLOT(activerSave()));
     QObject::connect(desc,SIGNAL(textChanged()),this,SLOT(activerSave()));
     QObject::connect(vfile,SIGNAL(textChanged()),this,SLOT(activerSave()));
+    QObject::connect(archieve,SIGNAL(clicked()),this,SLOT(archiverVideo()));
+    QObject::connect(supprimer,SIGNAL(clicked()),this,SLOT(SupprimertousVideo()));
+
 
 
 }
@@ -75,19 +120,70 @@ void VideoEditeur::saveVideo(){
    // image->setTitle(titre->text());
     //image->setDesc(desc->toPlainText());
 
+/*
+    Audio adTemp = *audio;
+    adTemp.setTitle(titre->text());
+    adTemp.setDesc(desc->toPlainText());
 
-    Video vidTemp = *video;
-    vidTemp.setTitle(titre->text());
-    vidTemp.setDesc(desc->toPlainText());
+    NotesManager::getManager().addAudio(adTemp); */
 
-    NotesManager::getManager().addVideo(vidTemp);
+if(restaurer >=0) {
+      qDebug()<<"restaurer??";
+        NotesManager::getManager().restaurerVersionNote(video,restaurer);
+        QMessageBox::information(this,"restauration","bien restaurer");
+        setVisible(false);
+}
+    else {
+
+    if(newVid==false) {
+        Note* vidTemp= NotesManager::getManager().copieNote(id->text());
+        vidTemp->setDateDerModif(QDateTime::currentDateTime());
+        vidTemp->setTitle(titre->text());
+        static_cast<Video*>(vidTemp)->setDesc(desc->toPlainText());
+        static_cast<Video*>(vidTemp)->setVFile(vfile->text());
+        NotesManager::getManager().nouvelleVersion(vidTemp);
+
+       }
+    else {
+        video->setId(id->text());
+        video->setTitle(titre->text());
+        video->setDesc(desc->toPlainText());
+        video->setVFile(vfile->text());
+        NotesManager::getManager().addNote(video);
+        emit SendToPage1(id->text());
+    }
 
     QMessageBox::information(this,"sauvegarder","bien sauvegarder");
-    save->setEnabled(false);
+    save->setEnabled(false);}
 
 }
-void ImageEditeur::activerSave(QString){
+void VideoEditeur::activerSave(QString){
     save->setEnabled(true);
+}
+
+void VideoEditeur::archiverVideo(){
+
+    NotesManager::getManager().archiverNoteX(video->getId());
+
+    RelationManager::getManager().archiverLesCoupleContenantNoteX (video->getId());
+
+    QMessageBox::information(this,"archiver","bien archiver");
+}
+
+void VideoEditeur::SupprimertousVideo(){
+    if(Reference::getRef()->supprimeroupas(video->getId())){
+
+   NotesManager::getManager().supprimertousNotes(video->getId());
+     RelationManager::getManager().supprimerLesCoupleContenantNoteX(video->getId());
+    QMessageBox::information(this,"supprimer","bien supprimer");}
+    else{
+        NotesManager::getManager().archiverNoteX(video->getId());
+         RelationManager::getManager().archiverLesCoupleContenantNoteX(video->getId());
+
+        QMessageBox::information(this,"archiver","bien archiver");
+    }
+
+
 }
 
 

@@ -1,7 +1,6 @@
 #ifndef ARTICLEEDITEUR
 #define ARTICLEEDITEUR
 #include <QApplication>
-#include <QObject>
 #include <QWidget>
 #include <QLabel>
 #include <QLineEdit>
@@ -10,40 +9,55 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <QObject>
 #include "notes.h"
-class ArticleEditeur: public QDialog
+class ArticleEditeur: public QWidget
 {
     Q_OBJECT     //macro pour pouvoir utiliser les signals et les slots
 
-    QLineEdit *id;
-    QLineEdit *titre;
-    QTextEdit *text;
+  bool ad;
 
     QLabel *id1;
     QLabel *titre1;
-    QLabel *text1;
+    QLabel *t1;
 
     QPushButton *save;
-
+    QPushButton *archieve;
+    QPushButton *desarchieve;
+    QPushButton *supprimertous;
+    QHBoxLayout *buttons;
     QHBoxLayout *cid;
     QHBoxLayout *ctitre;
-    QHBoxLayout *ctext;
+    QHBoxLayout *ct;
     QVBoxLayout *couche;
-
-    Article *article; //pointeur vers l'article Ã  afficher par la fenetre
+    QPushButton *rest;
+ int restaurer;
+     //pointeur vers l'article à afficher par la fenetre
 
 public:
-    explicit ArticleEditeur (Article& article,QWidget *parent=0,bool n=false);
-    //explicit pour empÃªcher la conversion implicite de article vers Article
+
+  bool arc;
+    bool newA;
+    void setRest(int i) {restaurer =i;}
+    Article *article;
+    QLineEdit *id;
+    QLineEdit *titre;
+    QTextEdit *t;
+    explicit ArticleEditeur (Article& article,QWidget *parent=0,bool n=true, int r=(-1), bool a=false);
+    //explicit pour empêcher la conversion implicite de article vers Article
 
 signals:
+    void SendToPage1(QString);
+
 private slots:
     void activerSave(QString ="");
-    //la valeur par dÃ©faut c'est pour pouvoir la connecter avec deux signals
+    //la valeur par défaut c'est pour pouvoir la connecter avec deux signals
     //l'un avec un parametre qstring et l'autre sans parametre
 public slots:
     void saveArticle();
 
+    void ArchiverArticle();
+    void SupprimertousArticle();
 
 };
 
