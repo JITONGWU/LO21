@@ -18,7 +18,7 @@ RelationEditeur::RelationEditeur(Relation &re, QWidget *parent,bool newR):
 
     save=new QPushButton("sauvegarder",this);
     supprimerC=new QPushButton("supprimer couple",this);
-    ajouter=new QPushButton("ajouter",this);
+    ajouter=new QPushButton("ajouter couple",this);
 
     ctitre=new QHBoxLayout;
     ctitre->addWidget(titre1);
@@ -58,20 +58,30 @@ RelationEditeur::RelationEditeur(Relation &re, QWidget *parent,bool newR):
     QObject::connect(orient,SIGNAL(clicked()),this,SLOT(IsOriente()));
     QObject::connect(titre,SIGNAL(textEdited(QString)),this,SLOT(activerSave()));
     QObject::connect(desc,SIGNAL(textChanged()),this,SLOT(activerSave()));
+    QObject::connect(couples,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(afficherNote(QListWidgetItem*)));
+
 
 }
+void RelationEditeur::afficherNote(QListWidgetItem *item){
+    if(relation->getCouple(item->text())!=nullptr){
+    QString id1 = relation->getCouple(item->text())->getX()->getId();
+    QString id2 = relation->getCouple(item->text())->getY()->getId();
+    item->setText("note:"+id1+"-> note:"+id2);
+    return;
+    }
+    else return;
 
+}
 void RelationEditeur::saveRelation(){
     relation->setTitre(titre->text());
     relation->setDesc(desc->toPlainText());
 
-    if(newRelation)   RelationManager::getManager().addRelation(relation);
+    if(newRelation==true)  { RelationManager::getManager().addRelation(relation);
+                             emit SendToPage2(titre->text());}
+
     QMessageBox::information(this,"sauvegarder","bien sauvegarder");
     qDebug()<<"saveRelation réussi\n";
     save->setEnabled(false);
-
-    emit SendToPage2(titre->text());//
-
 }
 
 void RelationEditeur::supprimerCouple(){
@@ -100,6 +110,7 @@ CoupleEditeur::CoupleEditeur(Relation& relation,QWidget *parent,RelationEditeur 
     label = new QLineEdit;
     notes = new QListWidget;
     for(NotesManager::Iterator it= NotesManager::getManager().getIterator();!it.isDone();it.next())
+
         notes->addItem(it.current().getId());
 
 

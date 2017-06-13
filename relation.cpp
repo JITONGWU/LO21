@@ -15,7 +15,7 @@ void Reference::freeRef(){
 void Relation::addCouple(const Couple* c){
     for(unsigned int i=0;i<nbCouples;i++)
     {
-        if (couples[i]->getLabel()==c->getLabel()) return;
+        if (couples[i]->getLabel()==c->getLabel()&&(couples[i]->getX()->getId()==c->getY()->getId()||couples[i]->getY()->getId()==c->getX()->getId())) return;
     }
 
     if (nbCouples==nbMaxCouples){
@@ -51,24 +51,22 @@ void Relation::addCouple(const QString& lab, Note *x, Note *y, const QString &e)
     Couple* c=new Couple(lab,x,y,e);
     addCouple(c);
     if (orient==false){ // relation non orienté
-        Couple* c2= new Couple(lab,y,x,e);
+        const QString lab2=lab+"_inverse";
+        Couple* c2= new Couple(lab2,y,x,e);
         addCouple(c2);
     }
 
 }
 
 void Relation::retirerCouple(unsigned int i){
-    nbCouples--;
-    while(i<nbCouples){
-        couples[i]=couples[i+1];
-        i++;
-    }
+    for(unsigned int j=i;j<nbCouples;j++)
+        couples[j]=couples[j+1];
+    nbCouples=nbCouples-1;
 }
 void Relation::retirerCouple(const Couple *c){
     for(unsigned int i=0;i<nbCouples;i++)
         if (couples[i]->getLabel()==c->getLabel()) retirerCouple(i);
 }
-
 Couple* Relation::getCouple(const QString &l){
     for(unsigned int i=0;i<nbCouples;i++)
         {
@@ -76,7 +74,7 @@ Couple* Relation::getCouple(const QString &l){
                return couples[i];
         }
 
-    throw NotesException("erreur: didn't find couple");
+    return nullptr;
 }
 Couple* Relation::getCoupleParIndice(unsigned int i){
     if(i<getNbCouples()) return couples[i];

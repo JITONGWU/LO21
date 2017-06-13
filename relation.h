@@ -37,6 +37,33 @@ protected:
     unsigned int nbCouples;
     unsigned int nbMaxCouples;
 public:
+    class Iterator {
+            friend class Relation;
+           Couple** currentN;
+            unsigned int nbRemain;
+            Iterator(Couple** a, unsigned nb):currentN(a),nbRemain(nb){}
+        public:
+            Iterator():currentN(NULL),nbRemain(0){}
+            bool isDone() const { return nbRemain==0; }
+            void next() {
+                if (isDone())
+                    throw NotesException("error, next on an iterator which is done");
+                nbRemain--;
+                currentN++;
+            }
+           Couple& current() const {
+                if (isDone())
+                    throw "error, indirection on an iterator which is done";
+                return **currentN;
+            }
+        };
+        Iterator getIterator() {
+            return Iterator(couples,nbCouples);
+        }
+
+
+
+
     friend void  RelationManager::restaurerLesCoupleContenantNoteX(QString id);
     friend void  RelationManager::archiverLesCoupleContenantNoteX(QString id);
     friend void  RelationManager::supprimerLesCoupleContenantNoteX(QString id);
@@ -51,7 +78,6 @@ public:
     void addCouple(const QString& lab, Note *x, Note *y, const QString& e="N");// seulement pour les notes de dernière version!
     void retirerCouple(unsigned int i);
     void retirerCouple(const Couple *c);
-
     QString getTitre()const {return titre;}
     QString getDesc()const{return desc;}
     bool getOrient()const {return orient;}
@@ -73,10 +99,18 @@ private:
             ~Handler() { delete reference; }
         };
 public:
+
+
+
+
+
+
     Reference():Relation("reference","\ref{idNote}"){}
     static Handler handler;
     static Reference* getRef();
     static void freeRef();
+    bool supprimeroupas(QString id){for(int i=0;i<nbCouples;i++){if(couples[i]->getX()->getId()==id||couples[i]->getY()->getId()==id) return false;}
+                                   return true;}
 
 };
 #endif // RELATION_H

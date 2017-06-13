@@ -14,6 +14,11 @@
 using namespace std;
 
 class NotesManager;
+
+
+
+
+
 class Note {
     QString id;
     QString title;
@@ -36,6 +41,7 @@ public:
     QDateTime getDateCreat() const {return creat;}
     QDateTime getDateDernier() const {return der_modif;}
     void setId(const QString& i){id=i;}
+     void setEmplacement(const QString& i){emplacement=i;}
     void setTitle(const QString& t){title=t;}
     void setDateCreat();//ajouter
     void setDateDerModif(const QDateTime d) {der_modif=d;}
@@ -51,6 +57,9 @@ public:
     virtual ~Note(){}
 
 };
+
+
+
 
 class Tache : public Note {
     QString action;
@@ -74,6 +83,8 @@ public :
 
 
 };
+
+
 
 class Article : public Note{
 

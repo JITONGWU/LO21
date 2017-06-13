@@ -21,6 +21,7 @@ class RelationManager{
     static Handler handlerR;
 
     RelationManager():relations(nullptr),nbRelations(0),nbMaxRelations(0),filename(""){
+        addRefDansRelationManager();
         qDebug()<<"constructeur de RelationManager réussi\n";
 
     }
@@ -30,6 +31,7 @@ class RelationManager{
 
 
 public:
+     void addRefDansRelationManager();
     void restaurerLesCoupleContenantNoteX(QString id);
     void supprimerLesCoupleContenantNoteX(QString id);
     void archiverLesCoupleContenantNoteX(QString id);

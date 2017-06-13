@@ -6,6 +6,10 @@
 #include "relationmanager.h"
 #include "window.h"
 using namespace std ;
+
+
+
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -22,10 +26,7 @@ int main(int argc, char *argv[])
     //rm.load();
 
     //ajouter ref à la premiere lancement
-    bool refExiste=false;
-    for(RelationManager::Iterator it=rm.getIterator();!it.isDone();it.next())
-        if(it.current().getTitre()=="reference") refExiste=true;
-    if(!refExiste) rm.addRelation(Reference::getRef());
+
 
     QDateTime d1=QDateTime::currentDateTime();
     QDateTime d2=QDateTime::currentDateTime();

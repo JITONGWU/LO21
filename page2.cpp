@@ -11,6 +11,10 @@ Page2::Page2(QWidget *parent):QMainWindow(parent)
     supprimerR = new QPushButton("supprimer une relation",this);
     QObject::connect(supprimerR,SIGNAL(clicked()),this,SLOT(supprimerRelation()));
 
+    update = new QPushButton("update",this);
+    QObject::connect(update,SIGNAL(clicked()),this,SLOT(Update()));
+
+
     listR = new ListeRelation;
     vide = new QWidget;
 
@@ -21,6 +25,7 @@ Page2::Page2(QWidget *parent):QMainWindow(parent)
     buttons = new QHBoxLayout;
     buttons->addWidget(AjoutRelation);
     buttons->addWidget(supprimerR);
+    buttons->addWidget(update);
     layout =new QHBoxLayout;
     couche = new QVBoxLayout;
     layout->addWidget(listR,1,0);
@@ -41,9 +46,14 @@ Page2::Page2(QWidget *parent):QMainWindow(parent)
 void Page2::receive(QString titre){
     listR->addItem(titre);
 }
+void Page2::Update(){
+    listR->clear();
+    for(RelationManager::Iterator it = RelationManager::getManager().getIterator();!it.isDone();it.next())
+        listR->addItem(it.current().getTitre());
+}
 
 void Page2::afficherWidget(QListWidgetItem* item){
-    re->orient->setEnabled(false);
+
     re->titre->setReadOnly(true);
     supprimerR->setEnabled(true);
     re->desc->setReadOnly(false);
@@ -63,8 +73,12 @@ void Page2::afficherWidget(QListWidgetItem* item){
     if(choisir->getOrient())  re->orient->setChecked(true);
 
     re->couples->clear();
-    for(unsigned int i=0;i<choisir->getNbCouples();i++)
-    re->couples->insertItem(i,choisir->getCoupleParIndice(i)->getLabel());
+
+    for(unsigned int i=0;i<choisir->getNbCouples();i++){
+        if(choisir->getCoupleParIndice(i)->getEtat()!="C")
+      re->couples->addItem(choisir->getCoupleParIndice(i)->getLabel());
+
+    }
 
     rv->setVisible(false);
     vide->setVisible(false);
@@ -73,6 +87,13 @@ void Page2::afficherWidget(QListWidgetItem* item){
 
 }
 void Page2::RelationEditeurVide(){
+    Relation* rvid = new Relation("","");
+
+    rv->relation=rvid;
+    rv->titre->clear();
+    rv->desc->clear();
+    rv->couples->clear();
+    rv->orient->setChecked(false);
     vide->setVisible(false);
     re->setVisible(false);
     rv->setVisible(true);

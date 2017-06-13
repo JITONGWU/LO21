@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui multimedia multimediawidgets
 
 QMAKE = /FS
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -38,7 +38,10 @@ SOURCES += main.cpp\
     imageediteur.cpp \
     relationediteur.cpp \
     page3.cpp \
-    page2.cpp
+    page2.cpp \
+    audioediteur.cpp \
+    tacheediteur.cpp \
+    videoediteur.cpp
 
 HEADERS  += mainwindow.h \
     relation.h \
@@ -48,9 +51,13 @@ HEADERS  += mainwindow.h \
     notes.h \
     imageediteur.h \
     relationediteur.h \
-    notemanager.h
+    notemanager.h \
+    audioediteur.h \
+    videoediteur.h \
+    tacheediteur.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    dialog.ui
 
 DISTFILES += \
     notes.xml \

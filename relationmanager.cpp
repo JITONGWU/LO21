@@ -2,19 +2,33 @@
 #include "relation.h"
 // relationManager singleton
 
+void RelationManager::addRefDansRelationManager(){
+    bool refExiste=false;
+    for(Iterator it=getIterator();!it.isDone();it.next())
+        if(it.current().getTitre()=="reference") refExiste=true;
+    if(!refExiste) addRelation(Reference::getRef());
+}
+
 void RelationManager::restaurerLesCoupleContenantNoteX(QString id){
+ qDebug()<<"0\n";
+if(nbRelations==0) { qDebug()<<"0.5\n"; return;}
+ qDebug()<<"1\n";
     for(unsigned int i=0;i<nbRelations;i++){
+         qDebug()<<"2\n";
         for(unsigned int j=0;j<relations[i]->getNbCouples();j++)
         {
             if(relations[i]->couples[j]->getX()->getId()==id||relations[i]->couples[j]->getY()->getId()==id)
                 relations[i]->couples[j]->setEtat("N");
+ qDebug()<<"3\n";
         }
-    }
-
+    } qDebug()<<"4\n";
+     return ;
 
 }
 
 void RelationManager::supprimerLesCoupleContenantNoteX(QString id){
+    if(nbRelations==0) return;
+
     for(unsigned int i=0;i<nbRelations;i++){
         for(unsigned int j=0;j<relations[i]->getNbCouples();j++)
         {
@@ -27,6 +41,8 @@ void RelationManager::supprimerLesCoupleContenantNoteX(QString id){
 }
 
 void RelationManager::archiverLesCoupleContenantNoteX(QString id){
+    if(nbRelations==0) return;
+
     for(unsigned int i=0;i<nbRelations;i++){
         for(unsigned int j=0;j<relations[i]->getNbCouples();j++)
         {
@@ -64,6 +80,7 @@ void RelationManager::addRelation(Relation *re){
 void RelationManager::addRelation(const QString& t, const QString& d, bool o, Couple** c, unsigned int nbC, unsigned int nbM){
 
 
+
     for(unsigned int i=0;i<nbRelations;i++)
         {
             if (relations[i]->getTitre()==t)
@@ -76,12 +93,9 @@ void RelationManager::addRelation(const QString& t, const QString& d, bool o, Co
 }
 
 void RelationManager::supprimerRelation(unsigned int i){
-    nbRelations--;
-    while(i<nbRelations)
-    {
-       relations[i]=relations[i+1];
-       i++;
-    }
+   for(unsigned int j=i;j<nbRelations;j++)
+       relations[j]=relations[j+1];
+               nbRelations=nbRelations-1;
 }
 
 

@@ -25,12 +25,12 @@ private:
 typedef enum { actuelle, ancienne, non_traite } Etat;
 class NotesManager {
 private:
-    mutable QString filename;
 
     Note** notes;  //QList<Note*> notes;
     unsigned int nbNotes;
     unsigned int nbMaxNotes;
 
+    mutable QString filename;
 
     Note** oldVersions;
     unsigned int nbOldVersions;
@@ -47,18 +47,22 @@ private:
         ~Handler() { delete instance; }
     };
     static Handler handler;
+
     NotesManager();
     ~NotesManager();
     NotesManager(const NotesManager& m);
     NotesManager& operator=(const NotesManager& m);
+
+
 public:
+    void desarchiver(QString id);
     bool IdUniqueDansNotes(QString id);
     void restaurerDeCorbeille(QString id);
     void archiverNoteX(QString id);
     void addCorbeille(const Note *);
     void supprimerNote(QString id);
     void supprimertousNotes(QString id);
-
+    void supprimerDefinitivement(QString id);
     void addNote(const Note* n);
     void addTache(const QString & id, const QString & t, QDateTime c, QDateTime d, QString em, Etat et, int nb, const QString& a,
                   const QString& p, QDateTime e, const QString& s);
@@ -81,10 +85,12 @@ public:
     void save() const; // save notes in file filename
     static void addCoupleDansReference(const QString& id,QString& s);
     static void supprimerCoupleDansReference(const QString& id, QString& s);
+
     static NotesManager& getManager();
     static void freeManager(); // free the memory used by the NotesManager; it can be rebuild later
 
     Note* getOldVersion(unsigned int j);
+    Note &getOldVersion2(unsigned int i);
     void addOldVersion(const Note* a);
     void nouvelleVersion(Note* a);
     int getNbOldVersions()const{return nbOldVersions;}
@@ -158,5 +164,32 @@ public:
                };
                 OldIterator getOldIterator() const {
                     return OldIterator(oldVersions,nbOldVersions);}
+
+
+                class IteratorCorb {
+                        friend class NotesManager;
+                        Note** currentC;
+                        unsigned int nbRemain;
+                        IteratorCorb(Note** a, unsigned nb):currentC(a),nbRemain(nb){}
+                    public:
+                        IteratorCorb():currentC(NULL),nbRemain(0){}
+                        bool isDone() const { return nbRemain==0; }
+                        void next() {
+                            if (isDone())
+                                throw NotesException("error, next on an iterator which is done");
+                            nbRemain--;
+                            currentC++;
+                        }
+                       Note& current() const {
+                            if (isDone())
+                                throw NotesException("error, indirection on an iterator which is done");
+                            return **currentC;
+                        }
+                    };
+                    IteratorCorb getIteratorCorb() {
+                        return IteratorCorb(Corbeille,nbCorbeille);
+                    }
+
+
 };
 #endif // NOTEMANAGER_H

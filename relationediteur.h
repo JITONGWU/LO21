@@ -54,6 +54,7 @@ public slots:
     void ajouterCouple();
     void IsOriente();
     void supprimerCouple();
+    void afficherNote(QListWidgetItem*);
 };
 
 
