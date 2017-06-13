@@ -1,5 +1,6 @@
-#ifndef ARTICLEEDITEUR
-#define ARTICLEEDITEUR
+#ifndef AUDIOEDITEUR
+#define AUDIOEDITEUR
+
 #include <QApplication>
 #include <QWidget>
 #include <QLabel>
@@ -10,40 +11,53 @@
 #include <QVBoxLayout>
 #include <QFileDialog>
 #include <QObject>
+#include <QMediaPlayer>
 #include "notes.h"
-class ArticleEditeur: public QWidget
+#include "notemanager.h"
+
+class AudioEditeur: public QWidget
 {
     Q_OBJECT     //macro pour pouvoir utiliser les signals et les slots
 
-  bool ad;
 
     QLabel *id1;
     QLabel *titre1;
-    QLabel *t1;
+    QLabel *desc1;
+    QLabel *file1;
+    QLabel *afile1;
 
     QPushButton *save;
     QPushButton *archieve;
     QPushButton *desarchieve;
-    QPushButton *supprimertous;
+    QPushButton *supprimer;
+    QPushButton *rest;
+
     QHBoxLayout *buttons;
     QHBoxLayout *cid;
     QHBoxLayout *ctitre;
-    QHBoxLayout *ct;
+    QHBoxLayout *cdesc;
+    QHBoxLayout *cfile;
+    QHBoxLayout *cafile;
     QVBoxLayout *couche;
-    QPushButton *rest;
- int restaurer;
-     //pointeur vers l'article à afficher par la fenetre
+    int restaurer;
+
 
 public:
-
-  bool arc;
-    bool newA;
-    void setRest(int i) {restaurer =i;}
-    Article *article;
+    bool arc;
+    Audio *audio;
     QLineEdit *id;
     QLineEdit *titre;
-    QTextEdit *t;
-    explicit ArticleEditeur (Article& article,QWidget *parent=0,bool n=true, int r=(-1), bool a=false);
+    QLineEdit *desc;
+    QLineEdit *file;
+    QLineEdit *afile;
+    QMediaPlayer *sound;
+    QPushButton *start;
+
+    void setRest(int i){restaurer=i;}
+
+
+    bool newAud;
+    explicit AudioEditeur (Audio& aud,QWidget *parent=0, bool n=false, int r=(-1), bool a=false);
     //explicit pour empêcher la conversion implicite de article vers Article
 
 signals:
@@ -54,17 +68,19 @@ private slots:
     //la valeur par défaut c'est pour pouvoir la connecter avec deux signals
     //l'un avec un parametre qstring et l'autre sans parametre
 public slots:
+    void saveAudio();
 
-    void saveArticle();
-
-    void ArchiverArticle();
-    void SupprimertousArticle();
-    void SupprimertousArticle2(QString id);
+    void archiverAudio();
+    void SupprimertousAudio();
+    void SupprimertousAudio2(QString id);
     void desarchiver();
     void DemandeSave();
-
+    void getFile();
+    void play();
 };
 
-#endif // ARTICLEEDITEUR
 
+
+
+#endif // AUDIOEDITEUR
 

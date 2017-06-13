@@ -4,13 +4,13 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui multimedia multimediawidgets
 
-
+QMAKE = /FS
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 QT += xml
 
-QMAKE_CXXFLAGS = /FS
+
 QMAKE_LFLAGS = -std=c++11
 
 TARGET = LO21
@@ -32,14 +32,32 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     relation.cpp \
     notes.cpp \
-    relationmanager.cpp
+    relationmanager.cpp \
+    window.cpp \
+    articleediteur.cpp \
+    imageediteur.cpp \
+    relationediteur.cpp \
+    page3.cpp \
+    page2.cpp \
+    audioediteur.cpp \
+    tacheediteur.cpp \
+    videoediteur.cpp
 
 HEADERS  += mainwindow.h \
     relation.h \
+    relationmanager.h \
+    window.h \
+    articleediteur.h \
     notes.h \
-    relationmanager.h
+    imageediteur.h \
+    relationediteur.h \
+    notemanager.h \
+    audioediteur.h \
+    videoediteur.h \
+    tacheediteur.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    dialog.ui
 
 DISTFILES += \
     notes.xml \
