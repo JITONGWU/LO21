@@ -1,19 +1,15 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2017-05-16T16:51:12
+# Project created by QtCreator 2017-06-08T21:52:37
 #
 #-------------------------------------------------
 
 QT       += core gui
-
-QMAKE = /FS
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 QT += xml
 
-
-QMAKE_LFLAGS = -std=c++11
-
-TARGET = LO21
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QMAKE_CXXFLAGS = /FS
+TARGET = lo21projet
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -30,34 +26,24 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    relation.cpp \
     notes.cpp \
+    relation.cpp \
     relationmanager.cpp \
-    window.cpp \
     articleediteur.cpp \
     imageediteur.cpp \
     relationediteur.cpp \
-    page3.cpp \
-    page2.cpp \
-    audioediteur.cpp \
-    tacheediteur.cpp \
-    videoediteur.cpp
+    window.cpp
 
 HEADERS  += mainwindow.h \
+    notes.h \
     relation.h \
     relationmanager.h \
-    window.h \
     articleediteur.h \
-    notes.h \
     imageediteur.h \
     relationediteur.h \
-    notemanager.h \
-    audioediteur.h \
-    videoediteur.h \
-    tacheediteur.h
+    window.h
 
-FORMS    += mainwindow.ui \
-    dialog.ui
+FORMS    += mainwindow.ui
 
 DISTFILES += \
     notes.xml \
