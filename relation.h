@@ -2,7 +2,7 @@
 #define RELATION_H
 #include<QStringList>
 #include "notes.h"
-#include <stdlib.h>
+#include "relationmanager.h"
 
 class Couple{
     QString label;
@@ -10,7 +10,13 @@ class Couple{
     Note* y;
     QString etat;
 public:
+    friend void  RelationManager::restaurerLesCoupleContenantNoteX(QString id);
+    friend void  RelationManager::archiverLesCoupleContenantNoteX(QString id);
+    friend void  RelationManager::supprimerLesCoupleContenantNoteX(QString id);
     Couple(const QString& l, Note* a,Note* b,const QString& e="N"):label(l),x(a),y(b),etat(e){}
+  /*  ~Couple(){
+    qDebug()<<"destructeur de couple\n";
+    }*/
     QString getLabel()const{return label;}
     Note* getX() const {return x;}
     Note* getY() const {return y;}
@@ -26,26 +32,63 @@ class Relation{
 protected:
     QString titre;
     QString desc;
-    QList<Couple*> couples ;
+    Couple** couples ;
     bool orient;
+    unsigned int nbCouples;
+    unsigned int nbMaxCouples;
 public:
-    Relation(const QString& t, const QString& d,bool o=true,QList<Couple*> *c= nullptr):
-        titre(t),desc(d),couples(*c),orient(o){}
-    ~Relation(){couples.clear();}
+    class Iterator {
+            friend class Relation;
+           Couple** currentN;
+            unsigned int nbRemain;
+            Iterator(Couple** a, unsigned nb):currentN(a),nbRemain(nb){}
+        public:
+            Iterator():currentN(NULL),nbRemain(0){}
+            bool isDone() const { return nbRemain==0; }
+            void next() {
+                if (isDone())
+                    throw NotesException("error, next on an iterator which is done");
+                nbRemain--;
+                currentN++;
+            }
+           Couple& current() const {
+                if (isDone())
+                    throw "error, indirection on an iterator which is done";
+                return **currentN;
+            }
+        };
+        Iterator getIterator() {
+            return Iterator(couples,nbCouples);
+        }
 
-    void addCouple(const QString& lab,Note* x,Note* y,const QString& e);// seulement pour les notes de dernière version!
+
+
+
+    friend void  RelationManager::restaurerLesCoupleContenantNoteX(QString id);
+    friend void  RelationManager::archiverLesCoupleContenantNoteX(QString id);
+    friend void  RelationManager::supprimerLesCoupleContenantNoteX(QString id);
+    Relation(const QString& t, const QString& d,bool o=false,Couple** c=nullptr,unsigned int nbC=0,unsigned int nbm=0):
+        titre(t),desc(d),orient(o),couples(c),nbCouples(nbC),nbMaxCouples(nbm){}
+  /* ~Relation(){
+        for(unsigned int i=0;i<nbCouples;i++)delete couples[i];
+        delete[] couples;
+        qDebug()<<"destructeur de relation\n";
+    }*/
+    void addCouple(const Couple *c);
+    void addCouple(const QString& lab, Note *x, Note *y, const QString& e="N");// seulement pour les notes de dernière version!
+    void retirerCouple(unsigned int i);
+    void retirerCouple(const Couple *c);
     QString getTitre()const {return titre;}
     QString getDesc()const{return desc;}
     bool getOrient()const {return orient;}
-    QList<Couple*> getCouples() const {return couples;}
-
+    unsigned int getNbCouples()const {return nbCouples;}
+    unsigned int getNbMaxCouples()const {return nbMaxCouples;}
     void setTitre(const QString& t){titre=t;}
     void setDesc(const QString& d){desc=d;}
     void setOrient(bool o){orient=o;}
-
-
-    Couple* getCouple(const QString& l);//get couple par label
-    Couple* getCouple(unsigned int i);//get couple par la position dans le tableau
+    void setNbCouples(unsigned int i){nbCouples=i;nbMaxCouples=i;}
+    Couple* getCouple(const QString& l);//get couple par label*
+    Couple* getCoupleParIndice(unsigned int i);//get couple par la position dans le tableau
 };
 
 class Reference:public Relation{  //singleton
@@ -56,14 +99,39 @@ private:
             ~Handler() { delete reference; }
         };
 public:
-    Reference():Relation("Référence","\ref{idNote}"){}
+
+
+
+
+
+
+    Reference():Relation("reference","\ref{idNote}"){}
     static Handler handler;
-    static Reference& getRef();
+    static Reference* getRef();
     static void freeRef();
+    bool supprimeroupas(QString id);
 
 };
 #endif // RELATION_H
-//créer une note --- choisir le type --- remplir les attribues --- sauvegarder ( si on trouve \ref, addCouple()dans reference)
-//choisir une note existant --- modifier / supprimer ce note --- sauvegarder ( si on trouve \ref, addCouple()dans reference)
-//création d'une relation --- remplir le titre , description etc...
-//choisir une relation existant --- supprimer/ ajouter les couples
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
